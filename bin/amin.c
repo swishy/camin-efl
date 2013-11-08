@@ -6,42 +6,50 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
+#include "common.h"
+
+#define STDINBUFFERSIZE 1
 
 static struct option long_options[] =
 {
     {"help",  no_argument,       0, 'h'},
     {"version",  no_argument,       0, 'v'},
     {"adminlist",  required_argument, 0, 'a'},
-    {"profile",  required_argument, 0, 'p'},
+    {"profile",  no_argument, 0, 'p'},
     {"uri",  required_argument, 0, 'u'},
     {NULL, 0, NULL, 0}
 };
 
 void print_usage()
 {
-  printf("[-h|-help]\n");
-  printf("[-u|-uri] uri://\n"); 
-  printf("[-p|-profile] as <STDIN>\n");
-  printf("[-a|-adminlist] uri://\n");
-  printf("[-v|-version]\n"); 
-  printf("print_usage called\n");
+  LOG("[-h|-help]\n");
+  LOG("[-u|-uri] uri://\n"); 
+  LOG("[-p|-profile] as <STDIN>\n");
+  LOG("[-a|-adminlist] uri://\n");
+  LOG("[-v|-version]\n"); 
+  LOG("print_usage called\n");
 }
 
 void process_adminlist()
 {
-  printf("process_adminlist called");
+  LOG("process_adminlist called");
 }
 
 void process_profile()
 {
-  printf("process_profile called.");
+  LOG("process_profile called.");
+}
+
+void process_input(char *profile)
+{
+  LOGF("%s", profile);
 }
 
 
 int main(int argc, char* argv[])
 {
-      printf("Welcome to Amin version 1.0");
-      printf("Today brought to you by caffiene and MoonAlice(tm)...");
+      LOG("Welcome to Amin version 1.0");
+      LOG("Today brought to you by caffiene and MoonAlice(tm)...");
        int c;
      
        while (1)
@@ -49,7 +57,7 @@ int main(int argc, char* argv[])
            /* getopt_long stores the option index here. */
            int option_index = 0;
      
-           c = getopt_long (argc, argv, "hv:a:p:u:",
+           c = getopt_long (argc, argv, "hv:a:pu:",
                             long_options, &option_index);
      
            /* Detect the end of the options. */
@@ -62,31 +70,62 @@ int main(int argc, char* argv[])
                /* If this option set a flag, do nothing else now. */
                if (long_options[option_index].flag != 0)
                  break;
-               printf ("option %s", long_options[option_index].name);
+               LOGF("option %s", long_options[option_index].name);
                if (optarg)
-                 printf (" with arg %s", optarg);
-               printf ("\n");
+                 LOGF(" with arg %s", optarg);
+               LOG("\n");
                break;
      
              case 'h':
-               puts ("option -h\n");
+               LOG("option -h\n");
 	       print_usage();
                break;
      
              case 'v':
-               puts ("option -v\n");
+               LOG("option -v\n");
                break;
      
              case 'a':
-               printf ("option -a with value `%s'\n", optarg);
+               LOGF("option -a with value `%s'", optarg);
                break;
      
              case 'p':
-               printf ("option -p with value `%s'\n", optarg);
+              LOG("option -p\n");
+	     
+	      unsigned char     profile[STDINBUFFERSIZE];
+	      FILE                         *instream;
+	      int                            bytes_read=0;
+	      int                            buffer_size=0;
+	      
+	      buffer_size=sizeof(unsigned char)*STDINBUFFERSIZE;
+	      
+	      // Open stdin for reading 
+	      instream=fopen("/dev/stdin","r");
+ 
+	      // Check it opened
+	      if(instream!=NULL){
+		
+		// Read from stdin until end 
+		while((bytes_read=fread(&profile, buffer_size, 1, instream))==buffer_size){
+		  fprintf(stdout, "%c", profile[0]);
+		}
+	      }
+	      
+	      // TODO handle error better.
+	      else{
+		LOG_ERROR("Unable to open stdin. exiting Amin.", NULL);
+		exit(1);
+	      }
+	       
+	       LOGF("Bytes read in [ %c ]", bytes_read);
+	       
+	       // pass to stdin handler
+	       process_input(profile);
+	       
                break;
 	       
 	     case 'u':
-               printf ("option -u with value `%s'\n", optarg);
+               LOGF("option -u with value `%s'\n", optarg);
                break;
      
              default:

@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <uv.h>
+#include "common.h"
 
 #define PORT 420
 
@@ -14,12 +15,6 @@ if (status != 0) { \
 fprintf(stderr, "%s: %s\n", msg, uv_err_name(status)); \
 exit(1); \
 }
-
-// Logging macros.
-#define UVERR(err, msg) fprintf(stderr, "%s: %s\n", msg, uv_err_name(err))
-#define LOG_ERROR(msg) puts(msg);
-#define LOG(msg) puts(msg);
-#define LOGF(fmt, params...) printf(fmt "\n", params);
 
 // Max number of write handles for libuv to maintain.
 #define MAX_WRITE_HANDLES 10
