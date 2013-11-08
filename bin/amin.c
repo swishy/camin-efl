@@ -45,95 +45,100 @@ void process_input(char *profile)
   LOGF("%s", profile);
 }
 
+void read_stdin()
+{
+  unsigned char     profile[STDINBUFFERSIZE];
+  FILE                         *instream;
+  int                            bytes_read=0;
+  int                            buffer_size=0;
+  
+  buffer_size=sizeof(unsigned char)*STDINBUFFERSIZE;
+  
+  // Open stdin for reading. 
+  instream=fopen("/dev/stdin","r");
+  
+  // Check it opened.
+  if(instream!=NULL){
+    
+    // Read from stdin until end. 
+    while((bytes_read=fread(&profile, buffer_size, 1, instream))==buffer_size){
+      fprintf(stdout, "%c", profile[0]);
+    }
+  }
+
+  // No point carrying on here ABORT ABORT!!!
+  else{
+    LOG_ERROR("Unable to open stdin. exiting Amin.", NULL);
+  exit(1);
+  }
+  
+  LOGF("Bytes read in [ %c ]", bytes_read);
+  
+  // pass to stdin handler
+  process_input(profile); 
+}
+
 
 int main(int argc, char* argv[])
 {
-      LOG("Welcome to Amin version 1.0");
-      LOG("Today brought to you by caffiene and MoonAlice(tm)...");
-       int c;
-     
-       while (1)
-         {
-           /* getopt_long stores the option index here. */
-           int option_index = 0;
-     
-           c = getopt_long (argc, argv, "hv:a:pu:",
-                            long_options, &option_index);
-     
-           /* Detect the end of the options. */
-           if (c == -1)
-             break;
-     
-           switch (c)
-             {
-             case 0:
-               /* If this option set a flag, do nothing else now. */
-               if (long_options[option_index].flag != 0)
-                 break;
-               LOGF("option %s", long_options[option_index].name);
-               if (optarg)
-                 LOGF(" with arg %s", optarg);
-               LOG("\n");
-               break;
-     
-             case 'h':
-               LOG("option -h\n");
-	       print_usage();
-               break;
-     
-             case 'v':
-               LOG("option -v\n");
-               break;
-     
-             case 'a':
-               LOGF("option -a with value `%s'", optarg);
-               break;
-     
-             case 'p':
-              LOG("option -p\n");
-	     
-	      unsigned char     profile[STDINBUFFERSIZE];
-	      FILE                         *instream;
-	      int                            bytes_read=0;
-	      int                            buffer_size=0;
-	      
-	      buffer_size=sizeof(unsigned char)*STDINBUFFERSIZE;
-	      
-	      // Open stdin for reading 
-	      instream=fopen("/dev/stdin","r");
- 
-	      // Check it opened
-	      if(instream!=NULL){
-		
-		// Read from stdin until end 
-		while((bytes_read=fread(&profile, buffer_size, 1, instream))==buffer_size){
-		  fprintf(stdout, "%c", profile[0]);
-		}
-	      }
-	      
-	      // TODO handle error better.
-	      else{
-		LOG_ERROR("Unable to open stdin. exiting Amin.", NULL);
-		exit(1);
-	      }
-	       
-	       LOGF("Bytes read in [ %c ]", bytes_read);
-	       
-	       // pass to stdin handler
-	       process_input(profile);
-	       
-               break;
-	       
-	     case 'u':
-               LOGF("option -u with value `%s'\n", optarg);
-               break;
-     
-             default:
-	       print_usage();
-             }
-         }
-         
-         // Currently exit till we have something happening....
-     
-       exit (0);
+  LOG("Welcome to Amin version 1.0");
+  LOG("Today brought to you by caffiene and MoonAlice(tm)...");
+  int c;
+  
+  while (1)
+  {
+    /* getopt_long stores the option index here. */
+    int option_index = 0;
+    
+    c = getopt_long (argc, argv, "hv:a:pu:",
+		     long_options, &option_index);
+    
+    /* Detect the end of the options. */
+    if (c == -1)
+      break;
+    
+    switch (c)
+    {
+      case 0:
+	/* If this option set a flag, do nothing else now. */
+	if (long_options[option_index].flag != 0)
+	  break;
+	LOGF("option %s", long_options[option_index].name);
+	if (optarg)
+	  LOGF(" with arg %s", optarg);
+	LOG("\n");
+	break;
+	
+      case 'h':
+	LOG("option -h\n");
+	print_usage();
+	break;
+	
+      case 'v':
+	LOG("option -v\n");
+	break;
+	
+      case 'a':
+	LOGF("option -a with value `%s'", optarg);
+	break;
+	
+      case 'p':
+	LOG("option -p\n");
+	
+	// Read from stdin.
+	read_stdin();
+	break;
+	
+      case 'u':
+	LOGF("option -u with value `%s'\n", optarg);
+	break;
+	
+      default:
+	print_usage();
+    }
+  }
+  
+  // Currently exit till we have something happening....
+  
+  exit (0);
 }
