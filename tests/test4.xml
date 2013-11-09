@@ -1,0 +1,6 @@
+<amin:profile xmlns:amin='http://projectamin.org/ns/'>
+	<amin:command name='mkdir'>
+		<amin:flag name='m'>0755</amin:flag>
+		<amin:param>/tmp/test_ashell</amin:param>
+	</amin:command>
+</amin:profile>

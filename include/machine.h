@@ -1,0 +1,1 @@
+void parse_content(char *input);

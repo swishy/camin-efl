@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
+#include "machine.h"
 #include "common.h"
 
 #define STDINBUFFERSIZE 1
@@ -43,6 +44,9 @@ void process_profile()
 void process_input(char *profile)
 {
   LOGF("%s", profile);
+  
+  // Send to machine for processing.
+  parse_content(profile);
 }
 
 void read_stdin()
@@ -72,7 +76,7 @@ void read_stdin()
   exit(1);
   }
   
-  LOGF("Bytes read in [ %c ]", bytes_read);
+  LOGF("Bytes read in [ %i ]", bytes_read);
   
   // pass to stdin handler
   process_input(profile); 
@@ -137,8 +141,6 @@ int main(int argc, char* argv[])
 	print_usage();
     }
   }
-  
-  // Currently exit till we have something happening....
   
   exit (0);
 }
