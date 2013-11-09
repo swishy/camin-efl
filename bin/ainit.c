@@ -50,7 +50,7 @@ void on_read(uv_stream_t* tcp, ssize_t nread, const uv_buf_t * buf) {
   if (nread >= 0) {
     parsed = 0;
     if (parsed < nread) {
-      LOGF("parse error");
+      LOG("parse error");
       uv_close((uv_handle_t*) &client->handle, on_close);
     }
   } else {

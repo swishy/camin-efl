@@ -1,11 +1,15 @@
 AUTOMAKE_OPTIONS = 1.4 foreign
-MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.h.in configure depcomp install-sh missing
+MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.h.in configure depcomp install-sh missing ltmain.sh config.guess config.sub
 
 INCLUDES = -I$(top_srcdir)/include
 
 lib_LIBRARIES = libamin.a
 libamin_a_SOURCES = lib/machine.c
-libamin_CFLAGS = -lexpat
+libamin_a_CFLAGS = -lexpat
+
+lib_LTLIBRARIES = libamin.la
+libamin_la_SOURCES = lib/machine.c
+libamin_la_CFLAGS = -lexpat
 
 bin_PROGRAMS = amin ainit
 
@@ -14,5 +18,5 @@ ainit_LDADD = /usr/lib/libuv.a
 ainit_CFLAGS = -luv -lpthread
 
 amin_SOURCES = bin/amin.c
-amin_LDADD = /usr/lib/libuv.a	
+amin_LDADD = libamin.la	
 amin_CFLAGS = -lpthread 
