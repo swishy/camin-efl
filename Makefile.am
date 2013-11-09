@@ -11,12 +11,12 @@ lib_LTLIBRARIES = libamin.la
 libamin_la_SOURCES = lib/machine.c
 libamin_la_CFLAGS = -lexpat
 
-bin_PROGRAMS = amin ainit
+bin_PROGRAMS = camin cainit
 
-ainit_SOURCES = bin/ainit.c
-ainit_LDADD = /usr/lib/libuv.a	
-ainit_CFLAGS = -luv -lpthread
+cainit_SOURCES = bin/ainit.c
+cainit_LDADD = /usr/lib/libuv.a	
+cainit_CFLAGS = -luv -lpthread
 
-amin_SOURCES = bin/amin.c
-amin_LDADD = libamin.la	
-amin_CFLAGS = -lpthread 
+camin_SOURCES = bin/amin.c
+camin_LDADD = libamin.la	
+camin_CFLAGS = -lpthread 
