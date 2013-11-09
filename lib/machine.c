@@ -37,6 +37,7 @@ void parse_content(char *input)
     int done;
 
     done = feof(input);
+    LOGF("done value %i", done);
 
     if (! XML_Parse(parser, input, sizeof(input), done)) {
       LOGF("Parse error at line %d:\n%s\n",

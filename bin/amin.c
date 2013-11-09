@@ -51,7 +51,7 @@ void process_input(char *profile)
 
 void read_stdin()
 {
-  unsigned char     profile[STDINBUFFERSIZE];
+  char     buffer[STDINBUFFERSIZE];
   FILE                         *instream;
   int                            bytes_read=0;
   int                            buffer_size=0;
@@ -65,8 +65,9 @@ void read_stdin()
   if(instream!=NULL){
     
     // Read from stdin until end. 
-    while((bytes_read=fread(&profile, buffer_size, 1, instream))==buffer_size){
-      fprintf(stdout, "%c", profile[0]);
+    while((bytes_read=fread(&buffer, buffer_size, 1, instream))==buffer_size){
+      fprintf(stdout, "%c", buffer[0]);
+      // TODO push to char[] to send to process_input
     }
   }
 
@@ -76,10 +77,11 @@ void read_stdin()
   exit(1);
   }
   
-  LOGF("Bytes read in [ %i ]", bytes_read);
+  // Garbage atm.
+  LOGF("Bytes read in [ %i ]", sizeof(buffer));
   
-  // pass to stdin handler
-  process_input(profile); 
+  // pass to handler
+  process_input(buffer); 
 }
 
 
