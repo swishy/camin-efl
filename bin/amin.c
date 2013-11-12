@@ -143,6 +143,7 @@ int main(int argc, char* argv[])
     return 1;
   }
   
+  // TODO fix handling here not quit right hense why adminlist / uri are commented.
   if (quit)
     return 0;
   
