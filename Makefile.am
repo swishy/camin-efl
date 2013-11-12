@@ -18,5 +18,5 @@ cainit_LDADD = /usr/lib/libuv.a
 cainit_CFLAGS = -luv -lpthread
 
 camin_SOURCES = bin/amin.c
-camin_LDADD = libamin.la	
-camin_CFLAGS = -lpthread 
+camin_LDADD = @EINA_LIBS@ @ECORE_LIBS@ libamin.la	
+camin_CFLAGS = @EINA_CFLAGS@ @ECORE_CFLAGS@

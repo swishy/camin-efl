@@ -25,6 +25,7 @@ void end(void *data, const char *el) {
 
 void parse_content(char *input)
 {
+
   XML_Parser parser = XML_ParserCreate(NULL);
   if (! parser) {
     LOG("Camin could not allocate memory for parser");
@@ -33,22 +34,11 @@ void parse_content(char *input)
 
   XML_SetElementHandler(parser, start, end);
 
-  for (;;) {
-    int done;
-
-    done = feof(input);
-    LOGF("done value %i", done);
-
-    if (! XML_Parse(parser, input, sizeof(input), done)) {
-      LOGF("Parse error at line %d:\n%s\n",
-	      XML_GetCurrentLineNumber(parser),
-	      XML_ErrorString(XML_GetErrorCode(parser)));
-      
-      // TODO handle and return profile with error elements.
-      exit(-1);
+  /* parse the xml */
+    if(XML_Parse(parser, input, strlen(input), XML_TRUE) == XML_STATUS_ERROR)
+    {
+        printf("Error: %s\n", XML_ErrorString(XML_GetErrorCode(parser)));
     }
 
-    if (done)
-      break;
-  }
+    XML_ParserFree(parser);
 }
