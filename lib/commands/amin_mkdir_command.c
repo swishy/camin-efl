@@ -8,7 +8,7 @@ typedef struct
    int a;
 } Private_Data;
 
-#define MY_CLASS AMIN_MKDIR_COMMAND
+#define MY_CLASS AMIN_MKDIR_COMMAND_CLASS
 
 static void
 _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
@@ -25,7 +25,7 @@ static void
 _class_constructor(Eo_Class *klass)
 {
    const Eo_Op_Func_Description func_desc[] = {
-        EO_OP_FUNC(AMIN_COMMAND_INTERFACE_ID(AMIN_COMMAND_INTERFACE_SUB_ID_parse), _parse),
+        EO_OP_FUNC(AMIN_COMMAND_INTERFACE_ID(AMIN_COMMAND_INTERFACE_SUB_ID_PARSE), _parse),
         EO_OP_FUNC_SENTINEL
    };
 

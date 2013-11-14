@@ -1,4 +1,3 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 
 extern EAPI Eo_Op AMIN_COMMAND_INTERFACE_BASE_ID;
@@ -18,5 +17,5 @@ enum {
  */
 #define interface_parse_get(result) AMIN_COMMAND_INTERFACE_ID(AMIN_COMMAND_INTERFACE_SUB_ID_PARSE), EO_TYPECHECK(char *, result)
 
-#define AMIN_COMMAND_INTERFACE_CLASS interface_class_get()
+#define AMIN_COMMAND_INTERFACE_CLASS amin_command_interface_class_get()
 const Eo_Class *amin_command_interface_class_get(void);

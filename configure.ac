@@ -13,6 +13,7 @@ AC_CONFIG_SRCDIR(configure.ac)
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE(1.6 dist-bzip2 [subdir-objects])
 
+AC_CONFIG_MACRO_DIR([m4])
 
 define([AC_LIBTOOL_LANG_CXX_CONFIG], [:])dnl
 define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
@@ -28,7 +29,8 @@ AC_PROG_CC
 # pkg-config
 PKG_PROG_PKG_CONFIG
 
-AC_DEFINE([EFL_BETA_API_SUPPORT], [1], [Enable access to unstable EFL API thats still in beta])
+EFL_ENABLE_EO_API_SUPPORT
+EFL_ENABLE_BETA_API_SUPPORT
 
 PKG_CHECK_MODULES(ECORE, [ ecore-con ecore ], [have_ecore="yes"], [have_ecore="no"])
 
