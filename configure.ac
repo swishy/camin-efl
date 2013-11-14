@@ -10,7 +10,7 @@ m4_define([lt_age], v_min)
 AC_INIT([CAmin], [project_version], [swishyTM@gmail.com])
 LT_INIT
 AC_CONFIG_SRCDIR(configure.ac)
-AM_CONFIG_HEADER(config.h)
+AM_CONFIG_HEADER(include/config.h)
 AM_INIT_AUTOMAKE(1.6 dist-bzip2 [subdir-objects])
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -29,8 +29,7 @@ AC_PROG_CC
 # pkg-config
 PKG_PROG_PKG_CONFIG
 
-EFL_ENABLE_EO_API_SUPPORT
-EFL_ENABLE_BETA_API_SUPPORT
+AC_DEFINE([EFL_BETA_API_SUPPORT], [1], [Enable access to unstable EFL API that are still in beta])
 
 PKG_CHECK_MODULES(ECORE, [ ecore-con ecore ], [have_ecore="yes"], [have_ecore="no"])
 

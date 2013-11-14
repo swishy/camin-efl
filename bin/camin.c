@@ -1,9 +1,14 @@
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <unistd.h>
 #include <Ecore.h>
 #include <Ecore_Getopt.h>
 #include "amin.h"
-#include "machine.h"
+#include "amin_machine.h"
 #include "common.h"
+#include "simple_class.h"
 
 struct context
 {
@@ -27,24 +32,12 @@ static const Ecore_Getopt optdesc = {
   }
 };
 
-void process_adminlist()
-{
-  LOG("process_adminlist called");
-}
-
-void process_uri(char *uri)
-{
-  LOGF("process_uri called with %s", uri);
-  eina_init();
-  
-}
-
 void process_input(char *profile)
 {
   LOGF("%s", profile);
   
   // Send to machine for processing.
-  parse_content(profile);
+  //parse_content(profile);
 }
 
 static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
@@ -83,8 +76,19 @@ static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
     // We want to remove the handler as we have process data relevant.
     ctxt->handler = NULL;
     
-    // Send input for processing.
-    process_input(buf);
+    LOG("Creating Amin Machine");
+    // Create Amin machine factory reference.   
+    Eo *amin_machine = eo_add(AMIN_MACHINE_CLASS, NULL);
+
+    LOG("Creating Amin Instance");
+    Eo *amin = eo_do(amin_machine, get_machine());
+    
+    eo_do(amin, parse(buf));
+    //process_input(buf);
+    
+    //eo_unref(amin_machine);
+    
+    //eo_shutdown();
     
     // Signal no further events to this callback.
     return ECORE_CALLBACK_CANCEL;
@@ -123,10 +127,10 @@ int main(int argc, char* argv[])
 	ECORE_GETOPT_VALUE_BOOL(quit),
 	ECORE_GETOPT_VALUE_NONE
   };
-  
+
   if (!ecore_init())
   {
-    printf("ERROR: Cannot init Ecore!\n");
+    printf("ERROR: Cannot init Eo / Ecore!\n");
     return -1;
   }
   
@@ -157,6 +161,7 @@ int main(int argc, char* argv[])
   
   ecore_main_loop_begin();
   
+  //eo_shutdown();
   ecore_shutdown();
   
   return 0;
