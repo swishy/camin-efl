@@ -88,7 +88,10 @@ static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
     
     //eo_unref(amin_machine);
     
-    //eo_shutdown();
+    eo_shutdown();
+    
+    // Stop nastyness for the moment....
+    ecore_main_loop_quit();
     
     // Signal no further events to this callback.
     return ECORE_CALLBACK_CANCEL;
