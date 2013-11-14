@@ -1,0 +1,16 @@
+Installation 
+
+Requires libuv, expat, ecore and eo libraries.
+
+Expat && libuv install via distro etc.
+
+Grab EFL 
+git clone http://git.enlightenment.org/core/efl.git/
+
+./autoconf --prefix=/usr && make && make install 
+
+Grab CAmin 
+
+git clone git@projectamin.org:camin 
+
+./autoconf --prefix=/usr && make && make install 
