@@ -7,7 +7,7 @@
 extern EAPI Eo_Op AMIN_COMMAND_INTERFACE_BASE_ID;
 
 enum {
-     AMIN_COMMAND_INTERFACE_SUB_ID_PARSE,
+     AMIN_COMMAND_INTERFACE_SUB_ID_PARSECOMMAND,
      AMIN_COMMAND_INTERFACE_SUB_ID_LAST
 };
 
@@ -19,7 +19,7 @@ enum {
  * @brief Parse command profile
  * @param[out] ret char pointer to command_document - value
  */
-#define parse(command_document) AMIN_COMMAND_INTERFACE_ID(AMIN_COMMAND_INTERFACE_SUB_ID_PARSE), EO_TYPECHECK(char, command_document)
+#define parseCommand(command_document) AMIN_COMMAND_INTERFACE_ID(AMIN_COMMAND_INTERFACE_SUB_ID_PARSE), EO_TYPECHECK(char, command_document)
 
 #define AMIN_COMMAND_INTERFACE_CLASS amin_command_interface_class_get()
 const Eo_Class *amin_command_interface_class_get(void);

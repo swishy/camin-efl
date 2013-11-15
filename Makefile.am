@@ -6,7 +6,7 @@ MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.h.in configure depcomp inst
 INCLUDES = -I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libamin.la
-libamin_la_SOURCES = lib/amin_machine.c lib/amin.c lib/amin_command_interface.c lib/commands/amin_mkdir_command.c 
+libamin_la_SOURCES = lib/amin_machine.c lib/amin.c lib/interfaces/amin_filter_interface.c lib/filters/amin_type_filter.c 
 libamin_la_LIBADD = @EINA_LIBS@ @ECORE_LIBS@ @EO_LIBS@
 libamin_la_CFLAGS = -lexpat @EINA_CFLAGS@ @ECORE_CFLAGS@ @EO_CFLAGS@
 libamin_la_LDFLAGS = -version-info @version_info@ 

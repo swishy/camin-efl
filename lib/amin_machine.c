@@ -18,7 +18,6 @@ typedef struct
 static Eo*
 _get_machine(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
-  printf("GET_MACHINE Called");
   printf("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   return eo_add(AMIN_CLASS, NULL);
 }
