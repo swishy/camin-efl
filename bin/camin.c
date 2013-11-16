@@ -69,9 +69,9 @@ static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
     return ECORE_CALLBACK_CANCEL;
   }
   
-  buf[nbytes - 1] = '\0';
+  //buf[nbytes - 1] = '\0';
     
-    LOGF("Read %zd bytes from input: \"%s\"\n", nbytes - 1, buf);
+    LOGF("Read %zd bytes from input: \"%s\"\n", nbytes, buf);
     
     // We want to remove the handler as we have process data relevant.
     ctxt->handler = NULL;
