@@ -62,4 +62,4 @@ static const Eo_Class_Description class_desc = {
      NULL
 };
 
-EO_DEFINE_CLASS(amin_elt_class_get, &class_desc, EO_BASE_CLASS, AMIN_XML_BASE_CLASS, NULL);
+EO_DEFINE_CLASS(amin_elt_class_get, &class_desc, AMIN_XML_BASE_CLASS, NULL);
