@@ -9,7 +9,6 @@
 #include "amin_elt.h"
 #include "amin_machine.h"
 #include "common.h"
-#include "simple_class.h"
 
 struct context
 {
