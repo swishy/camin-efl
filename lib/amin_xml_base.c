@@ -107,7 +107,7 @@ static const Eo_Op_Description op_desc[] = {
 static const Eo_Class_Description class_desc = {
      EO_VERSION,
      "Amin XML Base",
-     EO_CLASS_TYPE_REGULAR,
+     EO_CLASS_TYPE_MIXIN,
      EO_CLASS_DESCRIPTION_OPS(&AMIN_XML_BASE_BASE_ID, op_desc, AMIN_XML_BASE_SUB_ID_LAST),
      NULL,
      sizeof(Private_Data),

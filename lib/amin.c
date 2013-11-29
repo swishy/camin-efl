@@ -34,7 +34,7 @@ _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   char *document;
   document = va_arg(*list, char*);
   
-  eo_do(amin_elt, process(document));
+  eo_do(amin_elt, parse(document));
 }
 
 static void
