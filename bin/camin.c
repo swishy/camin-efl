@@ -6,6 +6,7 @@
 #include <Ecore.h>
 #include <Ecore_Getopt.h>
 #include "amin.h"
+#include "amin_elt.h"
 #include "amin_machine.h"
 #include "common.h"
 #include "simple_class.h"
@@ -69,37 +70,26 @@ static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
     return ECORE_CALLBACK_CANCEL;
   }
   
-  //buf[nbytes - 1] = '\0';
-    
-    LOGF("Read %zd bytes from input: \"%s\"\n", nbytes, buf);
-    
-    // We want to remove the handler as we have process data relevant.
-    ctxt->handler = NULL;
-    
-    LOG("Creating Amin Machine");
-    
-    // Create Amin machine factory reference.   
-    // TODO actually get amin from factory..
-    Eo *amin_machine = eo_add(AMIN_MACHINE_CLASS, NULL);
-
-    LOG("Creating Amin Instance");
-    Eo *amin = eo_add(AMIN_CLASS, NULL);
-    
-    const Eo_Class *klass = eo_class_get(amin);
-    printf("obj-type:'%s'\n", eo_class_name_get(klass));
-    
-    eo_do(amin, process(buf));
-    //process_input(buf);
-    
-    //eo_unref(amin_machine);
-    
-    eo_shutdown();
-    
-    // Stop nastyness for the moment....
-    ecore_main_loop_quit();
-    
-    // Signal no further events to this callback.
-    return ECORE_CALLBACK_CANCEL;
+  LOGF("Read %zd bytes from input: \"%s\"\n", nbytes, buf);
+  
+  // We want to remove the handler as we have process data relevant.
+  ctxt->handler = NULL;
+  
+  LOG("Creating Amin Instance");
+  Eo *amin = eo_add(AMIN_CLASS, NULL);
+  
+  const Eo_Class *klass = eo_class_get(amin);
+  printf("obj-type:'%s'\n", eo_class_name_get(klass));
+  
+  eo_do(amin, parse(buf));
+  
+  eo_shutdown();
+  
+  // Stop nastyness for the moment....
+  ecore_main_loop_quit();
+  
+  // Signal no further events to this callback.
+  return ECORE_CALLBACK_CANCEL;
 }
 
 void read_stdin()

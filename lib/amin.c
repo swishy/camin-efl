@@ -6,6 +6,7 @@
 #include "Eo.h"
 #include "common.h"
 #include "amin.h"
+#include "amin_elt.h"
 
 int DEPTH;
 
@@ -14,86 +15,33 @@ EAPI Eo_Op AMIN_BASE_ID = 0;
 typedef struct
 {
    char input;
-   Eo *filter;
+   Eo *handler;
 } Private_Data;
 
 #define MY_CLASS AMIN_CLASS
 
-static void 
-_start(void *data, const char *el, const char **attr) {
-  int i;
-  
-  // TODO Get ref to current class data to access filter.
-  //eo_do(pd->filter, start(data, el, attr));
-
-  for (i = 0; i < DEPTH; i++)
-    LOG("  ");
-
-  LOGF("%s", el);
-
-  for (i = 0; attr[i]; i += 2) {
-    LOGF(" %s='%s'", attr[i], attr[i + 1]);
-  }
-
-  DEPTH++;
-}  /* End of start handler */
-
 static void
-_char(void *user_data, const XML_Char *string, int string_len)
+_parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
-    // ref important bytes passed in if they arent whitespace.
-    if (string_len > 0 && !isspace(*string))
-    {
-      LOGF("char data in tag: %.*s", string_len, string);
-    }    
-}
-
-static void 
-_end(void *data, const char *el) {
-  DEPTH--;
-}  /* End of end handler */
-
-static void
-_process(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
-{
-  printf("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
+  LOG("Creating Amin Elt Instance");
+  Eo *amin_elt = eo_add(AMIN_ELT_CLASS, NULL);
+  const Eo_Class *klass = eo_class_get(amin_elt);
+  LOGF("obj-type:'%s'\n", eo_class_name_get(klass));
   
-  LOG("Getting input");
   Private_Data *pd = class_data;
-   char *input;
-   input = va_arg(*list, char*);
-   pd->input = input;
-   //pd->filter = eo_add(AMIN_TYPE_FILTER_CLASS,NULL);
-   LOG("Go input");
+  pd->handler = amin_elt;
   
-  LOGF("INPUT: %s\n", input);
+  char *document;
+  document = va_arg(*list, char*);
   
-  LOG("Initialising parser");
-  XML_Parser parser = XML_ParserCreate(NULL);
-  if (! parser) {
-    LOG("Camin could not allocate memory for parser");
-    exit(-1);
-  }
-
-  LOG("Setting element handlers");
-  XML_SetElementHandler(parser, _start, _end);
-  XML_SetCharacterDataHandler (parser, _char);
-
-  /* parse the xml */
-    if(XML_Parse(parser, input, strlen(input), XML_TRUE) == XML_STATUS_ERROR)
-    {
-        printf("Error: %s\n", XML_ErrorString(XML_GetErrorCode(parser)));
-    }
-
-    XML_ParserFree(parser);
+  eo_do(amin_elt, process(document));
 }
-
 
 static void
 _class_constructor(Eo_Class *klass)
 {
    const Eo_Op_Func_Description func_desc[] = {
-        EO_OP_FUNC(AMIN_ID(AMIN_SUB_ID_PROCESS), _process),
+        EO_OP_FUNC(AMIN_ID(AMIN_SUB_ID_PARSE), _parse),
         EO_OP_FUNC_SENTINEL
    };
 
@@ -101,7 +49,7 @@ _class_constructor(Eo_Class *klass)
 }
 
 static const Eo_Op_Description op_desc[] = {
-     EO_OP_DESCRIPTION(AMIN_SUB_ID_PROCESS, "Starts processing an Amin document."),
+     EO_OP_DESCRIPTION(AMIN_SUB_ID_PARSE, "Starts processing an Amin document."),
      EO_OP_DESCRIPTION_SENTINEL
 };
 
