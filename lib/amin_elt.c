@@ -38,7 +38,6 @@ _class_constructor(Eo_Class *klass)
    const Eo_Op_Func_Description func_desc[] = {
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_AMIN_COMMAND), _amin_command),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_WHITE_WASH), _white_wash),
-        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_WHITE_WASH), _white_wash),
         EO_OP_FUNC_SENTINEL
    };
 
@@ -54,7 +53,7 @@ static const Eo_Op_Description op_desc[] = {
 static const Eo_Class_Description class_desc = {
      EO_VERSION,
      "Amin Elt",
-     EO_CLASS_TYPE_MIXIN,
+     EO_CLASS_TYPE_REGULAR,
      EO_CLASS_DESCRIPTION_OPS(&AMIN_ELT_BASE_ID, op_desc, AMIN_ELT_SUB_ID_LAST),
      NULL,
      sizeof(Private_Data),

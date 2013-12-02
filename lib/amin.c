@@ -6,6 +6,7 @@
 #include "Eo.h"
 #include "common.h"
 #include "amin.h"
+#include "amin_xml_base.h"
 #include "amin_elt.h"
 
 int DEPTH;
@@ -34,7 +35,7 @@ _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   char *document;
   document = va_arg(*list, char*);
   
-  eo_do(amin_elt, parse(document));
+  eo_do(amin_elt, process(document));
 }
 
 static void
