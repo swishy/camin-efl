@@ -3,6 +3,7 @@
 #endif
 
 #include <expat.h>
+#include <pcre.h>
 #include "Eo.h"
 #include "common.h"
 #include "amin_elt.h"
@@ -15,10 +16,26 @@ EAPI Eo_Op AMIN_ELT_BASE_ID = 0;
 typedef struct
 {
    char input;
+   Eina_List *attrs;
+   char command;
+   char param;
+   char target;
+   char flag;
+   char name;
+   char element;
+   char doctype;
+   char docname;
+   char text;
    Eo *filter;
 } Private_Data;
 
 #define MY_CLASS AMIN_ELT_CLASS
+
+static void 
+_fix_text(char *input)
+{
+  LOGF("input %s", input);
+}
 
 static void
 _amin_command(Eo_Class *klass)

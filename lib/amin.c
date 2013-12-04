@@ -24,6 +24,10 @@ typedef struct
 static void
 _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
+  // TODO check if URI, for the moment load up from tha disk!
+  
+  // pd->handler = eo_add(AMIN_MACHINE_SPEC_CLASS, NULL);
+  
   LOG("Creating Amin Elt Instance");
   Eo *amin_elt = eo_add(AMIN_ELT_CLASS, NULL);
   const Eo_Class *klass = eo_class_get(amin_elt);

@@ -4,6 +4,7 @@
 
 #include <expat.h>
 #include "Eo.h"
+#include "Eina.h"
 #include "common.h"
 #include "amin_xml_base.h"
 
@@ -51,20 +52,21 @@ _char(void *user_data, const XML_Char *string, int string_len)
 static void 
 _end(void *data, const char *el) {
   DEPTH--;
+  //eo_do_super(obj, elm_wdg_theme(&int_ret));
 }  /* End of end handler */
 
 static void
 _process(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
-  printf("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
+  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
   LOG("Getting input");
   Private_Data *pd = class_data;
-   char *input;
-   input = va_arg(*list, char*);
-   pd->input = input;
-   //pd->filter = eo_add(AMIN_TYPE_FILTER_CLASS,NULL);
-   LOG("Got input");
+  char *input;
+  input = va_arg(*list, char*);
+  pd->input = input;
+  //pd->filter = eo_add(AMIN_TYPE_FILTER_CLASS,NULL);
+  LOG("Got input");
   
   LOGF("INPUT: %s\n", input);
   
@@ -74,18 +76,18 @@ _process(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
     LOG("Camin could not allocate memory for parser");
     exit(-1);
   }
-
+  
   LOG("Setting element handlers");
-  XML_SetElementHandler(parser, _start, _end);
-  XML_SetCharacterDataHandler (parser, _char);
-
+  XML_SetElementHandler(obj, _start, _end);
+  XML_SetCharacterDataHandler (obj, _char);
+  
   /* parse the xml */
-    if(XML_Parse(parser, input, strlen(input), XML_TRUE) == XML_STATUS_ERROR)
-    {
-        printf("Error: %s\n", XML_ErrorString(XML_GetErrorCode(parser)));
-    }
-
-    XML_ParserFree(parser);
+  if(XML_Parse(parser, input, strlen(input), XML_TRUE) == XML_STATUS_ERROR)
+  {
+    printf("Error: %s\n", XML_ErrorString(XML_GetErrorCode(parser)));
+  }
+  
+  XML_ParserFree(parser);
 }
 
 static void
@@ -93,6 +95,9 @@ _class_constructor(Eo_Class *klass)
 {
    const Eo_Op_Func_Description func_desc[] = {
         EO_OP_FUNC(AMIN_XML_BASE_ID(AMIN_XML_BASE_SUB_ID_PROCESS), _process),
+        EO_OP_FUNC(AMIN_XML_BASE_ID(AMIN_XML_BASE_SUB_ID_START), _start),
+        EO_OP_FUNC(AMIN_XML_BASE_ID(AMIN_XML_BASE_SUB_ID_END), _end),
+        EO_OP_FUNC(AMIN_XML_BASE_ID(AMIN_XML_BASE_SUB_ID_CHAR), _char),
         EO_OP_FUNC_SENTINEL
    };
 
@@ -101,6 +106,9 @@ _class_constructor(Eo_Class *klass)
 
 static const Eo_Op_Description op_desc[] = {
      EO_OP_DESCRIPTION(AMIN_XML_BASE_SUB_ID_PROCESS, "Starts processing an XML document."),
+     EO_OP_DESCRIPTION(AMIN_XML_BASE_SUB_ID_START, "Called when start element found."),
+     EO_OP_DESCRIPTION(AMIN_XML_BASE_SUB_ID_END, "Called when end element found."),
+     EO_OP_DESCRIPTION(AMIN_XML_BASE_SUB_ID_CHAR, "Called when char data found."),
      EO_OP_DESCRIPTION_SENTINEL
 };
 
