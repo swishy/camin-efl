@@ -7,15 +7,18 @@
 #include "Eina.h"
 #include "common.h"
 #include "amin_xml_base.h"
+#include "amin_elt.h"
 
 int DEPTH;
+
+XML_Parser *parser;
 
 EAPI Eo_Op AMIN_XML_BASE_BASE_ID = 0;
 
 typedef struct
 {
    char input;
-   Eo *filter;
+   Eina_List *filters;
 } Private_Data;
 
 #define MY_CLASS AMIN_XML_BASE_CLASS
@@ -24,8 +27,16 @@ static void
 _start(void *data, const char *el, const char **attr) {
   int i;
   
+  Eo *amin_elt = eo_add_custom(AMIN_ELT_CLASS, NULL, filter_constructor(parser));
+  //const Eo_Class *klass = eo_class_get(amin_elt);
+  //LOGF("obj-type:'%s'\n", eo_class_name_get(klass));
+  
   // TODO Get ref to current class data to access filter.
   //eo_do(pd->filter, start(data, el, attr));
+  
+  //LOG("Setting element handlers");
+  //XML_SetElementHandler(parser, _start2, _end2);
+  
 
   for (i = 0; i < DEPTH; i++)
     LOG("  ");
@@ -71,15 +82,15 @@ _process(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   LOGF("INPUT: %s\n", input);
   
   LOG("Initialising parser");
-  XML_Parser parser = XML_ParserCreate(NULL);
+  parser = XML_ParserCreate(NULL);
   if (! parser) {
     LOG("Camin could not allocate memory for parser");
     exit(-1);
   }
   
   LOG("Setting element handlers");
-  XML_SetElementHandler(obj, _start, _end);
-  XML_SetCharacterDataHandler (obj, _char);
+  XML_SetElementHandler(parser, _start, _end);
+  XML_SetCharacterDataHandler (parser, _char);
   
   /* parse the xml */
   if(XML_Parse(parser, input, strlen(input), XML_TRUE) == XML_STATUS_ERROR)
@@ -95,9 +106,6 @@ _class_constructor(Eo_Class *klass)
 {
    const Eo_Op_Func_Description func_desc[] = {
         EO_OP_FUNC(AMIN_XML_BASE_ID(AMIN_XML_BASE_SUB_ID_PROCESS), _process),
-        EO_OP_FUNC(AMIN_XML_BASE_ID(AMIN_XML_BASE_SUB_ID_START), _start),
-        EO_OP_FUNC(AMIN_XML_BASE_ID(AMIN_XML_BASE_SUB_ID_END), _end),
-        EO_OP_FUNC(AMIN_XML_BASE_ID(AMIN_XML_BASE_SUB_ID_CHAR), _char),
         EO_OP_FUNC_SENTINEL
    };
 
@@ -106,9 +114,6 @@ _class_constructor(Eo_Class *klass)
 
 static const Eo_Op_Description op_desc[] = {
      EO_OP_DESCRIPTION(AMIN_XML_BASE_SUB_ID_PROCESS, "Starts processing an XML document."),
-     EO_OP_DESCRIPTION(AMIN_XML_BASE_SUB_ID_START, "Called when start element found."),
-     EO_OP_DESCRIPTION(AMIN_XML_BASE_SUB_ID_END, "Called when end element found."),
-     EO_OP_DESCRIPTION(AMIN_XML_BASE_SUB_ID_CHAR, "Called when char data found."),
      EO_OP_DESCRIPTION_SENTINEL
 };
 

@@ -28,8 +28,8 @@ _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   
   // pd->handler = eo_add(AMIN_MACHINE_SPEC_CLASS, NULL);
   
-  LOG("Creating Amin Elt Instance");
-  Eo *amin_elt = eo_add(AMIN_ELT_CLASS, NULL);
+  LOG("Creating Amin XML Instance");
+  Eo *amin_elt = eo_add(AMIN_XML_BASE_CLASS, NULL);
   const Eo_Class *klass = eo_class_get(amin_elt);
   LOGF("obj-type:'%s'\n", eo_class_name_get(klass));
   

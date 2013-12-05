@@ -2,9 +2,13 @@
 # include <config.h>
 #endif
 
+#include <expat.h>
 #include "Eo.h"
+#include "common.h"
 #include "amin_machine.h"
 #include "amin.h"
+
+int DEPTH;
 
 EAPI Eo_Op AMIN_MACHINE_BASE_ID = 0;
 
@@ -14,6 +18,43 @@ typedef struct
 } Private_Data;
 
 #define MY_CLASS AMIN_MACHINE_CLASS
+
+static void 
+_start(void *data, const char *el, const char **attr) {
+  int i;
+  
+  // TODO Get ref to current class data to access filter.
+  //eo_do(pd->filter, start(data, el, attr));
+
+  for (i = 0; i < DEPTH; i++)
+    LOG("  ");
+
+  LOGF("%s", el);
+
+  for (i = 0; attr[i]; i += 2) {
+    LOGF(" %s='%s'", attr[i], attr[i + 1]);
+  }
+
+  DEPTH++;
+}  /* End of start handler */
+
+static void
+_char(void *user_data, const XML_Char *string, int string_len)
+{
+    // ref important bytes passed in if they arent whitespace.
+    if (string_len > 0 && !isspace(*string))
+    {
+      LOGF("char data in tag: %.*s", string_len, string);
+    }    
+}
+
+static void 
+_end(void *data, const char *el) {
+  DEPTH--;
+  //eo_do_super(obj, elm_wdg_theme(&int_ret));
+}  /* End of end handler */
+
+
 
 static Eo*
 _get_machine(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
@@ -32,6 +73,9 @@ _class_constructor(Eo_Class *klass)
    };
 
    eo_class_funcs_set(klass, func_desc);
+   
+   XML_SetElementHandler(klass, _start, _end);
+   XML_SetCharacterDataHandler (klass, _char);
 }
 
 static const Eo_Op_Description op_desc[] = {
