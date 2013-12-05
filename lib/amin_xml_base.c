@@ -63,6 +63,7 @@ _char(void *user_data, const XML_Char *string, int string_len)
 static void 
 _end(void *data, const char *el) {
   DEPTH--;
+  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   //eo_do_super(obj, elm_wdg_theme(&int_ret));
 }  /* End of end handler */
 

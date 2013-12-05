@@ -66,7 +66,15 @@ _char(void *user_data, const XML_Char *string, int string_len)
 static void 
 _end(void *data, const char *el) {
   DEPTH--;
-  //eo_do_super(obj, elm_wdg_theme(&int_ret));
+  
+  // TODO move this to a statement which checks end tag name = filter name
+  
+  Eo *filter = (Eo*)data;
+  
+  Eo *parent;
+  eo_do(filter, eo_parent_get(&parent));
+  
+  eo_do(parent, filter_focus(filter));
 }  /* End of end handler */
 
 static void 
@@ -88,18 +96,9 @@ _white_wash(Eo_Class *klass)
 }
 
 static void
-_filter_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_set_focus(XML_Parser *parser, Eo *current_filter)
 {
-  
-   eo_do_super(obj, MY_CLASS, eo_constructor());
-  
-   XML_Parser *parser;
-   parser = va_arg(*list, XML_Parser*);
-   
-   Private_Data *pd = class_data;
-   
-   pd->parser = parser;
-  
+   //XML_SetUserData(parser, current_filter); 
    LOG("Setting element handlers again.");
    XML_SetElementHandler(parser, _start, _end);
    LOG("Setting char handler");
@@ -107,10 +106,49 @@ _filter_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
+_filter_focus(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+{
+  
+    // Get child from args
+    Eo *child;
+    child = va_arg(*list, Eo*);
+    
+    // Get access to parser from private data
+    Private_Data *pd = class_data;
+   
+    // Set local callbacks
+    XML_Parser *parser = pd->parser;
+    _set_focus(parser, obj);
+    
+    // Release child
+    eo_unref(child);
+}
+
+static void
+_filter_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+{
+  
+  // Call base constructor.
+   eo_do_super(obj, MY_CLASS, eo_constructor());
+  
+   // Get parser from args.
+   XML_Parser *parser;
+   parser = va_arg(*list, XML_Parser*);
+   
+   Private_Data *pd = class_data;
+   
+   // Assign local reference.
+   pd->parser = parser;
+  
+   // Set local callbacks. 
+   _set_focus(parser, obj);
+}
+
+static void
 _constructor(Eo *obj, void *_pd EINA_UNUSED, va_list *list EINA_UNUSED)
 {
    eo_error_set(obj);
-   LOG_ERROR("Please use filter_constructor when creating class '%s'", MY_CLASS);
+   LOG_ERROR("Please use filter_constructor when creating class '%s'", eo_class_name_get(MY_CLASS));
 }
 
 static void
@@ -121,6 +159,7 @@ _class_constructor(Eo_Class *klass)
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_AMIN_COMMAND), _amin_command),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_WHITE_WASH), _white_wash),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), _filter_constructor),
+        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_FOCUS), _filter_focus),
         EO_OP_FUNC_SENTINEL
    };
 
@@ -131,6 +170,7 @@ static const Eo_Op_Description op_desc[] = {
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_AMIN_COMMAND, "Starts processing an Amin command."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_WHITE_WASH, "Resets filter state."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR, "Constructor function to use for filter instances."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_FILTER_FOCUS, "Called by child filter when delegating parsing."),
      EO_OP_DESCRIPTION_SENTINEL
 };
 

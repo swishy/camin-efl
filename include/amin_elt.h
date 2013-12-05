@@ -11,6 +11,7 @@ enum {
      AMIN_ELT_SUB_ID_AMIN_COMMAND,
      AMIN_ELT_SUB_ID_WHITE_WASH,
      AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR,
+     AMIN_ELT_SUB_ID_FILTER_FOCUS,
      AMIN_ELT_SUB_ID_LAST
 };
 
@@ -33,6 +34,12 @@ enum {
  * @brief Must be used to construct ELT instance or inherited classes to allow parser delegation.
  */
 #define filter_constructor(parser) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), EO_TYPECHECK(XML_Parser *, parser)
+
+/**
+ * @def filter_focus(Eo *child_filter)
+ * @brief Called via eo_super when child end element is hit to delegate parsing.
+ */
+#define filter_focus(child_filter) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_FOCUS), EO_TYPECHECK(Eo *, child_filter)
 
 #define AMIN_ELT_CLASS amin_elt_class_get()
 const Eo_Class *amin_elt_class_get(void);
