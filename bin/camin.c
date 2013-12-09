@@ -93,8 +93,6 @@ static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
 
 void read_stdin()
 {
-  printf("read_stdin.\n");
-  
   // Create struct to maintain pointer to handler.
   struct context ctxt = {0};
   
@@ -137,23 +135,22 @@ int main(int argc, char* argv[])
     return 1;
   }
   
-  // TODO fix handling here not quit right hense why adminlist / uri are commented.
-  if (quit)
-    return 0;
-  
-  if (adminlist)
-  {
-    //process_adminlist();
-  }
-  
-  if (uri)
-  {
-    //process_uri(uri);
-  }
-  
+  // We have something passed to us from stdin.
   if (profile)
   {
     read_stdin();
+  }
+  
+  else if (adminlist)
+  {
+    LOG("Adminlist passed, Not currently implemented.");
+    return 1;
+  }
+  
+  else if (uri)
+  {
+    LOG("Process URI passed, Not currently implemented.");
+    return 1;
   }
   
   ecore_main_loop_begin();
