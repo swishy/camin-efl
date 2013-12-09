@@ -6,7 +6,6 @@
 #include "Eo.h"
 #include "common.h"
 #include "amin.h"
-#include "amin_xml_base.h"
 #include "amin_elt.h"
 
 int DEPTH;
