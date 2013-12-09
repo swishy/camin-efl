@@ -16,7 +16,7 @@ EAPI Eo_Op AMIN_BASE_ID = 0;
 typedef struct
 {
    char input;
-   Eo *handler;
+   XML_Parser parser;
 } Private_Data;
 
 #define MY_CLASS AMIN_CLASS
@@ -28,29 +28,40 @@ _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   
   // pd->handler = eo_add(AMIN_MACHINE_SPEC_CLASS, NULL);
   
-  LOG("Creating Amin XML Instance");
-  Eo *amin_elt = eo_add(AMIN_XML_BASE_CLASS, NULL);
-  const Eo_Class *klass = eo_class_get(amin_elt);
-  LOGF("obj-type:'%s'\n", eo_class_name_get(klass));
-  
-  Private_Data *pd = class_data;
-  pd->handler = amin_elt;
+
   
   char *document;
   document = va_arg(*list, char*);
   
-  eo_do(amin_elt, process(document));
+  XML_Parser parser = XML_ParserCreate(NULL);
+  if (! parser) {
+    LOG("Camin could not allocate memory for parser");
+    exit(-1);
+  }
+  
+  LOG("Creating Amin ELT Instance");
+  Eo *amin_elt = eo_add_custom(AMIN_ELT_CLASS, NULL, filter_constructor(parser));
+  const Eo_Class *klass = eo_class_get(amin_elt);
+  LOGF("obj-type:'%s'\n", eo_class_name_get(klass));
+  
+  /* parse the xml */
+  if(XML_Parse(parser, document, strlen(document), XML_TRUE) == XML_STATUS_ERROR)
+  {
+    printf("Error: %s\n", XML_ErrorString(XML_GetErrorCode(parser)));
+  }
+  
+  XML_ParserFree(parser);
 }
 
 static void
 _class_constructor(Eo_Class *klass)
 {
-   const Eo_Op_Func_Description func_desc[] = {
-        EO_OP_FUNC(AMIN_ID(AMIN_SUB_ID_PARSE), _parse),
-        EO_OP_FUNC_SENTINEL
-   };
-
-   eo_class_funcs_set(klass, func_desc);
+  const Eo_Op_Func_Description func_desc[] = {
+    EO_OP_FUNC(AMIN_ID(AMIN_SUB_ID_PARSE), _parse),
+    EO_OP_FUNC_SENTINEL
+  };
+  
+  eo_class_funcs_set(klass, func_desc);
 }
 
 static const Eo_Op_Description op_desc[] = {
