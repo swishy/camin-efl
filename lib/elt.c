@@ -6,7 +6,7 @@
 #include <pcre.h>
 #include "Eo.h"
 #include "common.h"
-#include "amin_elt.h"
+#include "elt.h"
 
 int DEPTH;
 

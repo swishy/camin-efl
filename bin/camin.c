@@ -6,9 +6,8 @@
 #include <Ecore.h>
 #include <Ecore_Getopt.h>
 #include "amin.h"
-#include "amin_elt.h"
-#include "amin_machine.h"
 #include "common.h"
+#include "elt.h"
 
 struct context
 {
