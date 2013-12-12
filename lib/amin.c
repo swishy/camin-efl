@@ -7,6 +7,7 @@
 #include "common.h"
 #include "amin.h"
 #include "elt.h"
+#include "dispatcher.h"
 
 int DEPTH;
 
@@ -17,21 +18,21 @@ typedef struct
    char input;
 } Private_Data;
 
+
 #define MY_CLASS AMIN_CLASS
 
-_parse_uri(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
-{
-  LOG("PARSE_URI Not currently implemented");
-}
-
 static void
-_parse_string(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
-  // TODO check if URI!
 
   // Document is only thing passed to us so pop if off the list.
-  char *document;
-  document = va_arg(*list, char*);
+  char *document = va_arg(*list, char*);
+  
+  // TODO properly check if URI! atm just trys to create URL object.
+  Ecore_Con_Url *ec_url = ecore_con_url_new(document);
+  
+  // TODO implement machine_spec to load config. Need to check if spec is uri also.
+  // Perl currently loads up a fresh parser and passes it to machine_spec and starts parsing. 
   
   // Create a parser instance for this request.
   XML_Parser parser = XML_ParserCreate(NULL);
@@ -41,28 +42,38 @@ _parse_string(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   }
   
   // Load up initial filter instance to start parsing document. 
-  LOG("Creating Amin ELT Instance");
-  Eo *amin_elt = eo_add_custom(AMIN_ELT_CLASS, NULL, filter_constructor(parser));
-  const Eo_Class *klass = eo_class_get(amin_elt);
+  LOG("Creating Amin Dispatcher Instance");
+  Eo *amin_dispatcher = eo_add_custom(AMIN_MACHINE_DISPATCHER_CLASS, NULL, filter_constructor(parser));
+  const Eo_Class *klass = eo_class_get(amin_dispatcher);
   LOGF("obj-type:'%s'\n", eo_class_name_get(klass));
   
+  // Start processing, let dispatcher call 'parse' on the expat parser itself once initial processing has completed.
+  if(!ec_url)
+  {
+    // We dont appear to have a uri, process expecting XML in char.
+    eo_do(amin_dispatcher, parse_string(document));
+  }
+  else {
+    // We appear to have a url process as such.
+    eo_do(amin_dispatcher, parse_uri(document));
+  }
+
   // Let Expat do its thing, the local event callbacks are assigned to the parser instance
-  // as they are dynamically loaded up the stack. Here we just kick it off, callbacks are assigned
-  // in the ELT instance at this point.
+  // as they are dynamically loaded up the stack. Here we just kick it off.
   if(XML_Parse(parser, document, strlen(document), XML_TRUE) == XML_STATUS_ERROR)
   {
     printf("Error: %s\n", XML_ErrorString(XML_GetErrorCode(parser)));
   }
   
   XML_ParserFree(parser);
+  // TODO make sure the parser is free'd!!
 }
 
 static void
 _class_constructor(Eo_Class *klass)
 {
   const Eo_Op_Func_Description func_desc[] = {
-    EO_OP_FUNC(AMIN_ID(AMIN_SUB_ID_PARSE_URI), _parse_uri),
-    EO_OP_FUNC(AMIN_ID(AMIN_SUB_ID_PARSE_STRING), _parse_string),
+    EO_OP_FUNC(AMIN_ID(AMIN_SUB_ID_PARSE), _parse),
     EO_OP_FUNC_SENTINEL
   };
   
@@ -70,8 +81,7 @@ _class_constructor(Eo_Class *klass)
 }
 
 static const Eo_Op_Description op_desc[] = {
-     EO_OP_DESCRIPTION(AMIN_SUB_ID_PARSE_URI, "Starts processing an URL containing an Amin document."),
-     EO_OP_DESCRIPTION(AMIN_SUB_ID_PARSE_STRING, "Starts processing an Amin document."),
+     EO_OP_DESCRIPTION(AMIN_SUB_ID_PARSE, "Starts processing an Amin document."),
      EO_OP_DESCRIPTION_SENTINEL
 };
 

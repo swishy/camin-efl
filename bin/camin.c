@@ -79,7 +79,7 @@ static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
   const Eo_Class *klass = eo_class_get(amin);
   printf("obj-type:'%s'\n", eo_class_name_get(klass));
   
-  eo_do(amin, parse_string(buf));
+  eo_do(amin, parse(buf));
   
   eo_shutdown();
   
