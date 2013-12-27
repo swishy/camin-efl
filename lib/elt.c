@@ -17,6 +17,7 @@ typedef struct
    XML_Parser parser;
    char input;
    Eina_List *attrs;
+   Eina_List *filters;
    char command;
    char param;
    char target;
@@ -31,9 +32,37 @@ typedef struct
 
 #define MY_CLASS AMIN_ELT_CLASS
 
+static void
+_expat_start(void *data, const char *el, const char **attr) {
+  
+  Eo *self = (Eo*)data;
+  eo_do(self, start(data, el, attr));
+}
+
+static void
+_expat_char(void *data, const XML_Char *string, int string_len)
+{
+   Eo *self = (Eo*)data;
+   eo_do(self, char(data, string, string_len));
+}
+
+static void
+_expat_end(void *data, const char *el) {
+  DEPTH--;
+  
+  // TODO move this to a statement which checks end tag name = filter name
+  
+  Eo *self = (Eo*)data;
+  eo_do(self, end(data, el));
+}
+
 static void 
-_start(void *data, const char *el, const char **attr) {
+_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   int i;
+  
+  void *data = va_arg(*list, void*);
+  const char *element = va_arg(*list, const char*);
+  const char **attributes = va_arg(*list, const char**);
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
@@ -43,28 +72,35 @@ _start(void *data, const char *el, const char **attr) {
   for (i = 0; i < DEPTH; i++)
     LOG("  ");
 
-  LOGF("%s", el);
+  LOGF("%s", element);
 
-  for (i = 0; attr[i]; i += 2) {
-    LOGF(" %s='%s'", attr[i], attr[i + 1]);
+  for (i = 0; attributes[i]; i += 2) {
+    LOGF(" %s='%s'", attributes[i], attributes[i + 1]);
   }
 
   DEPTH++;
 }  /* End of start handler */
 
 static void
-_char(void *user_data, const XML_Char *string, int string_len)
+_char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
+  void *data = va_arg(*list, void*);
+  const XML_Char *string = va_arg(*list, const XML_Char*);
+  int length = va_arg(*list, int);
+
     // ref important bytes passed in if they arent whitespace.
-    if (string_len > 0 && !isspace(*string))
+    if (length > 0 && !isspace(*string))
     {
-      LOGF("char data in tag: %.*s", string_len, string);
+      LOGF("char data in tag: %.*s", length, string);
     }    
 }
 
 static void 
-_end(void *data, const char *el) {
+_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   DEPTH--;
+  
+  void *data = va_arg(*list, void*);
+  const char *element = va_arg(*list, const char*);
   
   // TODO move this to a statement which checks end tag name = filter name
   
@@ -73,7 +109,7 @@ _end(void *data, const char *el) {
   Eo *parent;
   eo_do(filter, eo_parent_get(&parent));
   
-  eo_do(parent, filter_focus(filter));
+  //eo_do(parent, filter_focus(filter));
 }  /* End of end handler */
 
 static void 
@@ -95,52 +131,25 @@ _white_wash(Eo_Class *klass)
 }
 
 static void
-_set_focus(XML_Parser *parser, Eo *current_filter)
-{
-   //XML_SetUserData(parser, current_filter); 
-   LOG("Setting element handlers again.");
-   XML_SetElementHandler(parser, _start, _end);
-   LOG("Setting char handler");
-   XML_SetCharacterDataHandler (parser, _char);
-}
-
-static void
-_filter_focus(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
-{
-  
-    // Get child from args
-    Eo *child;
-    child = va_arg(*list, Eo*);
-    
-    // Get access to parser from private data
-    Private_Data *pd = class_data;
-   
-    // Set local callbacks
-    XML_Parser *parser = pd->parser;
-    _set_focus(parser, obj);
-    
-    // Release child
-    eo_unref(child);
-}
-
-static void
 _filter_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
-  
-  // Call base constructor.
-   eo_do_super(obj, MY_CLASS, eo_constructor());
-  
    // Get parser from args.
-   XML_Parser *parser;
-   parser = va_arg(*list, XML_Parser*);
+   XML_Parser parser;
+   parser = va_arg(*list, XML_Parser);
    
    Private_Data *pd = class_data;
    
    // Assign local reference.
    pd->parser = parser;
-  
-   // Set local callbacks. 
-   _set_focus(parser, obj);
+   LOG("Assigning current instance as expat userdata");
+   XML_SetUserData(parser, obj); 
+   LOG("Setting element handlers again.");
+   XML_SetElementHandler(parser, _expat_start, _expat_end);
+   LOG("Setting char handler");
+   XML_SetCharacterDataHandler (parser, _expat_char);
+   
+   // Call base constructor.
+   eo_do_super(obj, MY_CLASS, eo_constructor());
 }
 
 static void
@@ -158,7 +167,9 @@ _class_constructor(Eo_Class *klass)
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_AMIN_COMMAND), _amin_command),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_WHITE_WASH), _white_wash),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), _filter_constructor),
-        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_FOCUS), _filter_focus),
+        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_START), _start),
+        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_CHAR), _char),
+        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_END), _end),
         EO_OP_FUNC_SENTINEL
    };
 
@@ -169,7 +180,9 @@ static const Eo_Op_Description op_desc[] = {
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_AMIN_COMMAND, "Starts processing an Amin command."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_WHITE_WASH, "Resets filter state."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR, "Constructor function to use for filter instances."),
-     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_FILTER_FOCUS, "Called by child filter when delegating parsing."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_START, "Called when XML start element is hit."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_CHAR, "Called when character data is found within XML element."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_END, "Called when XML end element is hit."),
      EO_OP_DESCRIPTION_SENTINEL
 };
 

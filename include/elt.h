@@ -11,7 +11,9 @@ enum {
      AMIN_ELT_SUB_ID_AMIN_COMMAND,
      AMIN_ELT_SUB_ID_WHITE_WASH,
      AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR,
-     AMIN_ELT_SUB_ID_FILTER_FOCUS,
+     AMIN_ELT_SUB_ID_START,
+     AMIN_ELT_SUB_ID_CHAR,
+     AMIN_ELT_SUB_ID_END,   
      AMIN_ELT_SUB_ID_LAST
 };
 
@@ -36,10 +38,22 @@ enum {
 #define filter_constructor(parser) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), EO_TYPECHECK(XML_Parser *, parser)
 
 /**
- * @def filter_focus(Eo *child_filter)
- * @brief Called via eo_super when child end element is hit to delegate parsing.
+ * @def start(void *data, const char *element, const char **attributes)
+ * @brief Called when XML start element is hit.
  */
-#define filter_focus(child_filter) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_FOCUS), EO_TYPECHECK(Eo *, child_filter)
+#define start(data, element, attributes) AMIN_ELT_ID(AMIN_ELT_SUB_ID_START), EO_TYPECHECK(void *, data), EO_TYPECHECK(const char *, element), EO_TYPECHECK(const char **, attributes)
+
+/**
+ * @def char(void *data, const XML_Char *string, int string_len)
+ * @brief Called when XML characters are found in element.
+ */
+#define char(data, string, string_length) AMIN_ELT_ID(AMIN_ELT_SUB_ID_CHAR), EO_TYPECHECK(void *, data), EO_TYPECHECK(const XML_Char *, string), EO_TYPECHECK(int, string_len)
+
+/**
+ * @def end(void *data, const char *element)
+ * @brief Called when XML start element is hit.
+ */
+#define end(data, element) AMIN_ELT_ID(AMIN_ELT_SUB_ID_END), EO_TYPECHECK(void *, data), EO_TYPECHECK(const char *, element)
 
 #define AMIN_ELT_CLASS amin_elt_class_get()
 const Eo_Class *amin_elt_class_get(void);
