@@ -35,7 +35,7 @@ enum {
  * @def filter_constructor(XML_Parser *, parser)
  * @brief Must be used to construct ELT instance or inherited classes to allow parser delegation.
  */
-#define filter_constructor(parser) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), EO_TYPECHECK(XML_Parser *, parser)
+#define filter_constructor(parser) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), EO_TYPECHECK(XML_Parser, parser)
 
 /**
  * @def start(void *data, const char *element, const char **attributes)

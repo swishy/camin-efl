@@ -113,19 +113,19 @@ _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
 }  /* End of end handler */
 
 static void 
-_fix_text(char *input)
+_fix_text(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
-  LOGF("input %s", input);
+  LOG("fix text called");
 }
 
 static void
-_amin_command(Eo_Class *klass)
+_amin_command(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
   LOG("amin_command called");
 }
 
 static void
-_white_wash(Eo_Class *klass)
+_white_wash(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
   LOG("white_wash called");
 }
