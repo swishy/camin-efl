@@ -30,7 +30,12 @@ typedef struct
    Eo *filter;
 } Private_Data;
 
+// TODO split common to public struct declaration and work out how to make the private data such.
+// TODO starts stubbing proper functionality into ELT and make dispatcher/filter>dispatcher split.
+
 #define MY_CLASS AMIN_ELT_CLASS
+
+// Wrappers to allow expat delegation to the current ELT subclass instance.
 
 static void
 _expat_start(void *data, const char *el, const char **attr) {
@@ -124,6 +129,7 @@ _amin_command(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   LOG("amin_command called");
 }
 
+// Trys to shell out and execute command if no amin module exists to handle it.
 static void
 _white_wash(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
@@ -178,7 +184,7 @@ _class_constructor(Eo_Class *klass)
 
 static const Eo_Op_Description op_desc[] = {
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_AMIN_COMMAND, "Starts processing an Amin command."),
-     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_WHITE_WASH, "Resets filter state."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_WHITE_WASH, "Trys to shell out and execute command if no amin module exists to handle it."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR, "Constructor function to use for filter instances."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_START, "Called when XML start element is hit."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_CHAR, "Called when character data is found within XML element."),
