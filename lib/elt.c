@@ -67,17 +67,14 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   const char **attributes = va_arg(*list, const char**);
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
-  
-  // TODO Get ref to current class data to access filter.
-  //eo_do(pd->filter, start(data, el, attr));
 
   for (i = 0; i < DEPTH; i++)
     LOG("  ");
 
-  LOGF("%s", element);
+  LOGF("ELEMENT: %s", element);
 
   for (i = 0; attributes[i]; i += 2) {
-    LOGF(" %s='%s'", attributes[i], attributes[i + 1]);
+    LOGF("ATTRIBUTE %i %s='%s'", i, attributes[i], attributes[i + 1]);
   }
 
   DEPTH++;
@@ -111,8 +108,11 @@ _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   Eo *parent;
   eo_do(filter, eo_parent_get(&parent));
   
-  //eo_do(parent, filter_focus(filter));
-}  /* End of end handler */
+  Private_Data *pd = class_data;
+  
+  LOG("Delegating parser handling back to parent");
+  XML_SetUserData(pd->parser, parent);
+} 
 
 static void 
 _fix_text(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
@@ -139,6 +139,11 @@ _filter_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
    // Get parser from args.
    XML_Parser parser;
    parser = va_arg(*list, XML_Parser);
+   
+   // Set parent
+   // TODO check if this is required.
+   Eo *parent = va_arg(*list, Eo *);
+   eo_do(obj, eo_parent_set(parent));
    
    Private_Data *pd = class_data;
    

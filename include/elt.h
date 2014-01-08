@@ -32,10 +32,10 @@ enum {
 #define white_wash(filter) AMIN_ELT_ID(AMIN_ELT_SUB_ID_WHITE_WASH), EO_TYPECHECK(Eo_Class *, filter)
 
 /**
- * @def filter_constructor(XML_Parser *, parser)
+ * @def filter_constructor(XML_Parser *, parser, Eo *, parent)
  * @brief Must be used to construct ELT instance or inherited classes to allow parser delegation.
  */
-#define filter_constructor(parser) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), EO_TYPECHECK(XML_Parser, parser)
+#define filter_constructor(parser, parent) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), EO_TYPECHECK(XML_Parser, parser), EO_TYPECHECK(Eo *, parent)
 
 /**
  * @def start(void *data, const char *element, const char **attributes)

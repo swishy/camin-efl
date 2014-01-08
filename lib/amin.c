@@ -23,7 +23,7 @@ typedef struct
 #define MY_CLASS AMIN_CLASS
 
 static void
-_parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_parse(Eo *obj, void *class_data, va_list *list)
 {
 
   // Document is only thing passed to us so pop if off the list.
@@ -43,7 +43,7 @@ _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   }
   
   LOG("Loading AMIN machine spec");
-  Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC_CLASS, NULL, filter_constructor(machine_parser));
+  Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC_CLASS, NULL, filter_constructor(machine_parser, obj));
   const Eo_Class *machine_class = eo_class_get(amin_machine_spec);
   LOGF("obj-type:'%s'\n", eo_class_name_get(machine_class));
   
