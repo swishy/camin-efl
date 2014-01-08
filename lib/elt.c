@@ -30,9 +30,6 @@ typedef struct
    Eo *filter;
 } Private_Data;
 
-// TODO split common to public struct declaration and work out how to make the private data such.
-// TODO starts stubbing proper functionality into ELT and make dispatcher/filter>dispatcher split.
-
 #define MY_CLASS AMIN_ELT_CLASS
 
 // Wrappers to allow expat delegation to the current ELT subclass instance.

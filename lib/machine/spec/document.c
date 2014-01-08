@@ -15,20 +15,8 @@ EAPI Eo_Op AMIN_MACHINE_SPEC_DOCUMENT_BASE_ID = 0;
 
 typedef struct
 {
-   XML_Parser parser;
-   char input;
    Eina_List *attrs;
    Eina_List *filters;
-   char command;
-   char param;
-   char target;
-   char flag;
-   char name;
-   char element;
-   char doctype;
-   char docname;
-   char text;
-   Eo *filter;
 } Private_Data;
 
 #define MY_CLASS AMIN_MACHINE_SPEC_DOCUMENT_CLASS

@@ -8,7 +8,7 @@
 #include "amin.h"
 #include "elt.h"
 #include "machine_spec.h"
-#include "dispatcher.h"
+#include "amin_machine_dispatcher.h"
 
 int DEPTH;
 
@@ -47,7 +47,8 @@ _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   const Eo_Class *machine_class = eo_class_get(amin_machine_spec);
   LOGF("obj-type:'%s'\n", eo_class_name_get(machine_class));
   
-  // Start processing, let dispatcher call 'parse' on the expat parser itself once initial processing has completed.
+  
+  // Start processing, let machine_spec handle expat foo.
   if(!ec_url)
   {
     // We dont appear to have a uri, process expecting XML in char.
@@ -63,6 +64,11 @@ _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
     // We appear to have a url process as such. Currently not handled.
     
   }
+  
+  // TODO Implement below. probably needs to be generic in ELT base ie get_result() not get_spec...
+  
+  // Eo *spec = eo_do(amin_machine_spec, get_spec());
+  Eo *spec = eo_add(AMIN_CLASS, NULL, NULL);
 
   XML_ParserFree(machine_parser);
   
@@ -79,7 +85,7 @@ _parse(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   
   // Load up initial filter instance to start parsing profile. 
   LOG("Creating Amin Dispatcher Instance");
-  Eo *amin_dispatcher = eo_add_custom(AMIN_MACHINE_DISPATCHER_CLASS, NULL, filter_constructor(parser));
+  Eo *amin_dispatcher = eo_add_custom(AMIN_MACHINE_DISPATCHER_CLASS, NULL, dispatcher_constructor(spec));
   const Eo_Class *klass = eo_class_get(amin_dispatcher);
   LOGF("obj-type:'%s'\n", eo_class_name_get(klass));
   
