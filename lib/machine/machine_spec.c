@@ -60,6 +60,8 @@ _start(Eo *obj, void *class_data, va_list *list) {
   // TODO place holder till we have /etc/amin/machine_spec.xml etc loaded.
   const char *spec = "<machine xmlns:amin=\"http://projectamin.org/ns/\"></machine>";
   
+  // TODO Add in XInclude filter.
+  
   Eo *document = eo_add_custom(AMIN_MACHINE_SPEC_DOCUMENT_CLASS, NULL, filter_constructor(document_parser, obj));
   const Eo_Class *document_class = eo_class_get(document);
   LOGF("obj-type:'%s'\n", eo_class_name_get(document_class));
