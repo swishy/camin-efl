@@ -32,17 +32,12 @@ typedef struct
    Eo *filter;
 } Private_Data;
 
-#define MY_CLASS AMIN_MACHINE_SPEC_CLASS
+#define MY_CLASS AMIN_MACHINE_SPEC
 
 static void 
-_start(Eo *obj, void *class_data, va_list *list) {
-  int i;
+_document_start(Eo *obj, void *class_data, va_list *list) {
   
-  void *data = va_arg(*list, void*);
-  const char *element = va_arg(*list, const char*);
-  const char **attributes = va_arg(*list, const char**);
-  
-  Private_Data *pd = class_data;
+    Private_Data *pd = class_data;
   
   pd->filters = NULL;
   
@@ -62,7 +57,7 @@ _start(Eo *obj, void *class_data, va_list *list) {
   
   // TODO Add in XInclude filter.
   
-  Eo *document = eo_add_custom(AMIN_MACHINE_SPEC_DOCUMENT_CLASS, NULL, filter_constructor(document_parser, obj));
+  Eo *document = eo_add_custom(AMIN_MACHINE_SPEC_DOCUMENT, NULL, filter_constructor(document_parser, obj));
   const Eo_Class *document_class = eo_class_get(document);
   LOGF("obj-type:'%s'\n", eo_class_name_get(document_class));
   
@@ -73,12 +68,39 @@ _start(Eo *obj, void *class_data, va_list *list) {
 	LOGF("Error: %s\n", XML_ErrorString(XML_GetErrorCode(document_parser)));
     }
   
+}
+
+static void 
+_start(Eo *obj, void *class_data, va_list *list) {
+  int i;
+  
+  void *data = va_arg(*list, void*);
+  const char *element = va_arg(*list, const char*);
+  const char **attributes = va_arg(*list, const char**);
+  
+
+  
 } 
+
+static void
+_char(Eo *obj, void *class_data, va_list *list)
+{
+  void *data = va_arg(*list, void*);
+  const XML_Char *string = va_arg(*list, const XML_Char*);
+  int length = va_arg(*list, int);
+
+    // ref important bytes passed in if they arent whitespace.
+    if (length > 0 && !isspace(*string))
+    {
+      LOGF("char data in tag: %.*s", length, string);
+    }    
+}
 
 static void
 _class_constructor(Eo_Class *klass)
 {
   const Eo_Op_Func_Description func_desc[] = {
+    EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_NAMESPACE_START), _document_start),
     EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_START), _start),
     EO_OP_FUNC_SENTINEL
   };
@@ -101,4 +123,4 @@ static const Eo_Class_Description class_desc = {
      NULL
 };
 
-EO_DEFINE_CLASS(amin_machine_spec_class_get, &class_desc, AMIN_ELT_CLASS, EO_BASE_CLASS, NULL);
+EO_DEFINE_CLASS(amin_machine_spec_class_get, &class_desc, AMIN_ELT, EO_BASE_CLASS, NULL);

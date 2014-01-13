@@ -21,6 +21,6 @@ enum {
  */
 #define parse(document) AMIN_ID(AMIN_SUB_ID_PARSE), EO_TYPECHECK(char *, document)
 
-#define AMIN_CLASS amin_class_get()
+#define AMIN amin_class_get()
 const Eo_Class *amin_class_get(void);
 

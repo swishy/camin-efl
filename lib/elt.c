@@ -30,9 +30,22 @@ typedef struct
    Eo *filter;
 } Private_Data;
 
-#define MY_CLASS AMIN_ELT_CLASS
+#define MY_CLASS AMIN_ELT
 
 // Wrappers to allow expat delegation to the current ELT subclass instance.
+void
+_expat_namespace_start(void *data, const char *prefix, const char *uri) {
+  printf("Name space start, uri: %s\n", uri);
+  Eo *self = (Eo*)data;
+  eo_do(self, namespace_start(data, prefix, uri));
+} 
+
+void
+_expat_namespace_end(void *data, const char *prefix) {
+  printf("Namespace end, uri: %s\n", prefix);
+  Eo *self = (Eo*)data;
+  eo_do(self, namespace_end(data, prefix));
+}
 
 static void
 _expat_start(void *data, const char *el, const char **attr) {
@@ -56,6 +69,11 @@ _expat_end(void *data, const char *el) {
   
   Eo *self = (Eo*)data;
   eo_do(self, end(data, el));
+}
+
+static void 
+_namespace_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+  
 }
 
 static void 
@@ -112,7 +130,12 @@ _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   
   LOG("Delegating parser handling back to parent");
   XML_SetUserData(pd->parser, parent);
-} 
+}
+
+static void 
+_namespace_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+  
+}
 
 static void 
 _fix_text(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
@@ -155,6 +178,8 @@ _filter_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
    XML_SetElementHandler(parser, _expat_start, _expat_end);
    LOG("Setting char handler");
    XML_SetCharacterDataHandler (parser, _expat_char);
+   LOG("Setting namespace handlers");
+   XML_SetNamespaceDeclHandler(parser, _expat_namespace_start, _expat_namespace_end);
    
    // Call base constructor.
    eo_do_super(obj, MY_CLASS, eo_constructor());
@@ -175,9 +200,11 @@ _class_constructor(Eo_Class *klass)
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_AMIN_COMMAND), _amin_command),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_WHITE_WASH), _white_wash),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), _filter_constructor),
+        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_NAMESPACE_START), _namespace_start),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_START), _start),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_CHAR), _char),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_END), _end),
+        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_NAMESPACE_END), _namespace_end),
         EO_OP_FUNC_SENTINEL
    };
 
@@ -188,9 +215,11 @@ static const Eo_Op_Description op_desc[] = {
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_AMIN_COMMAND, "Starts processing an Amin command."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_WHITE_WASH, "Trys to shell out and execute command if no amin module exists to handle it."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR, "Constructor function to use for filter instances."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_NAMESPACE_START, "Called when XML namespace element is hit."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_START, "Called when XML start element is hit."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_CHAR, "Called when character data is found within XML element."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_END, "Called when XML end element is hit."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_NAMESPACE_END, "Called when XML document end is hit."),
      EO_OP_DESCRIPTION_SENTINEL
 };
 

@@ -20,7 +20,7 @@ typedef struct
 } Private_Data;
 
 
-#define MY_CLASS AMIN_CLASS
+#define MY_CLASS AMIN
 
 static void
 _parse(Eo *obj, void *class_data, va_list *list)
@@ -43,7 +43,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
   }
   
   LOG("Loading AMIN machine spec");
-  Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC_CLASS, NULL, filter_constructor(machine_parser, obj));
+  Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC, NULL, filter_constructor(machine_parser, obj));
   const Eo_Class *machine_class = eo_class_get(amin_machine_spec);
   LOGF("obj-type:'%s'\n", eo_class_name_get(machine_class));
   
@@ -68,7 +68,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
   // TODO Implement below. probably needs to be generic in ELT base ie get_result() not get_spec...
   
   // Eo *spec = eo_do(amin_machine_spec, get_spec());
-  Eo *spec = eo_add(AMIN_CLASS, NULL, NULL);
+  Eo *spec = eo_add(AMIN, NULL, NULL);
 
   XML_ParserFree(machine_parser);
   
@@ -85,7 +85,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
   
   // Load up initial filter instance to start parsing profile. 
   LOG("Creating Amin Dispatcher Instance");
-  Eo *amin_dispatcher = eo_add_custom(AMIN_MACHINE_DISPATCHER_CLASS, NULL, dispatcher_constructor(spec));
+  Eo *amin_dispatcher = eo_add_custom(AMIN_MACHINE_DISPATCHER, NULL, dispatcher_constructor(spec));
   const Eo_Class *klass = eo_class_get(amin_dispatcher);
   LOGF("obj-type:'%s'\n", eo_class_name_get(klass));
   

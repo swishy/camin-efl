@@ -19,7 +19,7 @@ typedef struct
    Eina_List *filters;
 } Private_Data;
 
-#define MY_CLASS AMIN_MACHINE_SPEC_DOCUMENT_CLASS
+#define MY_CLASS AMIN_MACHINE_SPEC_DOCUMENT
 
 static void 
 _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
@@ -61,4 +61,4 @@ static const Eo_Class_Description class_desc = {
      NULL
 };
 
-EO_DEFINE_CLASS(amin_machine_spec_document_class_get, &class_desc, AMIN_ELT_CLASS, EO_BASE_CLASS, NULL);
+EO_DEFINE_CLASS(amin_machine_spec_document_class_get, &class_desc, AMIN_ELT, EO_BASE_CLASS, NULL);

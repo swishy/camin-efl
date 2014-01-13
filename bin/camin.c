@@ -74,7 +74,7 @@ static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
   ctxt->handler = NULL;
   
   LOG("Creating Amin Instance");
-  Eo *amin = eo_add(AMIN_CLASS, NULL);
+  Eo *amin = eo_add(AMIN, NULL);
   
   const Eo_Class *klass = eo_class_get(amin);
   printf("obj-type:'%s'\n", eo_class_name_get(klass));

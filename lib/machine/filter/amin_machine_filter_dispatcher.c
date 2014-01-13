@@ -7,11 +7,11 @@
 #include "common.h"
 #include "amin.h"
 #include "elt.h"
-#include "dispatcher.h"
+#include "amin_machine_filter_dispatcher.h"
 
 int DEPTH;
 
-EAPI Eo_Op AMIN_MACHINE_DISPATCHER_BASE_ID = 0;
+EAPI Eo_Op AMIN_MACHINE_FILTER_DISPATCHER_BASE_ID = 0;
 
 typedef struct
 {
@@ -31,7 +31,7 @@ typedef struct
    Eo *filter;
 } Private_Data;
 
-#define MY_CLASS AMIN_MACHINE_DISPATCHER_CLASS
+#define MY_CLASS AMIN_MACHINE_FILTER_DISPATCHER_CLASS
 
 static void 
 _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
@@ -77,13 +77,13 @@ static const Eo_Op_Description op_desc[] = {
 
 static const Eo_Class_Description class_desc = {
      EO_VERSION,
-     "Amin Machine Dispatcher",
+     "Amin Machine Filter Dispatcher",
      EO_CLASS_TYPE_REGULAR,
-     EO_CLASS_DESCRIPTION_OPS(&AMIN_MACHINE_DISPATCHER_BASE_ID, op_desc, AMIN_MACHINE_DISPATCHER_SUB_ID_LAST),
+     EO_CLASS_DESCRIPTION_OPS(&AMIN_MACHINE_FILTER_DISPATCHER_BASE_ID, op_desc, AMIN_MACHINE_FILTER_DISPATCHER_SUB_ID_LAST),
      NULL,
      sizeof(Private_Data),
      _class_constructor,
      NULL
 };
 
-EO_DEFINE_CLASS(amin_machine_dispatcher_class_get, &class_desc, AMIN_ELT_CLASS, EO_BASE_CLASS, NULL);
+EO_DEFINE_CLASS(amin_machine_filter_dispatcher_class_get, &class_desc, AMIN_ELT, EO_BASE_CLASS, NULL);

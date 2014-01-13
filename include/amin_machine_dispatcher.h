@@ -22,5 +22,5 @@ enum {
 #define dispatcher_constructor(spec) AMIN_MACHINE_DISPATCHER_ID(AMIN_MACHINE_DISPATCHER_SUB_ID_DISPATCHER_CONSTRUCTOR), EO_TYPECHECK(Eo *, spec)
 
 
-#define AMIN_MACHINE_DISPATCHER_CLASS amin_machine_dispatcher_class_get()
+#define AMIN_MACHINE_DISPATCHER amin_machine_dispatcher_class_get()
 const Eo_Class *amin_machine_dispatcher_class_get(void);

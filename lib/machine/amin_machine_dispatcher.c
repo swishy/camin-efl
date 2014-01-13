@@ -30,7 +30,7 @@ typedef struct
    Eo *filter;
 } Private_Data;
 
-#define MY_CLASS AMIN_MACHINE_DISPATCHER_CLASS
+#define MY_CLASS AMIN_MACHINE_DISPATCHER
 
 
 static void

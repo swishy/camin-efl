@@ -14,5 +14,5 @@ enum {
 
 #define AMIN_MACHINE_SPEC_ID(sub_id) (AMIN_MACHINE_SPEC_BASE_ID + sub_id)
 
-#define AMIN_MACHINE_SPEC_CLASS amin_machine_spec_class_get()
+#define AMIN_MACHINE_SPEC amin_machine_spec_class_get()
 const Eo_Class *amin_machine_spec_class_get(void);
