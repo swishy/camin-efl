@@ -37,7 +37,11 @@ typedef struct
 static void 
 _document_start(Eo *obj, void *class_data, va_list *list) {
   
-    Private_Data *pd = class_data;
+  FILE *machine_spec;
+  long size;
+  char *machine_spec_buffer;
+
+  Private_Data *pd = class_data;
   
   pd->filters = NULL;
   
@@ -52,9 +56,19 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
     ecore_shutdown();
   }
   
-  // TODO place holder till we have /etc/amin/machine_spec.xml etc loaded.
-  const char *spec = "<machine xmlns:amin=\"http://projectamin.org/ns/\"></machine>";
+  if ((machine_spec = fopen("/etc/amin/machine_spec.xml", "rb")))
+  {
+    fseek(machine_spec, 0, SEEK_END);
+    size = ftell(machine_spec);
+    fseek(machine_spec, 0, SEEK_SET);
+  }
   
+  if ((machine_spec_buffer = malloc(size)))
+  {
+    fread(machine_spec_buffer, 1, size, machine_spec);
+  }
+  
+  LOGF("%s", machine_spec_buffer);
   // TODO Add in XInclude filter.
   
   Eo *document = eo_add_custom(AMIN_MACHINE_SPEC_DOCUMENT, NULL, filter_constructor(document_parser, obj));
@@ -62,11 +76,11 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   LOGF("obj-type:'%s'\n", eo_class_name_get(document_class));
   
   // Let Expat do its thing, the local event callbacks are assigned to the parser instance
-    // as they are dynamically loaded up the stack. Here we just kick it off.
-    if(XML_Parse(document_parser, spec, strlen(spec), XML_TRUE) == XML_STATUS_ERROR)
-    {
-	LOGF("Error: %s\n", XML_ErrorString(XML_GetErrorCode(document_parser)));
-    }
+  // as they are dynamically loaded up the stack. Here we just kick it off.
+  if(XML_Parse(document_parser, machine_spec_buffer, strlen(machine_spec_buffer), XML_TRUE) == XML_STATUS_ERROR)
+  {
+    LOGF("Error: %s\n", XML_ErrorString(XML_GetErrorCode(document_parser)));
+  }
   
 }
 
@@ -78,7 +92,30 @@ _start(Eo *obj, void *class_data, va_list *list) {
   const char *element = va_arg(*list, const char*);
   const char **attributes = va_arg(*list, const char**);
   
-
+  size_t module_length = (strlen(element) + strlen(attributes[1]));
+  
+  char *module = malloc(sizeof(char) * module_length);
+  
+  eina_str_join(module, module_length, "", element, attributes[1]);
+  
+  LOG("AMIN_MACHINE_SPEC _start");
+  
+  LOGF("Element: %s", element);
+  LOGF("Attribute: %s", attributes[1]);
+  
+  LOGF("Module: %s", module);
+  
+  
+  /** PERL FOO 
+    my ($self, $element) = @_;
+	my %attrs = %{$element->{Attributes}};
+    my $module = $element->{Prefix} . "::" . $element->{'LocalName'};
+    if ($attrs{'{}name'}->{'Value'}) {
+        $module .= "::" . $attrs{'{}name'}->{'Value'};
+    }
+    $self->{'filters'}->{$module} = "";
+  
+  eina_str_join_len(prologue, 106, ' ', part1, strlen(part1), part2, strlen(part2));*/
   
 } 
 
