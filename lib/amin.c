@@ -2,7 +2,7 @@
 # include <config.h>
 #endif
 
-#include <expat.h>
+#include <libxml/SAX.h>
 #include "Eo.h"
 #include "common.h"
 #include "amin.h"
@@ -36,18 +36,35 @@ _parse(Eo *obj, void *class_data, va_list *list)
   // Perl currently loads up a fresh parser and passes it to machine_spec and starts parsing. 
   
   // Create a parser instance for this request.
-  XML_Parser machine_parser = XML_ParserCreate(NULL);
+  xmlSAXHandler machine_parser;
+  memset(&machine_parser, 0, sizeof(xmlSAXHandler));
+  machine_parser.initialized = XML_SAX2_MAGIC;
+  
+  
+  
+  
+  // Create a parser instance for this request.
+  /**XML_Parser machine_parser = XML_ParserCreate(NULL);
   if (! machine_parser) {
     LOG("Camin could not allocate memory for parser");
     ecore_shutdown();
-  }
+  }*/
   
   LOG("Loading AMIN machine spec");
   Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC, NULL, filter_constructor(machine_parser, obj));
   const Eo_Class *machine_class = eo_class_get(amin_machine_spec);
   LOGF("obj-type:'%s'\n", eo_class_name_get(machine_class));
   
+  HandlerData *handlerData;
+  handlerData->current_filter = amin_machine_spec;
+  handlerData->saxHandler = machine_parser;
+
+   xmlParserCtxtPtr context = xmlCreatePushParserCtxt(&machine_parser, handlerData, profile, strlen(profile), NULL);
+   LOG("Calling parse doc");
+   //xmlParseDocument(context);
+   xmlParseChunk(context, profile, strlen(profile), 0);
   
+  /** BELOW IS EXPAT FOO 
   // Start processing, let machine_spec handle expat foo.
   if(!ec_url)
   {
@@ -95,6 +112,8 @@ _parse(Eo *obj, void *class_data, va_list *list)
     {
 	LOGF("Error: %s\n", XML_ErrorString(XML_GetErrorCode(parser)));
     }
+    
+    */
 }
 
 static void

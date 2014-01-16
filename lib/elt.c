@@ -2,7 +2,6 @@
 # include <config.h>
 #endif
 
-#include <expat.h>
 #include <pcre.h>
 #include "Eo.h"
 #include "common.h"
@@ -14,7 +13,7 @@ EAPI Eo_Op AMIN_ELT_BASE_ID = 0;
 
 typedef struct
 {
-   XML_Parser parser;
+   xmlSAXHandler parser;
    char input;
    Eina_List *attrs;
    Eina_List *filters;
@@ -33,66 +32,113 @@ typedef struct
 #define MY_CLASS AMIN_ELT
 
 // Wrappers to allow expat delegation to the current ELT subclass instance.
-void
-_expat_namespace_start(void *data, const char *prefix, const char *uri) {
-  printf("Name space start, uri: %s\n", uri);
-  Eo *self = (Eo*)data;
-  eo_do(self, namespace_start(data, prefix, uri));
+static void
+_libxml2_document_start(void *user_data){
+    LOG("Document start");
+    HandlerData *data = (HandlerData*)user_data;
+    Eo *self = (Eo*)data->current_filter;
+    eo_do(self, document_start(user_data));
 } 
 
-void
-_expat_namespace_end(void *data, const char *prefix) {
-  printf("Namespace end, uri: %s\n", prefix);
-  Eo *self = (Eo*)data;
-  eo_do(self, namespace_end(data, prefix));
+static void
+_libxml2_document_end(void *user_data) {
+  LOG("Document end");
+  HandlerData *data = (HandlerData*)user_data;
+  Eo *self = data->current_filter;
+  eo_do(self, document_end(user_data));
 }
 
 static void
-_expat_start(void *data, const char *el, const char **attr) {
-  
-  Eo *self = (Eo*)data;
-  eo_do(self, start(data, el, attr));
-}
+_libxml2_start(
+  void *ctx,
+  const xmlChar *localname,
+  const xmlChar *prefix,
+  const xmlChar *URI,
+  int nb_namespaces,
+  const xmlChar **namespaces,
+  int nb_attributes,
+  int nb_defaulted,
+  const xmlChar **attributes ){
+    LOG("_libxml2_start");
+    
+    // Get the current filter from the libxml2 context
+    xmlParserCtxtPtr context = (xmlParserCtxtPtr)ctx;
+    Eo *self = context->userData;
+    
+    // Populate struct to pass around
+    ElementData *data;
+    data->ctx = ctx;
+    data->localname = localname;
+    data->prefix = prefix;
+    data->URI = URI;
+    data->nb_namespaces = nb_namespaces;
+    data->namespaces = namespaces;
+    data->nb_attributes = nb_attributes;
+    data->nb_defaulted = nb_defaulted;
+    data->attributes = attributes;
+    
+    // Fire in the hole! 
+    eo_do(self, document_start(user_data));
+} 
 
 static void
-_expat_char(void *data, const XML_Char *string, int string_len)
-{
-   Eo *self = (Eo*)data;
+_libxml2_char(
+  void *user_data, 
+  const xmlChar *string, 
+  int string_len) {
+   HandlerData *data = (HandlerData*)user_data;
+   Eo *self = data->current_filter;
    eo_do(self, char(data, string, string_len));
 }
 
 static void
-_expat_end(void *data, const char *el) {
+_libxml2_end( 
+  void* ctx,
+  const xmlChar* localname,
+  const xmlChar* prefix,
+  const xmlChar* URI) {
   DEPTH--;
   
   // TODO move this to a statement which checks end tag name = filter name
   
-  Eo *self = (Eo*)data;
-  eo_do(self, end(data, el));
+  ElementData *data;
+  data->ctx = ctx;
+  data->localname = localname;
+  data->prefix = prefix;
+  data->URI = URI;
+  
+  // Get the current filter from the libxml2 context
+  xmlParserCtxtPtr context = (xmlParserCtxtPtr)ctx;
+  Eo *self = context->userData;
+  eo_do(self, end(data));
 }
 
 static void 
-_namespace_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+_document_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+  
+  LOG("Amin machine spec doc start called");
+  
   
 }
+
+
 
 static void 
 _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   int i;
   
-  void *data = va_arg(*list, void*);
-  const char *element = va_arg(*list, const char*);
-  const char **attributes = va_arg(*list, const char**);
+  ElementData *data = va_arg(*list, ElementData*);
+
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
 
   for (i = 0; i < DEPTH; i++)
     LOG("  ");
 
-  LOGF("ELEMENT: %s", element);
+  LOGF("ELEMENT: %s", data->localname);
 
-  for (i = 0; attributes[i]; i += 2) {
-    LOGF("ATTRIBUTE %i %s='%s'", i, attributes[i], attributes[i + 1]);
+  for (i = 0; data->attributes[i]; i += 2) {
+    LOGF("ATTRIBUTE %i %s='%s'", i, data->attributes[i], data->attributes[i + 1]);
   }
 
   DEPTH++;
@@ -102,13 +148,13 @@ static void
 _char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
   void *data = va_arg(*list, void*);
-  const XML_Char *string = va_arg(*list, const XML_Char*);
+  const xmlChar *string = va_arg(*list, const xmlChar*);
   int length = va_arg(*list, int);
 
     // ref important bytes passed in if they arent whitespace.
     if (length > 0 && !isspace(*string))
     {
-      LOGF("char data in tag: %.*s", length, string);
+      LOGF("char data in tag: %i.%s", length, string);
     }    
 }
 
@@ -133,8 +179,8 @@ _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
 }
 
 static void 
-_namespace_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
-  
+_document_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+  LOG("Document end");
 }
 
 static void 
@@ -160,8 +206,8 @@ static void
 _filter_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
    // Get parser from args.
-   XML_Parser parser;
-   parser = va_arg(*list, XML_Parser);
+   xmlSAXHandler parser;
+   parser = va_arg(*list, xmlSAXHandler);
    
    // Set parent
    // TODO check if this is required.
@@ -172,14 +218,15 @@ _filter_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
    
    // Assign local reference.
    pd->parser = parser;
-   LOG("Assigning current instance as expat userdata");
-   XML_SetUserData(parser, obj); 
+   
+   LOG("Setting document handlers again.");
+   parser.startDocument = _libxml2_document_start;
+   parser.endDocument = _libxml2_document_end;
    LOG("Setting element handlers again.");
-   XML_SetElementHandler(parser, _expat_start, _expat_end);
+   parser.startElementNs = _libxml2_start;
+   parser.endElementNs = _libxml2_end;
    LOG("Setting char handler");
-   XML_SetCharacterDataHandler (parser, _expat_char);
-   LOG("Setting namespace handlers");
-   XML_SetNamespaceDeclHandler(parser, _expat_namespace_start, _expat_namespace_end);
+   parser.characters = _libxml2_char;
    
    // Call base constructor.
    eo_do_super(obj, MY_CLASS, eo_constructor());
@@ -200,11 +247,11 @@ _class_constructor(Eo_Class *klass)
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_AMIN_COMMAND), _amin_command),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_WHITE_WASH), _white_wash),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), _filter_constructor),
-        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_NAMESPACE_START), _namespace_start),
+        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_DOCUMENT_START), _document_start),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_START), _start),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_CHAR), _char),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_END), _end),
-        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_NAMESPACE_END), _namespace_end),
+        EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_DOCUMENT_END), _document_end),
         EO_OP_FUNC_SENTINEL
    };
 
@@ -215,11 +262,11 @@ static const Eo_Op_Description op_desc[] = {
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_AMIN_COMMAND, "Starts processing an Amin command."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_WHITE_WASH, "Trys to shell out and execute command if no amin module exists to handle it."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR, "Constructor function to use for filter instances."),
-     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_NAMESPACE_START, "Called when XML namespace element is hit."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_DOCUMENT_START, "Called when XML namespace element is hit."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_START, "Called when XML start element is hit."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_CHAR, "Called when character data is found within XML element."),
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_END, "Called when XML end element is hit."),
-     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_NAMESPACE_END, "Called when XML document end is hit."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_DOCUMENT_END, "Called when XML document end is hit."),
      EO_OP_DESCRIPTION_SENTINEL
 };
 

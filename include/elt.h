@@ -2,20 +2,34 @@
 # include <config.h>
 #endif
 
-#include <expat.h>
+#include <libxml/SAX2.h>
 #include "Eo.h"
 
 extern EAPI Eo_Op AMIN_ELT_BASE_ID;
+
+// Struct to maintain state through the parser.
+typedef struct ElementData
+{
+  void *ctx;
+  const xmlChar *localname;
+  const xmlChar *prefix;
+  const xmlChar *URI;
+  int nb_namespaces;
+  const xmlChar **namespaces;
+  int nb_attributes;
+  int nb_defaulted;
+  const xmlChar **attributes; 
+} ElementData ;
 
 enum {
      AMIN_ELT_SUB_ID_AMIN_COMMAND,
      AMIN_ELT_SUB_ID_WHITE_WASH,
      AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR,
-     AMIN_ELT_SUB_ID_NAMESPACE_START,
+     AMIN_ELT_SUB_ID_DOCUMENT_START,
      AMIN_ELT_SUB_ID_START,
      AMIN_ELT_SUB_ID_CHAR,
      AMIN_ELT_SUB_ID_END, 
-     AMIN_ELT_SUB_ID_NAMESPACE_END,
+     AMIN_ELT_SUB_ID_DOCUMENT_END,
      AMIN_ELT_SUB_ID_LAST
 };
 
@@ -34,41 +48,40 @@ enum {
 #define white_wash(filter) AMIN_ELT_ID(AMIN_ELT_SUB_ID_WHITE_WASH), EO_TYPECHECK(Eo_Class *, filter)
 
 /**
- * @def filter_constructor(XML_Parser *, parser, Eo *, parent)
+ * @def filter_constructor(xmlSAXHandler, parser, Eo *, parent)
  * @brief Must be used to construct ELT instance or inherited classes to allow parser delegation.
  */
-#define filter_constructor(parser, parent) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), EO_TYPECHECK(XML_Parser, parser), EO_TYPECHECK(Eo *, parent)
+#define filter_constructor(parser, parent) AMIN_ELT_ID(AMIN_ELT_SUB_ID_FILTER_CONSTRUCTOR), EO_TYPECHECK(xmlSAXHandler, parser), EO_TYPECHECK(Eo *, parent)
 
 /**
- * @def namespace_start(void *data, const char *prefix, const char *uri)
+ * @def document_start(void *user_data)
  * @brief Called when XML namespace element is hit.
  */
-#define namespace_start(data, prefix, uri) AMIN_ELT_ID(AMIN_ELT_SUB_ID_NAMESPACE_START), EO_TYPECHECK(void *, data), EO_TYPECHECK(const char *, prefix), EO_TYPECHECK(const char *, uri)
-
+#define document_start(user_data) AMIN_ELT_ID(AMIN_ELT_SUB_ID_DOCUMENT_START), EO_TYPECHECK(void *, data)
 
 /**
- * @def start(void *data, const char *element, const char **attributes)
+ * @def start(ElementData *elementData)
  * @brief Called when XML start element is hit.
  */
-#define start(data, element, attributes) AMIN_ELT_ID(AMIN_ELT_SUB_ID_START), EO_TYPECHECK(void *, data), EO_TYPECHECK(const char *, element), EO_TYPECHECK(const char **, attributes)
+#define start(elementData) AMIN_ELT_ID(AMIN_ELT_SUB_ID_START), EO_TYPECHECK(void *, elementData)
 
 /**
  * @def char(void *data, const XML_Char *string, int string_len)
  * @brief Called when XML characters are found in element.
  */
-#define char(data, string, string_length) AMIN_ELT_ID(AMIN_ELT_SUB_ID_CHAR), EO_TYPECHECK(void *, data), EO_TYPECHECK(const XML_Char *, string), EO_TYPECHECK(int, string_len)
+#define char(data, string, string_length) AMIN_ELT_ID(AMIN_ELT_SUB_ID_CHAR), EO_TYPECHECK(void *, data), EO_TYPECHECK(const xmlChar *, string), EO_TYPECHECK(int, string_len)
 
 /**
- * @def end(void *data, const char *element)
+ * @def end(void *data)
  * @brief Called when XML start element is hit.
  */
-#define end(data, element) AMIN_ELT_ID(AMIN_ELT_SUB_ID_END), EO_TYPECHECK(void *, data), EO_TYPECHECK(const char *, element)
+#define end(data) AMIN_ELT_ID(AMIN_ELT_SUB_ID_END), EO_TYPECHECK(void *, data)
 
 /**
- * @def namespace_end(void *data, const char *element)
+ * @def document_end(void *data, const char *element)
  * @brief Called when XML start element is hit.
  */
-#define namespace_end(vdata, prefix) AMIN_ELT_ID(AMIN_ELT_SUB_ID_NAMESPACE_END), EO_TYPECHECK(void *, data), EO_TYPECHECK(const char *, prefix)
+#define document_end(data) AMIN_ELT_ID(AMIN_ELT_SUB_ID_DOCUMENT_END), EO_TYPECHECK(void *, data)
 
 #define AMIN_ELT amin_elt_class_get()
 const Eo_Class *amin_elt_class_get(void);

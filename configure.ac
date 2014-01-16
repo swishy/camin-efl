@@ -37,6 +37,8 @@ PKG_CHECK_MODULES([EINA], [eina], [have_eina="yes"], [have_eina="no"])
 
 PKG_CHECK_MODULES([EO], [eo], [have_eo="yes"], [have_eo="no"])
 
+PKG_CHECK_MODULES([LIBXML2], [libxml-2.0], [have_libxml2="yes"], [have_libxml2="no"]  )
+
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_CONFIG_FILES([
@@ -56,4 +58,5 @@ echo
 echo " ecore.........: ${have_ecore}"
 echo " eina..........: ${have_eina}"
 echo " eo............: ${have_eo}"
+echo " libxml2.......: ${have_libxml2}"
 echo

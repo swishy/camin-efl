@@ -2,7 +2,7 @@
 # include <config.h>
 #endif
 
-#include <expat.h>
+#include <libxml/SAX2.h>
 #include "Eo.h"
 #include "common.h"
 #include "amin.h"
@@ -16,7 +16,7 @@ EAPI Eo_Op AMIN_MACHINE_SPEC_BASE_ID = 0;
 
 typedef struct
 {
-   XML_Parser parser;
+   xmlSAXHandler parser;
    char input;
    Eina_List *attrs;
    Eina_List *filters;
@@ -50,7 +50,7 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   LOG("MachineSpec start....");
   
   // Create a parser instance for this request.
-  XML_Parser document_parser = XML_ParserCreate(NULL);
+  /**XML_Parser document_parser = XML_ParserCreate(NULL);
   if (! document_parser) {
     LOG("Camin could not allocate memory for parser");
     ecore_shutdown();
@@ -80,7 +80,7 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   if(XML_Parse(document_parser, machine_spec_buffer, strlen(machine_spec_buffer), XML_TRUE) == XML_STATUS_ERROR)
   {
     LOGF("Error: %s\n", XML_ErrorString(XML_GetErrorCode(document_parser)));
-  }
+  }*/
   
 }
 
@@ -96,7 +96,7 @@ _start(Eo *obj, void *class_data, va_list *list) {
   
   char *module = malloc(sizeof(char) * module_length);
   
-  eina_str_join(module, module_length, "", element, attributes[1]);
+  //eina_str_join(module, module_length, "", element, attributes[1]);
   
   LOG("AMIN_MACHINE_SPEC _start");
   
@@ -122,7 +122,7 @@ _start(Eo *obj, void *class_data, va_list *list) {
 static void
 _char(Eo *obj, void *class_data, va_list *list)
 {
-  void *data = va_arg(*list, void*);
+  /**void *data = va_arg(*list, void*);
   const XML_Char *string = va_arg(*list, const XML_Char*);
   int length = va_arg(*list, int);
 
@@ -130,14 +130,14 @@ _char(Eo *obj, void *class_data, va_list *list)
     if (length > 0 && !isspace(*string))
     {
       LOGF("char data in tag: %.*s", length, string);
-    }    
+    }    */
 }
 
 static void
 _class_constructor(Eo_Class *klass)
 {
   const Eo_Op_Func_Description func_desc[] = {
-    EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_NAMESPACE_START), _document_start),
+    EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_DOCUMENT_START), _document_start),
     EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_START), _start),
     EO_OP_FUNC_SENTINEL
   };

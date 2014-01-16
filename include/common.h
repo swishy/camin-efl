@@ -1,3 +1,9 @@
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#include <libxml/SAX2.h>
+#include "Eo.h"
 
 // Logging macros.
 #define UVERR(err, msg) fprintf(stderr, "%s: %s\n", msg, uv_err_name(err))
@@ -10,3 +16,11 @@ typedef struct Spec
 {
    /* etc. */
 } Spec ;
+
+// Struct to maintain state through the parser.
+typedef struct HandlerData
+{
+  xmlSAXHandler saxHandler;
+  Eo *current_filter;
+  
+} HandlerData ;
