@@ -27,7 +27,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
 {
 
   // Document is only thing passed to us so pop if off the list.
-  char *profile = va_arg(*list, char*);
+  const char *profile = va_arg(*list, const char *);
   
   // TODO properly check if URI! atm just trys to create URL object.
   Ecore_Con_Url *ec_url = ecore_con_url_new(profile);
@@ -40,9 +40,6 @@ _parse(Eo *obj, void *class_data, va_list *list)
   memset(&machine_parser, 0, sizeof(xmlSAXHandler));
   machine_parser.initialized = XML_SAX2_MAGIC;
   
-  
-  
-  
   // Create a parser instance for this request.
   /**XML_Parser machine_parser = XML_ParserCreate(NULL);
   if (! machine_parser) {
@@ -54,15 +51,15 @@ _parse(Eo *obj, void *class_data, va_list *list)
   Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC, NULL, filter_constructor(machine_parser, obj));
   const Eo_Class *machine_class = eo_class_get(amin_machine_spec);
   LOGF("obj-type:'%s'\n", eo_class_name_get(machine_class));
-  
-  HandlerData *handlerData;
-  handlerData->current_filter = amin_machine_spec;
-  handlerData->saxHandler = machine_parser;
 
-   xmlParserCtxtPtr context = xmlCreatePushParserCtxt(&machine_parser, handlerData, profile, strlen(profile), NULL);
-   LOG("Calling parse doc");
-   //xmlParseDocument(context);
-   xmlParseChunk(context, profile, strlen(profile), 0);
+  HandlerData handlerData;
+  handlerData.current_filter = amin_machine_spec;
+  handlerData.saxHandler = machine_parser;
+  
+  LOG("start parsing");
+  if (xmlSAXUserParseMemory(&machine_parser, &handlerData, profile, strlen(profile)) < 0 ) {
+    LOG("Issue parsing XML document");
+  };
   
   /** BELOW IS EXPAT FOO 
   // Start processing, let machine_spec handle expat foo.

@@ -88,6 +88,8 @@ static void
 _start(Eo *obj, void *class_data, va_list *list) {
   int i;
   
+  LOG("AMIN_MACHINE_SPEC _start");
+  
   void *data = va_arg(*list, void*);
   const char *element = va_arg(*list, const char*);
   const char **attributes = va_arg(*list, const char**);
@@ -98,7 +100,7 @@ _start(Eo *obj, void *class_data, va_list *list) {
   
   //eina_str_join(module, module_length, "", element, attributes[1]);
   
-  LOG("AMIN_MACHINE_SPEC _start");
+  
   
   LOGF("Element: %s", element);
   LOGF("Attribute: %s", attributes[1]);

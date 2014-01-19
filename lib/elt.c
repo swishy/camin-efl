@@ -5,6 +5,7 @@
 #include <pcre.h>
 #include "Eo.h"
 #include "common.h"
+#include "xml_sax_base.h"
 #include "elt.h"
 
 int DEPTH;
@@ -36,11 +37,13 @@ static void
 _libxml2_document_start(void *user_data){
     LOG("Document start");
     HandlerData *data = (HandlerData*)user_data;
-    Eo *self = (Eo*)data->current_filter;
+    Eo *self = data->current_filter;
+    const Eo_Class *object_class = eo_class_get(self);
+    LOGF("obj-type:'%s'\n", eo_class_name_get(object_class));
     eo_do(self, document_start(user_data));
 } 
 
-static void
+void
 _libxml2_document_end(void *user_data) {
   LOG("Document end");
   HandlerData *data = (HandlerData*)user_data;
@@ -48,7 +51,7 @@ _libxml2_document_end(void *user_data) {
   eo_do(self, document_end(user_data));
 }
 
-static void
+void
 _libxml2_start(
   void *ctx,
   const xmlChar *localname,
@@ -81,7 +84,7 @@ _libxml2_start(
     eo_do(self, document_start(user_data));
 } 
 
-static void
+void
 _libxml2_char(
   void *user_data, 
   const xmlChar *string, 
@@ -91,7 +94,7 @@ _libxml2_char(
    eo_do(self, char(data, string, string_len));
 }
 
-static void
+void
 _libxml2_end( 
   void* ctx,
   const xmlChar* localname,
@@ -221,12 +224,12 @@ _filter_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
    
    LOG("Setting document handlers again.");
    parser.startDocument = _libxml2_document_start;
-   parser.endDocument = _libxml2_document_end;
+   //parser.endDocument = _libxml2_document_end;
    LOG("Setting element handlers again.");
-   parser.startElementNs = _libxml2_start;
-   parser.endElementNs = _libxml2_end;
+   //parser.startElementNs = _libxml2_start;
+   //parser.endElementNs = _libxml2_end;
    LOG("Setting char handler");
-   parser.characters = _libxml2_char;
+   //parser.characters = _libxml2_char;
    
    // Call base constructor.
    eo_do_super(obj, MY_CLASS, eo_constructor());
@@ -281,4 +284,4 @@ static const Eo_Class_Description class_desc = {
      NULL
 };
 
-EO_DEFINE_CLASS(amin_elt_class_get, &class_desc, EO_BASE_CLASS, NULL);
+EO_DEFINE_CLASS(amin_elt_class_get, &class_desc, XML_SAX_BASE, NULL);
