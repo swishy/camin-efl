@@ -6,6 +6,7 @@
 #include "Eo.h"
 #include "common.h"
 #include "amin.h"
+#include "xml_sax_base.h"
 #include "elt.h"
 #include "amin_machine_filter_dispatcher.h"
 
@@ -64,7 +65,7 @@ static void
 _class_constructor(Eo_Class *klass)
 {
   const Eo_Op_Func_Description func_desc[] = {
-    EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_START), _start),
+    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_START), _start),
     EO_OP_FUNC_SENTINEL
   };
   
