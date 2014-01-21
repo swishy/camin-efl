@@ -8,9 +8,9 @@ Installation
 
 Installation 
 
-Requires libuv, expat, ecore and eo libraries.
+Requires libuv, libxml2, ecore and eo libraries.
 
-Expat install via distro etc.
+Libxml2 install via distro etc.
 
 Grab Libuv 
 
