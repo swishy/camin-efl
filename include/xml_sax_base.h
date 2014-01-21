@@ -23,6 +23,7 @@ typedef struct ElementData
 
 enum {
      XML_SAX_BASE_SUB_ID_PARSE_STRING,
+     XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR,
      XML_SAX_BASE_SUB_ID_DOCUMENT_START,
      XML_SAX_BASE_SUB_ID_START,
      XML_SAX_BASE_SUB_ID_CHAR,
@@ -38,6 +39,12 @@ enum {
  * @brief Starts parsing a XMl document.
  */
 #define parse_string(document) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_PARSE_STRING), EO_TYPECHECK(const char *, document)
+
+/**
+ * @def set_document_locator(void *user_data)
+ * @brief Receives the document locator on startup.
+ */
+#define set_document_locator(user_data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR), EO_TYPECHECK(void *, user_data)
 
 /**
  * @def document_start(void *user_data)
@@ -58,13 +65,13 @@ enum {
 #define char(data, string, string_length) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_CHAR), EO_TYPECHECK(void *, data), EO_TYPECHECK(const xmlChar *, string), EO_TYPECHECK(int, string_len)
 
 /**
- * @def end(void *data)
+ * @def end(ElementData *data)
  * @brief Called when XML start element is hit.
  */
-#define end(data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_END), EO_TYPECHECK(void *, data)
+#define end(data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_END), EO_TYPECHECK(ElementData *, data)
 
 /**
- * @def document_end(void *data, const char *element)
+ * @def document_end(void *data)
  * @brief Called when XML start element is hit.
  */
 #define document_end(data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_END), EO_TYPECHECK(void *, data)

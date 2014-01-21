@@ -38,8 +38,6 @@ _white_wash(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
   LOG("white_wash called");
 }
 
-
-
 static void
 _class_constructor(Eo_Class *klass)
 {

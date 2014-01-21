@@ -11,14 +11,22 @@ EAPI Eo_Op XML_SAX_BASE_BASE_ID = 0;
 
 typedef struct
 {
-   Eo *Handler;
-   xmlSAXHandler parser;
+  Eo *Handler;
+  xmlSAXHandler parser;
 } Private_Data;
 
 
 #define MY_CLASS XML_SAX_BASE
 
 // LIBXML Wrappers
+static void
+_libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc) {
+    LOG("_libxml2_set_document_locator");
+    HandlerData *data = (HandlerData*)ctx;
+    Eo *self = data->current_filter;
+    eo_do(self, set_document_locator(data));
+  
+}
 
 static void
 _libxml2_document_start(void *user_data){
@@ -74,10 +82,10 @@ _libxml2_char(
   void *user_data, 
   const xmlChar *string, 
   int string_len) {
-   LOG("_libxml2_char");
-   HandlerData *data = (HandlerData*)user_data;
-   Eo *self = data->current_filter;
-   eo_do(self, char(data, string, string_len));
+  LOG("_libxml2_char");
+  HandlerData *data = (HandlerData*)user_data;
+  Eo *self = data->current_filter;
+  eo_do(self, char(data, string, string_len));
 }
 
 void
@@ -108,30 +116,37 @@ _libxml2_end(
 static void
 _parse_string(Eo *obj, void *class_data, va_list *list)
 {
-   // Create a parser instance for this request.
-   // TODO this currently is here as having one setup in the constructor 
-   // results in function references being lost in transit...
-   xmlSAXHandler parser;
-   memset(&parser, 0, sizeof(xmlSAXHandler));
-   parser.initialized = XML_SAX2_MAGIC;
+  // Create a parser instance for this request.
+  // TODO this currently is here as having one setup in the constructor 
+  // results in function references being lost in transit...
+  xmlSAXHandler parser;
+  memset(&parser, 0, sizeof(xmlSAXHandler));
+  parser.initialized = XML_SAX2_MAGIC;
 
-   // Grab XML string from args
-   char *xmlString = va_arg(*list, char*);
-   
-   LOG("Setting document handlers.");
-   parser.startDocument = _libxml2_document_start;
-   parser.endDocument = _libxml2_document_end;
-   LOG("Setting element handlers again.");
-   parser.startElementNs = _libxml2_start;
-   parser.endElementNs = _libxml2_end;
-   parser.characters = _libxml2_char;
-   
-   HandlerData handlerData;
-   handlerData.current_filter = obj;
-   
-   if (xmlSAXUserParseMemory(&parser, &handlerData, xmlString, strlen(xmlString)) < 0 ) {
+  // Grab XML string from args
+  char *xmlString = va_arg(*list, char*);
+  
+  LOG("Setting document handlers.");
+  parser.startDocument = _libxml2_document_start;
+  parser.endDocument = _libxml2_document_end;
+  LOG("Setting element handlers again.");
+  parser.startElementNs = _libxml2_start;
+  parser.endElementNs = _libxml2_end;
+  parser.characters = _libxml2_char;
+  parser.setDocumentLocator = _libxml2_set_document_locator;
+  
+  HandlerData handlerData;
+  handlerData.current_filter = obj;
+  
+  if (xmlSAXUserParseMemory(&parser, &handlerData, xmlString, strlen(xmlString)) < 0 ) {
     LOG("Issue parsing XML document");
   };
+}
+
+static void 
+_set_document_locator(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+  
+  LOG("XML SAX BASE set document locator called");  
 }
 
 static void 
@@ -147,14 +162,16 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   ElementData *element = va_arg(*list, ElementData*);
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
-  
-  LOG("Before call to elementdata");
 
   LOGF("ELEMENT: %s", element->localname);
 
-  /**for (i = 0; data->attributes[i]; i += 2) {
-    LOGF("ATTRIBUTE %i %s='%s'", i, data->attributes[i], data->attributes[i + 1]);
-  }*/
+
+  if (element->nb_attributes > 0)
+  {
+    for (i = 0; element->attributes[i]; i++) {
+    LOGF("ATTRIBUTE %i %s", i, element->attributes[i]);
+    }
+  } 
 }
 
 static void
@@ -175,6 +192,8 @@ static void
 _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
 
   LOG("Element End");
+  ElementData *element = va_arg(*list, ElementData*);
+  LOGF("End element name: %s", element->localname);
 }
 
 static void 
@@ -187,6 +206,7 @@ _class_constructor(Eo_Class *klass)
 {
   const Eo_Op_Func_Description func_desc[] = {
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_PARSE_STRING), _parse_string),
+    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR), _set_document_locator),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_START), _document_start),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_START), _start),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_CHAR), _char),
@@ -199,24 +219,25 @@ _class_constructor(Eo_Class *klass)
 }
 
 static const Eo_Op_Description op_desc[] = {
-     EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_PARSE_STRING, "Starts processing an XML document."),
-     EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_DOCUMENT_START, "Called when parser starts processing document"),
-     EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_START, "Called when start tage hit during parsing"),
-     EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_CHAR, "Called when char data found between elements"),
-     EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_END, "Called when end tag is hit during parsing"),
-     EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_DOCUMENT_END, "Called when end of document is reached during parsing"),
-     EO_OP_DESCRIPTION_SENTINEL
+    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_PARSE_STRING, "Starts processing an XML document."),
+    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR, "Recieves the document locator on startup"),
+    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_DOCUMENT_START, "Called when parser starts processing document"),
+    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_START, "Called when start tage hit during parsing"),
+    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_CHAR, "Called when char data found between elements"),
+    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_END, "Called when end tag is hit during parsing"),
+    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_DOCUMENT_END, "Called when end of document is reached during parsing"),
+    EO_OP_DESCRIPTION_SENTINEL
 };
 
 static const Eo_Class_Description class_desc = {
-     EO_VERSION,
-     "XML Sax Base",
-     EO_CLASS_TYPE_REGULAR,
-     EO_CLASS_DESCRIPTION_OPS(&XML_SAX_BASE_BASE_ID, op_desc, XML_SAX_BASE_SUB_ID_LAST),
-     NULL,
-     sizeof(Private_Data),
-     _class_constructor,
-     NULL
+    EO_VERSION,
+    "XML Sax Base",
+    EO_CLASS_TYPE_REGULAR,
+    EO_CLASS_DESCRIPTION_OPS(&XML_SAX_BASE_BASE_ID, op_desc, XML_SAX_BASE_SUB_ID_LAST),
+    NULL,
+    sizeof(Private_Data),
+    _class_constructor,
+    NULL
 };
 
 EO_DEFINE_CLASS(xml_sax_base_class_get, &class_desc, EO_BASE_CLASS, NULL);
