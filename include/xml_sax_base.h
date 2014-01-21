@@ -46,7 +46,7 @@ enum {
 #define document_start(user_data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_START), EO_TYPECHECK(void *, user_data)
 
 /**
- * @def start(ElementData elementData)
+ * @def start(ElementData *elementData)
  * @brief Called when XML start element is hit.
  */
 #define start(elementData) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_START), EO_TYPECHECK(ElementData *, elementData)

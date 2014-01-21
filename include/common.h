@@ -20,7 +20,6 @@ typedef struct Spec
 // Struct to maintain state through the parser.
 typedef struct HandlerData
 {
-  xmlSAXHandler saxHandler;
   Eo *current_filter;
   
 } HandlerData ;

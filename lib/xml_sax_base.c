@@ -22,14 +22,18 @@ typedef struct
 
 static void
 _libxml2_document_start(void *user_data){
-    LOG("Document start");
+    LOG("_libxml2_document_start");
+    HandlerData *data = (HandlerData*)user_data;
+    Eo *self = data->current_filter;
+    eo_do(self, document_start(data));
 } 
 
 static void
 _libxml2_document_end(void *user_data) {
-  LOG("Document end");
-  Eo *self = (Eo*)user_data;
-  eo_do(self, document_end(self));
+  LOG("_libxml2_document_end");
+  HandlerData *data = (HandlerData*)user_data;
+  Eo *self = data->current_filter;
+  eo_do(self, document_end(data));
 }
 
 static void
@@ -46,22 +50,23 @@ _libxml2_start(
     LOG("_libxml2_start");
     
     // Get the current filter from the libxml2 context
-    Eo *self = (Eo*)ctx;
+    HandlerData *data = (HandlerData*)ctx;
+    Eo *self = data->current_filter;
     
     // Populate struct to pass around
-    ElementData *data;
-    data->ctx = ctx;
-    data->localname = localname;
-    data->prefix = prefix;
-    data->URI = URI;
-    data->nb_namespaces = nb_namespaces;
-    data->namespaces = namespaces;
-    data->nb_attributes = nb_attributes;
-    data->nb_defaulted = nb_defaulted;
-    data->attributes = attributes;
+    ElementData element_data;
+    element_data.ctx = ctx;
+    element_data.localname = localname;
+    element_data.prefix = prefix;
+    element_data.URI = URI;
+    element_data.nb_namespaces = nb_namespaces;
+    element_data.namespaces = namespaces;
+    element_data.nb_attributes = nb_attributes;
+    element_data.nb_defaulted = nb_defaulted;
+    element_data.attributes = attributes;
     
     // Fire in the hole! 
-    eo_do(self, start(data));
+    eo_do(self, start(&element_data));
 } 
 
 void
@@ -69,6 +74,7 @@ _libxml2_char(
   void *user_data, 
   const xmlChar *string, 
   int string_len) {
+   LOG("_libxml2_char");
    HandlerData *data = (HandlerData*)user_data;
    Eo *self = data->current_filter;
    eo_do(self, char(data, string, string_len));
@@ -81,18 +87,20 @@ _libxml2_end(
   const xmlChar* prefix,
   const xmlChar* URI) {
   
+  LOG("_libxml2_end");
+  
   // TODO move this to a statement which checks end tag name = filter name
   
-  ElementData *data;
-  data->ctx = ctx;
-  data->localname = localname;
-  data->prefix = prefix;
-  data->URI = URI;
+  ElementData element_data;
+  element_data.ctx = ctx;
+  element_data.localname = localname;
+  element_data.prefix = prefix;
+  element_data.URI = URI;
   
   // Get the current filter from the libxml2 context
-  xmlParserCtxtPtr context = (xmlParserCtxtPtr)ctx;
-  Eo *self = context->userData;
-  eo_do(self, end(data));
+  HandlerData *data = (HandlerData*)ctx;
+  Eo *self = data->current_filter;
+  eo_do(self, end(&element_data));
 }
 
 // EFL Functions
@@ -100,38 +108,30 @@ _libxml2_end(
 static void
 _parse_string(Eo *obj, void *class_data, va_list *list)
 {
-  // Create a parser instance for this request.
+   // Create a parser instance for this request.
+   // TODO this currently is here as having one setup in the constructor 
+   // results in function references being lost in transit...
    xmlSAXHandler parser;
    memset(&parser, 0, sizeof(xmlSAXHandler));
    parser.initialized = XML_SAX2_MAGIC;
 
    // Grab XML string from args
-  char *xmlString = va_arg(*list, char*);
+   char *xmlString = va_arg(*list, char*);
    
    LOG("Setting document handlers.");
    parser.startDocument = _libxml2_document_start;
-   //parser.endDocument = _libxml2_document_end;
-   //LOG("Setting element handlers again.");
+   parser.endDocument = _libxml2_document_end;
+   LOG("Setting element handlers again.");
    parser.startElementNs = _libxml2_start;
+   parser.endElementNs = _libxml2_end;
+   parser.characters = _libxml2_char;
    
-   if (xmlSAXUserParseMemory(&parser, obj, xmlString, strlen(xmlString)) < 0 ) {
+   HandlerData handlerData;
+   handlerData.current_filter = obj;
+   
+   if (xmlSAXUserParseMemory(&parser, &handlerData, xmlString, strlen(xmlString)) < 0 ) {
     LOG("Issue parsing XML document");
   };
-   
-  /**LOG("XML SAX BASE parse string called.");
-  Private_Data *pd = class_data;
-  
-  // Grab XML string from args
-  char *xmlString = va_arg(*list, char*);
-  
-  xmlSAXHandler handler = (xmlSAXHandler)pd->parser;
-  
-  LOG("start parsing");
-  if (xmlSAXUserParseMemory(&handler, obj, xmlString, strlen(xmlString)) < 0 ) {
-    LOG("Issue parsing XML document");
-  };
-  
-  LOG("XML SAX BASE parse completed.");*/
 }
 
 static void 
@@ -183,38 +183,9 @@ _document_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
 }
 
 static void
-_constructor(Eo *obj, void *_pd, va_list *list EINA_UNUSED)
-{
-   LOG("XML SAX BASE CONSTRUCTOR");
-  
-   // Create a parser instance for this request.
-   xmlSAXHandler parser;
-   memset(&parser, 0, sizeof(xmlSAXHandler));
-   parser.initialized = XML_SAX2_MAGIC;
-
-   Private_Data *pd = _pd;
-   
-   // Assign local reference.
-   pd->parser = parser;
-   
-   LOG("Setting document handlers.");
-   //parser.startDocument = _libxml2_document_start;
-   //parser.endDocument = _libxml2_document_end;
-   //LOG("Setting element handlers again.");
-   parser.startElementNs = _libxml2_start;
-   //parser.endElementNs = _libxml2_end;
-   //LOG("Setting char handler");
-   //parser.characters = _libxml2_char;
-   
-   // Call base constructor.
-   eo_do_super(obj, MY_CLASS, eo_constructor());
-}
-
-static void
 _class_constructor(Eo_Class *klass)
 {
   const Eo_Op_Func_Description func_desc[] = {
-    EO_OP_FUNC(EO_BASE_ID(EO_BASE_SUB_ID_CONSTRUCTOR), _constructor),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_PARSE_STRING), _parse_string),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_START), _document_start),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_START), _start),
