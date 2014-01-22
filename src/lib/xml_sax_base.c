@@ -11,8 +11,8 @@ EAPI Eo_Op XML_SAX_BASE_BASE_ID = 0;
 
 typedef struct
 {
-   Eo *Handler;
-   xmlSAXHandler parser;
+   Eo *handler;
+   Eo *current_filter;
 }
 Private_Data;
 
@@ -23,26 +23,52 @@ static void
 _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
 {
    LOG("_libxml2_set_document_locator");
-   HandlerData *data = (HandlerData*)ctx;
-   Eo *self = data->current_filter;
-   eo_do(self, set_document_locator(data));
-
+   
+   // Here we grab current filter and private data for such, if a handler exists we
+   // use the handler callback if defined.
+   Eo *filter = (Eo*)ctx;
+   const Eo_Class *current_class = eo_class_get(filter);
+   
+   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
+   
+   Private_Data *data = eo_data_get(filter, current_class);
+   
+   Eo *handler = data->handler;
+   
+   if (handler != NULL)
+   {
+     eo_do(handler, set_document_locator(data));
+   } else {
+     eo_do(filter, set_document_locator(data));
+   }
 }
 
 static void
 _libxml2_document_start(void *user_data)
 {
    LOG("_libxml2_document_start");
-   HandlerData *data = (HandlerData*)user_data;
-   Eo *self = data->current_filter;
-   eo_do(self, document_start(data));
+   Eo *filter = (Eo*)user_data;
+   const Eo_Class *current_class = eo_class_get(filter);
+   
+   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
+   
+   Private_Data *data = eo_data_get(filter, current_class);
+   
+   Eo *handler = data->handler;
+   
+   if (handler != NULL)
+   {
+     eo_do(handler, document_start(user_data));
+   } else {
+     eo_do(filter, document_start(user_data));
+   }
 }
 
 static void
 _libxml2_document_end(void *user_data)
 {
    LOG("_libxml2_document_end");
-   HandlerData *data = (HandlerData*)user_data;
+   Private_Data *data = (Private_Data*)user_data;
    Eo *self = data->current_filter;
    eo_do(self, document_end(data));
 }
@@ -62,7 +88,7 @@ _libxml2_start(
    LOG("_libxml2_start");
 
    // Get the current filter from the libxml2 context
-   HandlerData *data = (HandlerData*)ctx;
+   Private_Data *data = (Private_Data*)ctx;
    Eo *self = data->current_filter;
 
    // Populate struct to pass around
@@ -88,7 +114,7 @@ _libxml2_char(
 	      int string_len)
 {
    LOG("_libxml2_char");
-   HandlerData *data = (HandlerData*)user_data;
+   Private_Data *data = (Private_Data*)user_data;
    Eo *self = data->current_filter;
    eo_do(self, char(data, string, string_len));
 }
@@ -112,7 +138,7 @@ _libxml2_end(
    element_data.URI = URI;
 
    // Get the current filter from the libxml2 context
-   HandlerData *data = (HandlerData*)ctx;
+   Private_Data *data = (Private_Data*)ctx;
    Eo *self = data->current_filter;
    eo_do(self, end(&element_data));
 }
@@ -135,16 +161,13 @@ _parse_string(Eo *obj, void *class_data, va_list *list)
    LOG("Setting document handlers.");
    parser.startDocument = _libxml2_document_start;
    parser.endDocument = _libxml2_document_end;
-   LOG("Setting element handlers again.");
+   LOG("Setting element handlers.");
    parser.startElementNs = _libxml2_start;
    parser.endElementNs = _libxml2_end;
    parser.characters = _libxml2_char;
    parser.setDocumentLocator = _libxml2_set_document_locator;
 
-   HandlerData handlerData;
-   handlerData.current_filter = obj;
-
-   if (xmlSAXUserParseMemory(&parser, &handlerData, xmlString, strlen(xmlString)) < 0 )
+   if (xmlSAXUserParseMemory(&parser, obj, xmlString, strlen(xmlString)) < 0 )
 {
    LOG("Issue parsing XML document");
 };
@@ -154,7 +177,8 @@ static void
 _set_document_locator(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
 
-   LOG("XML SAX BASE set document locator called");
+   const Eo_Class *current_class = eo_class_get(obj);
+   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
 }
 
 static void
@@ -214,10 +238,25 @@ _document_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
+_handler_constructor(Eo *obj, void *class_data, va_list *list)
+{
+   // Get handler from args
+   Eo *handler = va_arg(*list, Eo*);
+   
+   // Assign the current handler.
+   Private_Data *pd = class_data;
+   pd->handler = handler;
+   
+   // Call base constructor.
+   eo_do_super(obj, MY_CLASS, eo_constructor());
+}
+
+static void
 _class_constructor(Eo_Class *klass)
 {
    const Eo_Op_Func_Description func_desc[] =
 {
+   EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_HANDLER_CONSTRUCTOR), _handler_constructor),
    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_PARSE_STRING), _parse_string),
    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR), _set_document_locator),
    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_START), _document_start),
@@ -233,6 +272,7 @@ _class_constructor(Eo_Class *klass)
 
 static const Eo_Op_Description op_desc[] =
 {
+   EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_HANDLER_CONSTRUCTOR, "Custom constructor that allows setting of handler."),
    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_PARSE_STRING, "Starts processing an XML document."),
    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR, "Recieves the document locator on startup"),
    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_DOCUMENT_START, "Called when parser starts processing document"),

@@ -8,6 +8,7 @@
 #include "amin.h"
 #include "xml_sax_base.h"
 #include "elt.h"
+#include "xinclude.h"
 #include "machine_spec.h"
 #include "amin_machine_dispatcher.h"
 
@@ -48,7 +49,9 @@ _parse(Eo *obj, void *class_data, va_list *list)
   
   LOG("Loading XML_SAX_BASE");
   
-  Eo *xmlBase = eo_add(XML_SAX_BASE, NULL);
+  Eo *xinclude_filter = eo_add(AMIN_XINCLUDE, NULL);
+  
+  Eo *xmlBase = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
   
   const Eo_Class *xmlBase_class = eo_class_get(xmlBase);
   LOGF("obj-type:'%s'\n", eo_class_name_get(xmlBase_class));

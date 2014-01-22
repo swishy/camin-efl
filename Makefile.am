@@ -10,7 +10,8 @@ libamin_la_SOURCES = src/lib/amin.c src/lib/xml_sax_base.c \
 src/lib/elt.c src/lib/machine/machine_spec.c \
 src/lib/machine/spec/document.c \
 src/lib/machine/amin_machine_dispatcher.c \
-src/lib/machine/filter/amin_machine_filter_dispatcher.c 
+src/lib/machine/filter/amin_machine_filter_dispatcher.c \
+src/lib/machine/filter/xinclude.c
 libamin_la_LIBADD = @EINA_LIBS@ @ECORE_LIBS@ @EO_LIBS@ @LIBXML2_LIBS@
 libamin_la_CFLAGS = -lexpat @EINA_CFLAGS@ @ECORE_CFLAGS@ @EO_CFLAGS@ @LIBXML2_CFLAGS@
 libamin_la_LDFLAGS = -version-info @version_info@ 

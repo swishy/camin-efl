@@ -16,10 +16,3 @@ typedef struct Spec
 {
    /* etc. */
 } Spec ;
-
-// Struct to maintain state through the parser.
-typedef struct HandlerData
-{
-  Eo *current_filter;
-  
-} HandlerData ;

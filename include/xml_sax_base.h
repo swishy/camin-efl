@@ -7,7 +7,7 @@
 
 extern EAPI Eo_Op XML_SAX_BASE_BASE_ID;
 
-// Struct to maintain state through the parser.
+// Struct to pass around callback data easily.
 typedef struct ElementData
 {
   void *ctx;
@@ -22,6 +22,7 @@ typedef struct ElementData
 } ElementData ;
 
 enum {
+     XML_SAX_BASE_SUB_ID_HANDLER_CONSTRUCTOR,
      XML_SAX_BASE_SUB_ID_PARSE_STRING,
      XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR,
      XML_SAX_BASE_SUB_ID_DOCUMENT_START,
@@ -33,6 +34,12 @@ enum {
 };
 
 #define XML_SAX_BASE_ID(sub_id) (XML_SAX_BASE_BASE_ID + sub_id)
+
+/**
+ * @def set_handler_constructor(handler)
+ * @brief Sets handler on construction.
+ */
+#define set_handler_constructor(handler) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_HANDLER_CONSTRUCTOR), EO_TYPECHECK(Eo *, handler)
 
 /**
  * @def parse(document)
