@@ -51,14 +51,16 @@ _parse(Eo *obj, void *class_data, va_list *list)
   
   Eo *xinclude_filter = eo_add(AMIN_XINCLUDE, NULL);
   
-  Eo *xmlBase = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
+  Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
   
-  const Eo_Class *xmlBase_class = eo_class_get(xmlBase);
-  LOGF("obj-type:'%s'\n", eo_class_name_get(xmlBase_class));
+  eo_do(xinclude_filter, white_wash(xinclude_filter));
+  
+  const Eo_Class *xml_base_class = eo_class_get(xml_base);
+  LOGF("obj-type:'%s'\n", eo_class_name_get(xml_base_class));
   
   LOG("Kicking parser into action....");
   
-  eo_do(xmlBase, parse_string(profile));
+  eo_do(xml_base, parse_string(profile));
   
   /**LOG("Loading AMIN machine spec");
   Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC, NULL, filter_constructor(machine_parser, obj));

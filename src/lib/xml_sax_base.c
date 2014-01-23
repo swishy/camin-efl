@@ -37,9 +37,9 @@ _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
    
    if (handler != NULL)
    {
-     eo_do(handler, set_document_locator(data));
+     eo_do(handler, set_document_locator(ctx, loc));
    } else {
-     eo_do(filter, set_document_locator(data));
+     eo_do(filter, set_document_locator(ctx, loc));
    }
 }
 

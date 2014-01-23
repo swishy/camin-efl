@@ -48,10 +48,10 @@ enum {
 #define parse_string(document) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_PARSE_STRING), EO_TYPECHECK(const char *, document)
 
 /**
- * @def set_document_locator(void *user_data)
+ * @def set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
  * @brief Receives the document locator on startup.
  */
-#define set_document_locator(user_data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR), EO_TYPECHECK(void *, user_data)
+#define set_document_locator(ctx, loc) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR), EO_TYPECHECK(void *, ctx), EO_TYPECHECK(xmlSAXLocatorPtr, loc)
 
 /**
  * @def document_start(void *user_data)
