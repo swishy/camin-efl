@@ -64,11 +64,12 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
           //pd->href = element->attributes->href;
 	  
 	  int i = 0;
-	  while(i < element->nb_attributes)
+	  if (element->nb_attributes > 0)
 	  {
-	    const xmlChar * attribute = element->attributes[i];
-	    LOGF("Attribute name: %s", attribute);
-	    i++;
+	    for (i = 0; element->attributes[i]; i++)
+	    {
+	      LOGF("ATTRIBUTE %i %s", i, element->attributes[i]);
+	    }
 	  }
 	  
 	  //char *parse = element->attributes->parse ?? "xml";
