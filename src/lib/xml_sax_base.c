@@ -56,6 +56,8 @@ _libxml2_document_start(void *user_data)
    
    Eo *handler = data->handler;
    
+   LOGF("Handler is : %s ", eo_class_name_get(eo_class_get(handler)));
+   
    if (handler != NULL)
    {
      eo_do(handler, document_start(user_data));
@@ -68,9 +70,23 @@ static void
 _libxml2_document_end(void *user_data)
 {
    LOG("_libxml2_document_end");
-   Private_Data *data = (Private_Data*)user_data;
-   Eo *self = data->current_filter;
-   eo_do(self, document_end(data));
+   Eo *filter = (Eo*)user_data;
+   const Eo_Class *current_class = eo_class_get(filter);
+   
+   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
+   
+   Private_Data *data = eo_data_get(filter, current_class);
+   
+   Eo *handler = data->handler;
+   
+   LOGF("Handler is : %s ", eo_class_name_get(eo_class_get(handler)));
+   
+   if (handler != NULL)
+   {
+     eo_do(handler, document_end(user_data));
+   } else {
+     eo_do(filter, document_end(user_data));
+   }
 }
 
 static void
@@ -85,11 +101,16 @@ _libxml2_start(
 	       int nb_defaulted,
 	       const xmlChar **attributes )
 {
-   LOG("_libxml2_start");
-
-   // Get the current filter from the libxml2 context
-   Private_Data *data = (Private_Data*)ctx;
-   Eo *self = data->current_filter;
+   // Here we grab current filter and private data for such, if a handler exists we
+   // use the handler callback if defined.
+   Eo *filter = (Eo*)ctx;
+   const Eo_Class *current_class = eo_class_get(filter);
+   
+   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
+   
+   Private_Data *data = eo_data_get(filter, current_class);
+   
+   Eo *handler = data->handler;
 
    // Populate struct to pass around
    ElementData element_data;
@@ -102,9 +123,16 @@ _libxml2_start(
    element_data.nb_attributes = nb_attributes;
    element_data.nb_defaulted = nb_defaulted;
    element_data.attributes = attributes;
+   
+   LOG("_libxml2_start element data constructed calling eo_do");
 
    // Fire in the hole!
-   eo_do(self, start(&element_data));
+   if (handler != NULL)
+   {
+     eo_do(handler, start(&element_data));
+   } else {
+     eo_do(filter, start(&element_data));
+   }
 }
 
 void
@@ -114,9 +142,23 @@ _libxml2_char(
 	      int string_len)
 {
    LOG("_libxml2_char");
-   Private_Data *data = (Private_Data*)user_data;
-   Eo *self = data->current_filter;
-   eo_do(self, char(data, string, string_len));
+   // Here we grab current filter and private data for such, if a handler exists we
+   // use the handler callback if defined.
+   Eo *filter = (Eo*)user_data;
+   const Eo_Class *current_class = eo_class_get(filter);
+   
+   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
+   
+   Private_Data *data = eo_data_get(filter, current_class);
+   
+   Eo *handler = data->handler;
+   
+   if (handler != NULL)
+   {
+     eo_do(handler, char(data, string, string_len));
+   } else {
+     eo_do(filter, char(data, string, string_len));
+   }
 }
 
 void
@@ -128,6 +170,17 @@ _libxml2_end(
 {
 
    LOG("_libxml2_end");
+   
+   // Here we grab current filter and private data for such, if a handler exists we
+   // use the handler callback if defined.
+   Eo *filter = (Eo*)ctx;
+   const Eo_Class *current_class = eo_class_get(filter);
+   
+   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
+   
+   Private_Data *data = eo_data_get(filter, current_class);
+   
+   Eo *handler = data->handler;
 
    // TODO move this to a statement which checks end tag name = filter name
    //
@@ -136,11 +189,14 @@ _libxml2_end(
    element_data.localname = localname;
    element_data.prefix = prefix;
    element_data.URI = URI;
-
-   // Get the current filter from the libxml2 context
-   Private_Data *data = (Private_Data*)ctx;
-   Eo *self = data->current_filter;
-   eo_do(self, end(&element_data));
+   
+   // Fire in the hole!
+   if (handler != NULL)
+   {
+     eo_do(handler, end(&element_data));
+   } else {
+     eo_do(filter, end(&element_data));
+   }
 }
 
 // EFL Functions
