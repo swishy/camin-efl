@@ -3,6 +3,7 @@
 #endif
 
 #include <pcre.h>
+#include <string.h>
 #include "Eo.h"
 #include "Eina.h"
 #include "common.h"
@@ -15,9 +16,11 @@ int DEPTH;
 
 EAPI Eo_Op AMIN_XINCLUDE_BASE_ID = 0;
 
-#define XINCLUDE_NAMESPACE "http://www.w3.org/2001/XInclude"
+static const char XINCLUDE_NAMESPACE[] = "http://www.w3.org/2001/XInclude";
 
-#define NS_XML "http://www.w3.org/XML/1998/namespace"
+static const char NS_XML[] = "http://www.w3.org/XML/1998/namespace";
+
+static const char XINCLUDE_TAG[] = "include";
 
 typedef struct
 {
@@ -48,42 +51,69 @@ _start_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
-_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_start ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 {
+  const Eo_Class *current_class = eo_class_get ( obj );
+  LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
+
   Private_Data *pd = class_data;
-  ElementData *element = va_arg(*list, ElementData*);
-  if(pd->level == 0)
-  {
+  ElementData *element = va_arg ( *list, ElementData* );
+  if ( pd->level == 0 )
+    {
       pd->attributes = element->attributes;
-      
+
       // Handle XML_BASE stuff?? Bryan?
-      
+
       // Handle xincludes
-      if ((char*)element->URI == XINCLUDE_NAMESPACE && (char*)element->localname == "include")
-      {
-          //pd->href = element->attributes->href;
-	  
-	  int i = 0;
-	  if (element->nb_attributes > 0)
-	  {
-	    for (i = 0; element->attributes[i]; i++)
-	    {
-	      LOGF("ATTRIBUTE %i %s", i, element->attributes[i]);
-	    }
-	  }
-	  
-	  //char *parse = element->attributes->parse ?? "xml";
-	  
-	  /**if(parse == "text")
-	  {
-	      LOG("PLEASE IMPLEMENT _include_text_document");  
-	  } else if (parse == "xml") {
-	      LOG("PLEASE IMPLEMENT _include_xml_document"); 
-	  } else {
-	    eo_error_set(obj);
-	  }*/
-      }
-  }
+      LOGF ( "XML URI %s", element->URI );
+      LOGF ( "XML localname %s", element->localname );
+
+      if ( element->URI != NULL )
+        {
+          if ( strncmp ( element->URI,XINCLUDE_NAMESPACE,sizeof ( XINCLUDE_NAMESPACE ) ) == 0 &&  strncmp ( element->localname,XINCLUDE_TAG,sizeof ( XINCLUDE_TAG ) ) == 0 )
+            {
+              //pd->href = element->attributes->href;
+              LOG ( "COMPARISON MATCHED" );
+              if ( element->nb_attributes > 0 )
+                {
+                  LOGF ( "Number of attributes: %i",element->nb_attributes );
+		  int i = 0;
+		  int attribute_position = 0;
+                  while ( i < element->nb_attributes)
+                    {
+                      if ( element->attributes[attribute_position] != NULL )
+                        {
+                          if ( strncmp ( element->attributes[attribute_position],"href",sizeof ( element->attributes[attribute_position] ) ) == 0 )
+                            {
+                              pd->href = element->attributes[attribute_position];
+                              LOGF ("Matched href, value is : %s", element->attributes[attribute_position + 3]);
+                            }
+                        }
+
+                      LOGF ( "ATTRIBUTE %i %s", i, element->attributes[attribute_position] );
+		      attribute_position = attribute_position + 5;
+		      i++;
+                    }
+                }
+
+              //char *parse = element->attributes->parse ?? "xml";
+
+              /**if(parse == "text")
+              {
+                  LOG("PLEASE IMPLEMENT _include_text_document");
+              } else if (parse == "xml") {
+                  LOG("PLEASE IMPLEMENT _include_xml_document");
+              } else {
+                eo_error_set(obj);
+              }*/
+            }
+          else
+            {
+              // Pass back to XML_SAX_BASE
+              eo_do_super ( obj, MY_CLASS, start ( element ) );
+            }
+        }
+    }
 }
 
 static void
