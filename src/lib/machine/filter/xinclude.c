@@ -120,6 +120,8 @@ _start ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 		      // Invalid XInclude so error
                       eo_error_set ( obj );
                     }
+                    
+                    pd->level++;
                 }
             }
           else
@@ -172,6 +174,27 @@ _set_document_locator ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 }
 
 static void
+_end ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+{
+  Private_Data *pd = class_data;
+  ElementData *element = va_arg ( *list, ElementData* );
+
+  if ( element->URI != NULL && element->localname != NULL )
+    {
+      if ( strncmp ( element->URI,XINCLUDE_NAMESPACE,sizeof ( XINCLUDE_NAMESPACE ) ) == 0 &&  strncmp ( element->localname,XINCLUDE_TAG,sizeof ( XINCLUDE_TAG ) ) == 0 )
+        {
+          pd->level--;
+        }
+    }
+  else if ( pd->level == 0 )
+    {
+
+      // Pass back to XML_SAX_BASE
+      eo_do_super ( obj, MY_CLASS, end ( element ) );
+    }
+}
+
+static void
 _end_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 {
   Private_Data *pd = class_data;
@@ -193,6 +216,7 @@ _class_constructor ( Eo_Class *klass )
     EO_OP_FUNC ( XML_SAX_BASE_ID ( XML_SAX_BASE_SUB_ID_SET_DOCUMENT_LOCATOR ), _set_document_locator ),
     EO_OP_FUNC ( XML_SAX_BASE_ID ( XML_SAX_BASE_SUB_ID_DOCUMENT_START ), _start_document ),
     EO_OP_FUNC ( XML_SAX_BASE_ID ( XML_SAX_BASE_SUB_ID_START ), _start ),
+    EO_OP_FUNC ( XML_SAX_BASE_ID ( XML_SAX_BASE_SUB_ID_END ), _end ),
     EO_OP_FUNC ( XML_SAX_BASE_ID ( XML_SAX_BASE_SUB_ID_DOCUMENT_END ), _end_document ),
     EO_OP_FUNC_SENTINEL
   };
@@ -218,3 +242,4 @@ static const Eo_Class_Description class_desc =
 };
 
 EO_DEFINE_CLASS ( amin_xinclude_class_get, &class_desc, AMIN_ELT, NULL );
+
