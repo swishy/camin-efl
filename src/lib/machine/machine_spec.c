@@ -6,6 +6,7 @@
 #include "Eo.h"
 #include "common.h"
 #include "amin.h"
+#include "xinclude.h"
 #include "xml_sax_base.h"
 #include "elt.h"
 #include "machine_spec.h"
@@ -42,20 +43,14 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   long size;
   char *machine_spec_buffer;
 
-  Private_Data *pd = class_data;
+  Private_Data *data = eo_data_ref(obj, MY_CLASS);
   
-  pd->filters = NULL;
+  //pd->filters = NULL;
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
   LOG("MachineSpec start....");
-  
-  // Create a parser instance for this request.
-  /**XML_Parser document_parser = XML_ParserCreate(NULL);
-  if (! document_parser) {
-    LOG("Camin could not allocate memory for parser");
-    ecore_shutdown();
-  }
+
   
   if ((machine_spec = fopen("/etc/amin/machine_spec.xml", "rb")))
   {
@@ -70,18 +65,16 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   }
   
   LOGF("%s", machine_spec_buffer);
-  // TODO Add in XInclude filter.
   
-  Eo *document = eo_add_custom(AMIN_MACHINE_SPEC_DOCUMENT, NULL, filter_constructor(document_parser, obj));
-  const Eo_Class *document_class = eo_class_get(document);
-  LOGF("obj-type:'%s'\n", eo_class_name_get(document_class));
+  Eo *machine_spec_document = eo_add(AMIN_MACHINE_SPEC_DOCUMENT, NULL);
   
-  // Let Expat do its thing, the local event callbacks are assigned to the parser instance
-  // as they are dynamically loaded up the stack. Here we just kick it off.
-  if(XML_Parse(document_parser, machine_spec_buffer, strlen(machine_spec_buffer), XML_TRUE) == XML_STATUS_ERROR)
-  {
-    LOGF("Error: %s\n", XML_ErrorString(XML_GetErrorCode(document_parser)));
-  }*/
+  Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec_document));
+  
+  Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
+  
+  LOG("Kicking parser into action in machine_spec....");
+  
+  eo_do(xinclude_filter, parse_string(machine_spec_buffer));
   
 }
 

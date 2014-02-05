@@ -22,17 +22,29 @@ typedef struct
 
 #define MY_CLASS AMIN_MACHINE_SPEC_DOCUMENT
 
+_start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+{
+  LOG("IN DOCUMENT START DOCUMENT FILTER");
+  
+  ElementData *element = va_arg ( *list, ElementData* );
+  
+  const Eo_Class *current_class = eo_class_get ( obj );
+  LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
+  
+  eo_do_super ( obj, MY_CLASS, document_start ( element ) );
+}
+
 static void 
 _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   int i;
   
-  void *data = va_arg(*list, void*);
-  const char *element = va_arg(*list, const char*);
-  const char **attributes = va_arg(*list, const char**);
+  ElementData *element = va_arg ( *list, ElementData* );
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
   LOG("IN DOCUMENT FILTER");
+  
+  eo_do_super ( obj, MY_CLASS, start ( element ) );
  
 } 
 
@@ -40,6 +52,7 @@ static void
 _class_constructor(Eo_Class *klass)
 {
   const Eo_Op_Func_Description func_desc[] = {
+    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_START), _start_document),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_START), _start),
     EO_OP_FUNC_SENTINEL
   };

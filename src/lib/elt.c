@@ -19,6 +19,15 @@ typedef struct
 
 #define MY_CLASS AMIN_ELT
 
+static void
+_start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+{
+  const Eo_Class *current_class = eo_class_get ( obj );
+  LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
+      // Pass back to XML_SAX_BASE
+      eo_do_super ( obj, MY_CLASS, document_start ( va_arg ( *list, Eo* ) ) );
+}
+
 static void 
 _fix_text(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
@@ -42,6 +51,7 @@ static void
 _class_constructor(Eo_Class *klass)
 {
    const Eo_Op_Func_Description func_desc[] = {
+	EO_OP_FUNC ( XML_SAX_BASE_ID ( XML_SAX_BASE_SUB_ID_DOCUMENT_START ), _start_document ),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_AMIN_COMMAND), _amin_command),
         EO_OP_FUNC(AMIN_ELT_ID(AMIN_ELT_SUB_ID_WHITE_WASH), _white_wash),
         EO_OP_FUNC_SENTINEL

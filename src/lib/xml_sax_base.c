@@ -24,6 +24,8 @@ _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
 {
    LOG("_libxml2_set_document_locator");
    
+   LOGF("locator systemid: %s", loc->getSystemId(&ctx));
+   
    // Here we grab current filter and private data for such, if a handler exists we
    // use the handler callback if defined.
    Eo *filter = (Eo*)ctx;
@@ -31,7 +33,7 @@ _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_get(filter, current_class);
+   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
    
@@ -52,7 +54,7 @@ _libxml2_document_start(void *user_data)
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_get(filter, current_class);
+   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
    
@@ -75,7 +77,7 @@ _libxml2_document_end(void *user_data)
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_get(filter, current_class);
+   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
    
@@ -108,7 +110,7 @@ _libxml2_start(
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_get(filter, current_class);
+   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
 
@@ -149,7 +151,7 @@ _libxml2_char(
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_get(filter, current_class);
+   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
    
@@ -178,7 +180,7 @@ _libxml2_end(
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_get(filter, current_class);
+   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
 
@@ -300,7 +302,7 @@ _handler_constructor(Eo *obj, void *class_data, va_list *list)
    Eo *handler = va_arg(*list, Eo*);
    
    // Assign the current handler.
-   Private_Data *pd = class_data;
+   Private_Data  *pd = class_data;
    pd->handler = handler;
    
    // Call base constructor.

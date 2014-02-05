@@ -10,6 +10,7 @@
 #include "elt.h"
 #include "xinclude.h"
 #include "machine_spec.h"
+#include "document.h"
 #include "amin_machine_dispatcher.h"
 
 int DEPTH;
@@ -49,7 +50,9 @@ _parse(Eo *obj, void *class_data, va_list *list)
   
   LOG("Loading XML_SAX_BASE");
   
-  Eo *xinclude_filter = eo_add(AMIN_XINCLUDE, NULL);
+  Eo *machine_spec = eo_add(AMIN_MACHINE_SPEC, NULL);
+  
+  Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec));
   
   Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
   
@@ -60,7 +63,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
   
   LOG("Kicking parser into action....");
   
-  eo_do(xml_base, parse_string(profile));
+  eo_do(xinclude_filter, parse_string(profile));
   
   /**LOG("Loading AMIN machine spec");
   Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC, NULL, filter_constructor(machine_parser, obj));
