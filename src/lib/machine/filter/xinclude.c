@@ -90,7 +90,6 @@ _start ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
                         {
                           if ( strncmp ( element->attributes[attribute_position],"href",sizeof ( element->attributes[attribute_position] ) ) == 0 )
                             {
-                              pd->href = element->attributes[attribute_position];
                               int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
                               pd->href = strndup ( element->attributes[attribute_position + 3], attribute_length );
                             }
