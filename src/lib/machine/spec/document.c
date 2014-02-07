@@ -25,12 +25,14 @@ static const char NAMESPACE_TAG[] = "namespace";
 static const char NAME_TAG[] = "name";
 static const char MACHINE_TAG[] = "machine_name";
 static const char POSITION_TAG[] = "position";
+static const char DOWNLOAD_TAG[] = "download";
+static const char VERSION_TAG[] = "version";
+static const char FILTER_PARAMS_TAG[] = "filter_param";
 
 typedef struct
 {
-   char *localname;
-   void **attributes;
-   Eina_List *bundle;
+   const char *localname;
+   Eina_List *bundles;
    Eina_List *filters;
    char *element;
    Eo *mparent;   
@@ -67,8 +69,7 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   
   Private_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
-  
-  pd->attributes = element->attributes;
+
   pd->localname = element->localname;
   
   // Get Module Name 
@@ -182,7 +183,7 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
-  LOG("IN DOCUMENT FILTER");
+  LOG("IN DOCUMENT FILTER START");
 } 
 
 static void
@@ -200,23 +201,87 @@ _char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 	{
 	  pd->element_name = string;
 	}
-	if ( strncmp ( pd->localname,ELEMENT_TAG,sizeof ( NAMESPACE_TAG ) ) == 0 )
+	if ( strncmp ( pd->localname,NAMESPACE_TAG,sizeof ( NAMESPACE_TAG ) ) == 0 )
 	{
 	  pd->name_space = string;
 	}
-	if ( strncmp ( pd->localname,ELEMENT_TAG,sizeof ( NAME_TAG ) ) == 0 )
+	if ( strncmp ( pd->localname,NAME_TAG,sizeof ( NAME_TAG ) ) == 0 )
 	{
 	  pd->name = string;
 	}
-	if ( strncmp ( pd->localname,ELEMENT_TAG,sizeof ( MACHINE_TAG ) ) == 0 )
+	if ( strncmp ( pd->localname,MACHINE_TAG,sizeof ( MACHINE_TAG ) ) == 0 )
 	{
 	  pd->machine_name = string;
 	}
-	if ( strncmp ( pd->localname,ELEMENT_TAG,sizeof ( POSITION_TAG ) ) == 0 )
+	if ( strncmp ( pd->localname,POSITION_TAG,sizeof ( POSITION_TAG ) ) == 0 )
+	{
+	  pd->position = string;
+	}
+	if ( strncmp ( pd->localname,DOWNLOAD_TAG,sizeof ( DOWNLOAD_TAG ) ) == 0 )
+	{
+	  pd->position = string;
+	}
+	if ( strncmp ( pd->localname,VERSION_TAG,sizeof ( VERSION_TAG ) ) == 0 )
+	{
+	  pd->position = string;
+	}
+	if ( strncmp ( pd->localname,FILTER_PARAMS_TAG,sizeof ( FILTER_PARAMS_TAG ) ) == 0 )
 	{
 	  pd->position = string;
 	}
     }
+}
+
+static void 
+_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+  
+  Private_Data *pd = class_data;
+  ElementData *element = va_arg ( *list, ElementData* );
+  
+  if ( strncmp ( pd->localname,BUNDLE_TAG,sizeof ( BUNDLE_TAG ) ) == 0 )
+  {
+    Filter_Data bundle;
+    bundle.element = pd->element_name;
+    bundle.name_space = pd->name_space;
+    bundle.name = pd->name;
+    bundle.position = pd->position;
+    bundle.download = pd->download;
+    bundle.version = pd->version;
+    bundle.module = pd->module;
+    pd->bundles = eina_list_append(pd->bundles, &bundle);
+  }
+  if ( strncmp ( pd->localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 )
+  {
+    Filter_Data filter;
+    filter.element = pd->element_name;
+    filter.name_space = pd->name_space;
+    filter.name = pd->name;
+    filter.position = pd->position;
+    filter.download = pd->download;
+    filter.version = pd->version;
+    filter.module = pd->module;
+    pd->filters = eina_list_append(pd->filters, &filter);
+  }
+  if ( strncmp ( pd->localname,MACHINE_TAG,sizeof ( MACHINE_TAG ) ) == 0 )
+  {
+    // TODO investigate returned struct.
+    LOG("Dont think we need much more here?");
+  }
+}
+
+static void 
+_end_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+  
+  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
+  
+  Private_Data *pd = class_data;
+  
+  Machine_Spec_Document spec_document;
+  spec_document.filters = pd->filters;
+  spec_document.bundles = pd->bundles;
+  
+  LOG("END OF END DOCUMENT");
+  return spec_document;
 }
 
 static void
@@ -226,8 +291,11 @@ _class_constructor(Eo_Class *klass)
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_START), _start_document),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_START), _start),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_CHAR), _char),
+    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_END), _end),
+    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_END), _end_document),
     EO_OP_FUNC_SENTINEL
   };
+  
   
   eo_class_funcs_set(klass, func_desc);
 }

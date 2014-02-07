@@ -8,6 +8,27 @@
 
 extern EAPI Eo_Op AMIN_MACHINE_SPEC_DOCUMENT_BASE_ID;
 
+typedef struct
+{
+   const char *element;
+   const char *name_space;
+   const char *name;
+   const char *position;
+   const char *download;
+   const char *version;
+   const char *module;
+} Filter_Data;
+
+typedef struct
+{
+   Eina_List *filters;
+   Eina_List *bundles;
+   char *machine_name;
+   char *generator;
+   char *log;
+   char **filter_params;
+} Machine_Spec_Document;
+
 enum {
      AMIN_MACHINE_SPEC_DOCUMENT_SUB_ID_LAST
 };

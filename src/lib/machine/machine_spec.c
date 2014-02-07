@@ -74,7 +74,9 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   
   LOG("Kicking parser into action in machine_spec....");
   
-  eo_do(xinclude_filter, parse_string(machine_spec_buffer));
+  Machine_Spec_Document *spec = eo_do(xinclude_filter, parse_string(machine_spec_buffer));
+  LOG("machine spec oarse string comepled.....");
+  LOGF("We have a doc %s", spec->machine_name);
   
 }
 
