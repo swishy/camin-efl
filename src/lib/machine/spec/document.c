@@ -276,12 +276,12 @@ _end_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   
   Private_Data *pd = class_data;
   
-  Machine_Spec_Document spec_document;
-  spec_document.filters = pd->filters;
-  spec_document.bundles = pd->bundles;
+  // TODO Access result stored in XML_SAX_BASE pd and set spec document values on such.
+  //Machine_Spec_Document *spec_document = eo_data_ref(obj, XML_SAX_BASE);
+  //spec_document.filters = pd->filters;
+  //spec_document.bundles = pd->bundles;
   
   LOG("END OF END DOCUMENT");
-  return spec_document;
 }
 
 static void

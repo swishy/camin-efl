@@ -13,6 +13,7 @@ typedef struct
 {
    Eo *handler;
    Eo *current_filter;
+   void **result;
 }
 Private_Data;
 
@@ -206,6 +207,8 @@ _libxml2_end(
 static void
 _parse_string(Eo *obj, void *class_data, va_list *list)
 {
+  
+  Private_Data *data = class_data;
    // Create a parser instance for this request.
    // TODO this currently is here as having one setup in the constructor
    // results in function references being lost in transit...
@@ -215,6 +218,7 @@ _parse_string(Eo *obj, void *class_data, va_list *list)
 
    // Grab XML string from args
    char *xmlString = va_arg(*list, char*);
+   data->result = va_arg(*list, void**);
 
    LOG("Setting document handlers.");
    parser.startDocument = _libxml2_document_start;

@@ -63,7 +63,9 @@ _parse(Eo *obj, void *class_data, va_list *list)
   
   LOG("Kicking parser into action....");
   
-  eo_do(xinclude_filter, parse_string(profile));
+  int foo;
+  
+  eo_do(xinclude_filter, parse_string(profile, &foo));
   
   /**LOG("Loading AMIN machine spec");
   Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC, NULL, filter_constructor(machine_parser, obj));
