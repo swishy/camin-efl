@@ -7,6 +7,14 @@
 
 extern EAPI Eo_Op XML_SAX_BASE_BASE_ID;
 
+typedef struct
+{
+   Eo *handler;
+   Eo *current_filter;
+   void **result;
+}
+Xml_Base_Data;
+
 // Struct to pass around callback data easily.
 typedef struct ElementData
 {

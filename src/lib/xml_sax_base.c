@@ -9,14 +9,6 @@
 
 EAPI Eo_Op XML_SAX_BASE_BASE_ID = 0;
 
-typedef struct
-{
-   Eo *handler;
-   Eo *current_filter;
-   void **result;
-}
-Private_Data;
-
 #define MY_CLASS XML_SAX_BASE
 
 // LIBXML Wrappers
@@ -34,7 +26,7 @@ _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
+   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
    
@@ -55,7 +47,7 @@ _libxml2_document_start(void *user_data)
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
+   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
    
@@ -78,7 +70,7 @@ _libxml2_document_end(void *user_data)
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
+   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
    
@@ -111,7 +103,7 @@ _libxml2_start(
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
+   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
 
@@ -152,7 +144,7 @@ _libxml2_char(
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
+   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
    
@@ -181,7 +173,7 @@ _libxml2_end(
    
    LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
-   Private_Data *data = eo_data_ref(filter, XML_SAX_BASE);
+   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
 
@@ -208,7 +200,7 @@ static void
 _parse_string(Eo *obj, void *class_data, va_list *list)
 {
   
-  Private_Data *data = class_data;
+  Xml_Base_Data *data = class_data;
    // Create a parser instance for this request.
    // TODO this currently is here as having one setup in the constructor
    // results in function references being lost in transit...
@@ -306,7 +298,7 @@ _handler_constructor(Eo *obj, void *class_data, va_list *list)
    Eo *handler = va_arg(*list, Eo*);
    
    // Assign the current handler.
-   Private_Data  *pd = class_data;
+   Xml_Base_Data  *pd = class_data;
    pd->handler = handler;
    
    // Call base constructor.
@@ -352,7 +344,7 @@ static const Eo_Class_Description class_desc =
    EO_CLASS_TYPE_REGULAR,
    EO_CLASS_DESCRIPTION_OPS(&XML_SAX_BASE_BASE_ID, op_desc, XML_SAX_BASE_SUB_ID_LAST),
    NULL,
-   sizeof(Private_Data),
+   sizeof(Xml_Base_Data),
    _class_constructor,
    NULL
 };
