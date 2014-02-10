@@ -62,9 +62,10 @@ static Eina_Bool
 _filter_foreach_cb(const Eina_Hash *filter, const void *key,
 void *data, void *fdata)
 {
+LOG("In eina foreach callback");
 const char *name = key;
-Filter_Data *filter_data = data;
-printf("%s: %s\n", name, filter_data->name_space);
+Filter_Data *filter_data = (Filter_Data*)data;
+printf("%s\n", name);
 // Return EINA_FALSE to stop this callback from being called
 return EINA_TRUE;
 }
@@ -248,16 +249,16 @@ _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
 
   if ( strncmp ( element->localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 )
   {
-    Filter_Data *filter;
-    filter->element = pd->element_name;
-    filter->name_space = pd->name_space;
-    filter->name = pd->name;
-    filter->position = pd->position;
-    filter->download = pd->download;
-    filter->version = pd->version;
-    filter->module = pd->module;
-    LOGF("About to add filter to hash %s", filter->module);
-    eina_hash_add(pd->filters, filter->module, filter);
+    Filter_Data filter;
+    filter.element = pd->element_name;
+    filter.name_space = pd->name_space;
+    filter.name = pd->name;
+    filter.position = pd->position;
+    filter.download = pd->download;
+    filter.version = pd->version;
+    filter.module = pd->module;
+    LOGF("About to add filter to hash %s", filter.module);
+    eina_hash_add(pd->filters, filter.module, &filter);
   }
   /**if ( strncmp ( pd->localname,MACHINE_TAG,sizeof ( MACHINE_TAG ) ) == 0 )
   {
@@ -277,10 +278,11 @@ _end_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   if(!xd) LOG("No base data :(");
   if(xd->result)
   {
+    LOG("Adding filters to machine spec result.");
     // TODO Access result stored in XML_SAX_BASE pd and set spec document values on such.
     Machine_Spec_Document *spec_document = (Machine_Spec_Document*)xd->result;
     spec_document->filters = pd->filters;
-    eina_hash_foreach(pd->filters, _filter_foreach_cb, NULL);
+    
   } else {
     LOG("WOOOP BADNESS9000000");
   }

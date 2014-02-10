@@ -42,7 +42,7 @@ void *data, void *fdata)
 {
 const char *name = key;
 Filter_Data *filter_data = data;
-printf("%s: %s\n", name, filter_data->name_space);
+printf("%s\n", name);
 // Return EINA_FALSE to stop this callback from being called
 return EINA_TRUE;
 }
@@ -82,11 +82,11 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   LOG("Kicking parser into action in machine_spec....");
   
   // TODO implement out param on xml_sax_base tp receive the result of parsing....
-  Machine_Spec_Document *spec;
+  Machine_Spec_Document spec;
   eo_do(machine_spec_document, parse_string(machine_spec_buffer, &spec));
-  LOG("machine spec oarse string comepled.....");
+  LOG("Listing filters in result.....");
   
-  eina_hash_foreach(spec->filters, _filter_foreach_cb, NULL);
+  eina_hash_foreach(spec.filters, _filter_foreach_cb, NULL);
   
 }
 
