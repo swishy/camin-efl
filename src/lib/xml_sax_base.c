@@ -24,8 +24,6 @@ _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
    Eo *filter = (Eo*)ctx;
    const Eo_Class *current_class = eo_class_get(filter);
    
-   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
-   
    Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
@@ -41,17 +39,12 @@ _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
 static void
 _libxml2_document_start(void *user_data)
 {
-   LOG("_libxml2_document_start");
    Eo *filter = (Eo*)user_data;
    const Eo_Class *current_class = eo_class_get(filter);
-   
-   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
    Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
-   
-   LOGF("Handler is : %s ", eo_class_name_get(eo_class_get(handler)));
    
    if (handler != NULL)
    {
@@ -64,17 +57,12 @@ _libxml2_document_start(void *user_data)
 static void
 _libxml2_document_end(void *user_data)
 {
-   LOG("_libxml2_document_end");
    Eo *filter = (Eo*)user_data;
    const Eo_Class *current_class = eo_class_get(filter);
-   
-   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
    Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
-   
-   LOGF("Handler is : %s ", eo_class_name_get(eo_class_get(handler)));
    
    if (handler != NULL)
    {
@@ -101,8 +89,6 @@ _libxml2_start(
    Eo *filter = (Eo*)ctx;
    const Eo_Class *current_class = eo_class_get(filter);
    
-   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
-   
    Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
@@ -118,8 +104,6 @@ _libxml2_start(
    element_data.nb_attributes = nb_attributes;
    element_data.nb_defaulted = nb_defaulted;
    element_data.attributes = attributes;
-   
-   LOG("_libxml2_start element data constructed calling eo_do");
 
    // Fire in the hole!
    if (handler != NULL)
@@ -136,15 +120,15 @@ _libxml2_char(
 	      const xmlChar *string,
 	      int string_len)
 {
-   LOG("_libxml2_char");
    // Here we grab current filter and private data for such, if a handler exists we
    // use the handler callback if defined.
    Eo *filter = (Eo*)user_data;
    const Eo_Class *current_class = eo_class_get(filter);
+   const char *class_name = eo_class_name_get(current_class); 
    
-   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
+   LOGF("Current handler class is: %s", class_name);
    
-   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
+   Xml_Base_Data *data = eo_data_scope_get(filter, XML_SAX_BASE);
    
    Eo *handler = data->handler;
    
@@ -163,15 +147,10 @@ _libxml2_end(
 	     const xmlChar* prefix,
 	     const xmlChar* URI)
 {
-
-   LOG("_libxml2_end");
-   
    // Here we grab current filter and private data for such, if a handler exists we
    // use the handler callback if defined.
    Eo *filter = (Eo*)ctx;
    const Eo_Class *current_class = eo_class_get(filter);
-   
-   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
    
    Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
    
@@ -200,7 +179,7 @@ static void
 _parse_string(Eo *obj, void *class_data, va_list *list)
 {
   
-  Xml_Base_Data *data = class_data;
+   Xml_Base_Data *data = class_data;
    // Create a parser instance for this request.
    // TODO this currently is here as having one setup in the constructor
    // results in function references being lost in transit...
@@ -210,12 +189,10 @@ _parse_string(Eo *obj, void *class_data, va_list *list)
 
    // Grab XML string from args
    char *xmlString = va_arg(*list, char*);
-   data->result = va_arg(*list, void**);
+   data->result = va_arg(*list, void*);
 
-   LOG("Setting document handlers.");
    parser.startDocument = _libxml2_document_start;
    parser.endDocument = _libxml2_document_end;
-   LOG("Setting element handlers.");
    parser.startElementNs = _libxml2_start;
    parser.endElementNs = _libxml2_end;
    parser.characters = _libxml2_char;
@@ -230,9 +207,7 @@ _parse_string(Eo *obj, void *class_data, va_list *list)
 static void
 _set_document_locator(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
-
-   const Eo_Class *current_class = eo_class_get(obj);
-   LOGF("Class is : %s %s", eo_class_name_get(current_class), __func__);
+   LOG("XML SAX BASE _set_document_locator called");
 }
 
 static void
@@ -298,7 +273,7 @@ _handler_constructor(Eo *obj, void *class_data, va_list *list)
    Eo *handler = va_arg(*list, Eo*);
    
    // Assign the current handler.
-   Xml_Base_Data  *pd = class_data;
+   Xml_Base_Data  *pd = eo_data_scope_get(obj, XML_SAX_BASE);
    pd->handler = handler;
    
    // Call base constructor.

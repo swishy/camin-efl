@@ -19,11 +19,11 @@ static const char BUNDLE_TAG[] = "bundle";
 static const char GENERATOR_TAG[] = "generator";
 static const char HANDLER_TAG[] = "handler";
 static const char LOG_TAG[] = "log";
+static const char MACHINE_NAME_TAG[] = "name";
 
 static const char ELEMENT_TAG[] = "element";
 static const char NAMESPACE_TAG[] = "namespace";
 static const char NAME_TAG[] = "name";
-static const char MACHINE_TAG[] = "machine_name";
 static const char POSITION_TAG[] = "position";
 static const char DOWNLOAD_TAG[] = "download";
 static const char VERSION_TAG[] = "version";
@@ -32,8 +32,6 @@ static const char FILTER_PARAMS_TAG[] = "filter_param";
 typedef struct
 {
    const char *localname;
-   Eina_List *bundles;
-   Eina_List *filters;
    char *element;
    Eo *mparent;   
    char *log;   
@@ -49,142 +47,152 @@ typedef struct
    const char *machine_name;
    const char *position;
    const char *name_space;
+   Eina_Hash *filters;
 } Private_Data;
 
 #define MY_CLASS AMIN_MACHINE_SPEC_DOCUMENT
 
-_start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+static void
+_filter_entry_free_cb(void *data)
 {
-  LOG("IN DOCUMENT START DOCUMENT FILTER");
-  
-  ElementData *element = va_arg ( *list, ElementData* );
-  
-  const Eo_Class *current_class = eo_class_get ( obj );
-  LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
+  free(data);
 }
 
-static void 
-_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+static Eina_Bool
+_filter_foreach_cb(const Eina_Hash *filter, const void *key,
+void *data, void *fdata)
+{
+const char *name = key;
+Filter_Data *filter_data = data;
+printf("%s: %s\n", name, filter_data->name_space);
+// Return EINA_FALSE to stop this callback from being called
+return EINA_TRUE;
+}
+
+_start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+{
+  ElementData *element = va_arg ( *list, ElementData* );
+  Private_Data *pd = class_data;
+  pd->filters = eina_hash_string_superfast_new(_filter_entry_free_cb);
+}
+
+static void
+_start ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+{
   int i;
-  
+
   Private_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
 
   pd->localname = element->localname;
-  
-  // Get Module Name 
-  if ( strncmp ( element->localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 || strncmp ( element->localname,BUNDLE_TAG,sizeof ( BUNDLE_TAG ) ) == 0)
-  {
-    if ( element->nb_attributes > 0 )
-                {
-                  int i = 0;
-                  int attribute_position = 0;
-                  char *parse_value;
 
-                  // Get values from attributes
-                  while ( i < element->nb_attributes )
+  // Get Module Name
+  if ( strncmp ( element->localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 || strncmp ( element->localname,BUNDLE_TAG,sizeof ( BUNDLE_TAG ) ) == 0 )
+    {
+      if ( element->nb_attributes > 0 )
+        {
+          int i = 0;
+          int attribute_position = 0;
+          char *parse_value;
+
+          // Get values from attributes
+          while ( i < element->nb_attributes )
+            {
+              if ( element->attributes[attribute_position] != NULL )
+                {
+                  if ( strncmp ( element->attributes[attribute_position],"name",sizeof ( element->attributes[attribute_position] ) ) == 0 )
                     {
-                      if ( element->attributes[attribute_position] != NULL )
-                        {
-                          if ( strncmp ( element->attributes[attribute_position],"name",sizeof ( element->attributes[attribute_position] ) ) == 0 )
-                            {
-                              int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
-                              pd->module = strndup ( element->attributes[attribute_position + 3], attribute_length );
-                            }
-                        }
-                      attribute_position = attribute_position + 5;
-                      i++;
+                      int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                      pd->module = strndup ( element->attributes[attribute_position + 3], attribute_length );
                     }
-		}
-  }
-  
+                }
+              attribute_position = attribute_position + 5;
+              i++;
+            }
+        }
+    }
+
   if ( strncmp ( element->localname,GENERATOR_TAG,sizeof ( GENERATOR_TAG ) ) == 0 )
-  {
-    if ( element->nb_attributes > 0 )
-                {
-                  int i = 0;
-                  int attribute_position = 0;
-                  char *parse_value;
+    {
+      if ( element->nb_attributes > 0 )
+        {
+          int i = 0;
+          int attribute_position = 0;
+          char *parse_value;
 
-                  // Get values from attributes
-                  while ( i < element->nb_attributes )
+          // Get values from attributes
+          while ( i < element->nb_attributes )
+            {
+              if ( element->attributes[attribute_position] != NULL )
+                {
+                  if ( strncmp ( element->attributes[attribute_position],"generator",sizeof ( element->attributes[attribute_position] ) ) == 0 )
                     {
-                      if ( element->attributes[attribute_position] != NULL )
-                        {
-                          if ( strncmp ( element->attributes[attribute_position],"generator",sizeof ( element->attributes[attribute_position] ) ) == 0 )
-                            {
-                              int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
-                              pd->generator = strndup ( element->attributes[attribute_position + 3], attribute_length );
-                            }
-                        }
-                      attribute_position = attribute_position + 5;
-                      i++;
+                      int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                      pd->generator = strndup ( element->attributes[attribute_position + 3], attribute_length );
                     }
-		}
-  }
-  
+                }
+              attribute_position = attribute_position + 5;
+              i++;
+            }
+        }
+    }
+
   if ( strncmp ( element->localname,HANDLER_TAG,sizeof ( HANDLER_TAG ) ) == 0 )
-  {
-    if ( element->nb_attributes > 0 )
-                {
-                  int i = 0;
-                  int attribute_position = 0;
-                  char *parse_value;
+    {
+      if ( element->nb_attributes > 0 )
+        {
+          int i = 0;
+          int attribute_position = 0;
+          char *parse_value;
 
-                  // Get values from attributes
-                  while ( i < element->nb_attributes )
+          // Get values from attributes
+          while ( i < element->nb_attributes )
+            {
+              if ( element->attributes[attribute_position] != NULL )
+                {
+                  if ( strncmp ( element->attributes[attribute_position],"handler",sizeof ( element->attributes[attribute_position] ) ) == 0 )
                     {
-                      if ( element->attributes[attribute_position] != NULL )
-                        {
-                          if ( strncmp ( element->attributes[attribute_position],"handler",sizeof ( element->attributes[attribute_position] ) ) == 0 )
-                            {
-                              int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
-                              pd->handler_name = strndup ( element->attributes[attribute_position + 3], attribute_length );
-                            }
-                            
-                            if ( strncmp ( element->attributes[attribute_position],"output",sizeof ( element->attributes[attribute_position] ) ) == 0 )
-                            {
-                              int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
-                              pd->handler_out = strndup ( element->attributes[attribute_position + 3], attribute_length );
-                            }
-                        }
-                      attribute_position = attribute_position + 5;
-                      i++;
+                      int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                      pd->handler_name = strndup ( element->attributes[attribute_position + 3], attribute_length );
                     }
-		}
-  }
-  
+
+                  if ( strncmp ( element->attributes[attribute_position],"output",sizeof ( element->attributes[attribute_position] ) ) == 0 )
+                    {
+                      int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                      pd->handler_out = strndup ( element->attributes[attribute_position + 3], attribute_length );
+                    }
+                }
+              attribute_position = attribute_position + 5;
+              i++;
+            }
+        }
+    }
+
   if ( strncmp ( element->localname,LOG_TAG,sizeof ( LOG_TAG ) ) == 0 )
-  {
-    if ( element->nb_attributes > 0 )
-                {
-                  int i = 0;
-                  int attribute_position = 0;
-                  char *parse_value;
+    {
+      if ( element->nb_attributes > 0 )
+        {
+          int i = 0;
+          int attribute_position = 0;
+          char *parse_value;
 
-                  // Get values from attributes
-                  while ( i < element->nb_attributes )
+          // Get values from attributes
+          while ( i < element->nb_attributes )
+            {
+              if ( element->attributes[attribute_position] != NULL )
+                {
+                  if ( strncmp ( element->attributes[attribute_position],"log",sizeof ( element->attributes[attribute_position] ) ) == 0 )
                     {
-                      if ( element->attributes[attribute_position] != NULL )
-                        {
-                          if ( strncmp ( element->attributes[attribute_position],"log",sizeof ( element->attributes[attribute_position] ) ) == 0 )
-                            {
-                              int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
-                              pd->generator = strndup ( element->attributes[attribute_position + 3], attribute_length );
-                            }
-                        }
-                      attribute_position = attribute_position + 5;
-                      i++;
+                      int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                      pd->generator = strndup ( element->attributes[attribute_position + 3], attribute_length );
                     }
-		}
-  }
-  
-  LOGF("module value %s\n", pd->module);
-  
-  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
-  
-  LOG("IN DOCUMENT FILTER START");
-} 
+                }
+              attribute_position = attribute_position + 5;
+              i++;
+            }
+        }
+    }
+}
 
 static void
 _char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
@@ -199,35 +207,35 @@ _char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
      {
 	if ( strncmp ( pd->localname,ELEMENT_TAG,sizeof ( ELEMENT_TAG ) ) == 0 )
 	{
-	  pd->element_name = string;
+	  pd->element_name = strndup ( string, length );
 	}
 	if ( strncmp ( pd->localname,NAMESPACE_TAG,sizeof ( NAMESPACE_TAG ) ) == 0 )
 	{
-	  pd->name_space = string;
+	  pd->name_space = strndup ( string, length );
 	}
 	if ( strncmp ( pd->localname,NAME_TAG,sizeof ( NAME_TAG ) ) == 0 )
 	{
-	  pd->name = string;
+	  pd->name = strndup ( string, length );
 	}
-	if ( strncmp ( pd->localname,MACHINE_TAG,sizeof ( MACHINE_TAG ) ) == 0 )
+	/**if ( strncmp ( pd->localname,MACHINE_TAG,sizeof ( MACHINE_TAG ) ) == 0 )
 	{
-	  pd->machine_name = string;
-	}
+	  pd->machine_name = strndup ( string, length );
+	}*/
 	if ( strncmp ( pd->localname,POSITION_TAG,sizeof ( POSITION_TAG ) ) == 0 )
 	{
-	  pd->position = string;
+	  pd->position = strndup ( string, length );
 	}
 	if ( strncmp ( pd->localname,DOWNLOAD_TAG,sizeof ( DOWNLOAD_TAG ) ) == 0 )
 	{
-	  pd->position = string;
+	  pd->position = strndup ( string, length );
 	}
 	if ( strncmp ( pd->localname,VERSION_TAG,sizeof ( VERSION_TAG ) ) == 0 )
 	{
-	  pd->position = string;
+	  pd->position = strndup ( string, length );
 	}
 	if ( strncmp ( pd->localname,FILTER_PARAMS_TAG,sizeof ( FILTER_PARAMS_TAG ) ) == 0 )
 	{
-	  pd->position = string;
+	  pd->position = strndup ( string, length );
 	}
     }
 }
@@ -237,36 +245,25 @@ _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   
   Private_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
-  
-  if ( strncmp ( pd->localname,BUNDLE_TAG,sizeof ( BUNDLE_TAG ) ) == 0 )
+
+  if ( strncmp ( element->localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 )
   {
-    Filter_Data bundle;
-    bundle.element = pd->element_name;
-    bundle.name_space = pd->name_space;
-    bundle.name = pd->name;
-    bundle.position = pd->position;
-    bundle.download = pd->download;
-    bundle.version = pd->version;
-    bundle.module = pd->module;
-    pd->bundles = eina_list_append(pd->bundles, &bundle);
+    Filter_Data *filter;
+    filter->element = pd->element_name;
+    filter->name_space = pd->name_space;
+    filter->name = pd->name;
+    filter->position = pd->position;
+    filter->download = pd->download;
+    filter->version = pd->version;
+    filter->module = pd->module;
+    LOGF("About to add filter to hash %s", filter->module);
+    eina_hash_add(pd->filters, filter->module, filter);
   }
-  if ( strncmp ( pd->localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 )
-  {
-    Filter_Data filter;
-    filter.element = pd->element_name;
-    filter.name_space = pd->name_space;
-    filter.name = pd->name;
-    filter.position = pd->position;
-    filter.download = pd->download;
-    filter.version = pd->version;
-    filter.module = pd->module;
-    pd->filters = eina_list_append(pd->filters, &filter);
-  }
-  if ( strncmp ( pd->localname,MACHINE_TAG,sizeof ( MACHINE_TAG ) ) == 0 )
+  /**if ( strncmp ( pd->localname,MACHINE_TAG,sizeof ( MACHINE_TAG ) ) == 0 )
   {
     // TODO investigate returned struct.
     LOG("Dont think we need much more here?");
-  }
+  }*/
 }
 
 static void 
@@ -275,15 +272,18 @@ _end_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
   Private_Data *pd = class_data;
-  Xml_Base_Data *xd = eo_data_ref(obj, XML_SAX_BASE);
+  Xml_Base_Data *xd = eo_data_scope_get(obj, XML_SAX_BASE);
   
-  // TODO Access result stored in XML_SAX_BASE pd and set spec document values on such.
-  Machine_Spec_Document spec_document;
-  spec_document.filters = pd->filters;
-  spec_document.bundles = pd->bundles;
-  spec_document.machine_name = pd->machine_name;
-  
-  xd->result = &spec_document;
+  if(!xd) LOG("No base data :(");
+  if(xd->result)
+  {
+    // TODO Access result stored in XML_SAX_BASE pd and set spec document values on such.
+    Machine_Spec_Document *spec_document = (Machine_Spec_Document*)xd->result;
+    spec_document->filters = pd->filters;
+    eina_hash_foreach(pd->filters, _filter_foreach_cb, NULL);
+  } else {
+    LOG("WOOOP BADNESS9000000");
+  }
   
   LOG("END OF END DOCUMENT");
 }

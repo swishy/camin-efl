@@ -19,14 +19,20 @@ typedef struct
    const char *module;
 } Filter_Data;
 
+
 typedef struct
 {
-   Eina_List *filters;
-   Eina_List *bundles;
-   char *machine_name;
+   const char *name;
+   Filter_Data *data;
+} Filter;
+
+typedef struct
+{
+   const char *machine_name;
    char *generator;
    char *log;
    char **filter_params;
+   Eina_Hash *filters;
 } Machine_Spec_Document;
 
 enum {

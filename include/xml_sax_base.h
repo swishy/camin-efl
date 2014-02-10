@@ -11,7 +11,7 @@ typedef struct
 {
    Eo *handler;
    Eo *current_filter;
-   void **result;
+   void *result;
 }
 Xml_Base_Data;
 
@@ -50,10 +50,10 @@ enum {
 #define set_handler_constructor(handler) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_HANDLER_CONSTRUCTOR), EO_TYPECHECK(Eo *, handler)
 
 /**
- * @def parse_string(char *document, void **result)
+ * @def parse_string(char *document, void *result)
  * @brief Starts parsing a XMl document.
  */
-#define parse_string(document, result) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_PARSE_STRING), EO_TYPECHECK(const char *, document), EO_TYPECHECK(void**, result)
+#define parse_string(document, result) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_PARSE_STRING), EO_TYPECHECK(const char *, document), EO_TYPECHECK(void*, result)
 
 /**
  * @def set_document_locator(void * ctx, xmlSAXLocatorPtr loc)

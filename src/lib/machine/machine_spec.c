@@ -36,6 +36,17 @@ typedef struct
 
 #define MY_CLASS AMIN_MACHINE_SPEC
 
+static Eina_Bool
+_filter_foreach_cb(const Eina_Hash *filter, const void *key,
+void *data, void *fdata)
+{
+const char *name = key;
+Filter_Data *filter_data = data;
+printf("%s: %s\n", name, filter_data->name_space);
+// Return EINA_FALSE to stop this callback from being called
+return EINA_TRUE;
+}
+
 static void 
 _document_start(Eo *obj, void *class_data, va_list *list) {
   
@@ -44,8 +55,6 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   char *machine_spec_buffer;
 
   Private_Data *data = eo_data_ref(obj, MY_CLASS);
-  
-  //pd->filters = NULL;
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
@@ -64,8 +73,6 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
     fread(machine_spec_buffer, 1, size, machine_spec);
   }
   
-  LOGF("%s", machine_spec_buffer);
-  
   Eo *machine_spec_document = eo_add(AMIN_MACHINE_SPEC_DOCUMENT, NULL);
   
   Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec_document));
@@ -76,9 +83,10 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   
   // TODO implement out param on xml_sax_base tp receive the result of parsing....
   Machine_Spec_Document *spec;
-  eo_do(xinclude_filter, parse_string(machine_spec_buffer, &spec));
+  eo_do(machine_spec_document, parse_string(machine_spec_buffer, &spec));
   LOG("machine spec oarse string comepled.....");
-  LOGF("We have a doc %s", spec->machine_name);
+  
+  eina_hash_foreach(spec->filters, _filter_foreach_cb, NULL);
   
 }
 

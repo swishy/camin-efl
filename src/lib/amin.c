@@ -36,15 +36,6 @@ _parse(Eo *obj, void *class_data, va_list *list)
   Ecore_Con_Url *ec_url = ecore_con_url_new(profile);
   
   // TODO implement machine_spec to load config. Need to check if spec is uri also.
-  // Perl currently loads up a fresh parser and passes it to machine_spec and starts parsing. 
-
-  
-  // Create a parser instance for this request.
-  /**XML_Parser machine_parser = XML_ParserCreate(NULL);
-  if (! machine_parser) {
-    LOG("Camin could not allocate memory for parser");
-    ecore_shutdown();
-  }*/
   
   // Testing new XML_SAX_BASE
   
@@ -55,8 +46,6 @@ _parse(Eo *obj, void *class_data, va_list *list)
   Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec));
   
   Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
-  
-  eo_do(xinclude_filter, white_wash(xinclude_filter));
   
   const Eo_Class *xml_base_class = eo_class_get(xml_base);
   LOGF("obj-type:'%s'\n", eo_class_name_get(xml_base_class));
