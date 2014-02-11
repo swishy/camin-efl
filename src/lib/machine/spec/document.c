@@ -58,18 +58,6 @@ _filter_entry_free_cb(void *data)
   free(data);
 }
 
-static Eina_Bool
-_filter_foreach_cb(const Eina_Hash *filter, const void *key,
-void *data, void *fdata)
-{
-LOG("In eina foreach callback");
-const char *name = key;
-Filter_Data *filter_data = (Filter_Data*)data;
-printf("%s\n", name);
-// Return EINA_FALSE to stop this callback from being called
-return EINA_TRUE;
-}
-
 _start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 {
   ElementData *element = va_arg ( *list, ElementData* );
@@ -275,7 +263,7 @@ _end_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   Private_Data *pd = class_data;
   Xml_Base_Data *xd = eo_data_scope_get(obj, XML_SAX_BASE);
   
-  if(!xd) LOG("No base data :(");
+  if(!xd) eo_error_set(obj);
   if(xd->result)
   {
     LOG("Adding filters to machine spec result.");
@@ -284,7 +272,7 @@ _end_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
     spec_document->filters = pd->filters;
     
   } else {
-    LOG("WOOOP BADNESS9000000");
+    eo_error_set(obj);
   }
   
   LOG("END OF END DOCUMENT");

@@ -11,6 +11,8 @@ EAPI Eo_Op XML_SAX_BASE_BASE_ID = 0;
 
 #define MY_CLASS XML_SAX_BASE
 
+//TODO Pull logic into Eo functions NOT libxml2 callbacks, need to rework logic a bit too as its not doing the right thing atm.
+
 // LIBXML Wrappers
 static void
 _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
