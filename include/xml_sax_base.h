@@ -9,8 +9,9 @@ extern EAPI Eo_Op XML_SAX_BASE_BASE_ID;
 
 typedef struct
 {
+   Eo *content_handler;
+   Eo *document_handler;
    Eo *handler;
-   Eo *current_filter;
    void *result;
 }
 Xml_Base_Data;
@@ -38,10 +39,15 @@ enum {
      XML_SAX_BASE_SUB_ID_CHAR,
      XML_SAX_BASE_SUB_ID_END, 
      XML_SAX_BASE_SUB_ID_DOCUMENT_END,
+     XML_SAX_BASE_SUB_ID_SET_CONTENT_HANDLER,
+     XML_SAX_BASE_SUB_ID_SET_DOCUMENT_HANDLER,
+     XML_SAX_BASE_SUB_ID_SET_HANDLER,
      XML_SAX_BASE_SUB_ID_LAST
 };
 
 #define XML_SAX_BASE_ID(sub_id) (XML_SAX_BASE_BASE_ID + sub_id)
+
+/** Parser Callbacks **/
 
 /**
  * @def set_handler_constructor(handler)
@@ -77,7 +83,7 @@ enum {
  * @def char(void *data, const XML_Char *string, int string_len)
  * @brief Called when XML characters are found in element.
  */
-#define char(data, string, string_length) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_CHAR), EO_TYPECHECK(void *, data), EO_TYPECHECK(const xmlChar *, string), EO_TYPECHECK(int, string_len)
+#define char(data, string, string_length) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_CHAR), EO_TYPECHECK(void *, data), EO_TYPECHECK(const xmlChar *, string), EO_TYPECHECK(int, string_length)
 
 /**
  * @def end(ElementData *data)
@@ -90,6 +96,26 @@ enum {
  * @brief Called when XML start element is hit.
  */
 #define document_end(data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_END), EO_TYPECHECK(void *, data)
+
+/** XML_SAX_BASE Functions **/
+
+/**
+ * @def set_content_handler(Eo *handler)
+ * @brief Used to set a content handler on the current filter.
+ */
+#define set_content_handler(data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_CONTENT_HANDLER), EO_TYPECHECK(Eo *, handler)
+
+/**
+ * @def set_document_handler(Eo *handler)
+ * @brief Used to set a document handler on the current filter.
+ */
+#define set_document_handler(data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_HANDLER), EO_TYPECHECK(Eo *, handler)
+
+/**
+ * @def set_handler(Eo *handler)
+ * @brief Used to set a handler on the current filter.
+ */
+#define set_handler(data) XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_HANDLER), EO_TYPECHECK(Eo *, handler)
 
 #define XML_SAX_BASE xml_sax_base_class_get()
 const Eo_Class *xml_sax_base_class_get(void);

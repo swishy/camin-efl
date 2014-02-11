@@ -18,60 +18,28 @@ static void
 _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
 {
    LOG("_libxml2_set_document_locator");
-   
-   LOGF("locator systemid: %s", loc->getSystemId(&ctx));
-   
-   // Here we grab current filter and private data for such, if a handler exists we
-   // use the handler callback if defined.
    Eo *filter = (Eo*)ctx;
-   const Eo_Class *current_class = eo_class_get(filter);
-   
-   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
-   
-   Eo *handler = data->handler;
-   
-   if (handler != NULL)
-   {
-     eo_do(handler, set_document_locator(ctx, loc));
-   } else {
-     eo_do(filter, set_document_locator(ctx, loc));
-   }
+   eo_do(filter, set_document_locator(ctx, loc));
 }
 
 static void
 _libxml2_document_start(void *user_data)
 {
    Eo *filter = (Eo*)user_data;
-   const Eo_Class *current_class = eo_class_get(filter);
-   
-   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
-   
-   Eo *handler = data->handler;
-   
-   if (handler != NULL)
-   {
-     eo_do(handler, document_start(user_data));
-   } else {
-     eo_do(filter, document_start(user_data));
-   }
+   eo_do(filter, document_start(user_data));
 }
 
 static void
 _libxml2_document_end(void *user_data)
 {
    Eo *filter = (Eo*)user_data;
-   const Eo_Class *current_class = eo_class_get(filter);
-   
-   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
-   
-   Eo *handler = data->handler;
-   
-   if (handler != NULL)
+   if(filter)
    {
-     eo_do(handler, document_end(user_data));
-   } else {
      eo_do(filter, document_end(user_data));
+   } else {
+     LOG("WHO STOLE THA FILTER!!");
    }
+   
 }
 
 static void
@@ -86,14 +54,8 @@ _libxml2_start(
 	       int nb_defaulted,
 	       const xmlChar **attributes )
 {
-   // Here we grab current filter and private data for such, if a handler exists we
-   // use the handler callback if defined.
+   // Here we grab current filter 
    Eo *filter = (Eo*)ctx;
-   const Eo_Class *current_class = eo_class_get(filter);
-   
-   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
-   
-   Eo *handler = data->handler;
 
    // Populate struct to pass around
    ElementData element_data;
@@ -108,12 +70,7 @@ _libxml2_start(
    element_data.attributes = attributes;
 
    // Fire in the hole!
-   if (handler != NULL)
-   {
-     eo_do(handler, start(&element_data));
-   } else {
-     eo_do(filter, start(&element_data));
-   }
+   eo_do(filter, start(&element_data));
 }
 
 void
@@ -122,24 +79,9 @@ _libxml2_char(
 	      const xmlChar *string,
 	      int string_len)
 {
-   // Here we grab current filter and private data for such, if a handler exists we
-   // use the handler callback if defined.
+   // Pass on through to the other side...
    Eo *filter = (Eo*)user_data;
-   const Eo_Class *current_class = eo_class_get(filter);
-   const char *class_name = eo_class_name_get(current_class); 
-   
-   LOGF("Current handler class is: %s", class_name);
-   
-   Xml_Base_Data *data = eo_data_scope_get(filter, XML_SAX_BASE);
-   
-   Eo *handler = data->handler;
-   
-   if (handler != NULL)
-   {
-     eo_do(handler, char(data, string, string_len));
-   } else {
-     eo_do(filter, char(data, string, string_len));
-   }
+   eo_do(filter, char(user_data, string, string_len));
 }
 
 void
@@ -152,11 +94,6 @@ _libxml2_end(
    // Here we grab current filter and private data for such, if a handler exists we
    // use the handler callback if defined.
    Eo *filter = (Eo*)ctx;
-   const Eo_Class *current_class = eo_class_get(filter);
-   
-   Xml_Base_Data *data = eo_data_ref(filter, XML_SAX_BASE);
-   
-   Eo *handler = data->handler;
 
    // TODO move this to a statement which checks end tag name = filter name
    //
@@ -167,12 +104,7 @@ _libxml2_end(
    element_data.URI = URI;
    
    // Fire in the hole!
-   if (handler != NULL)
-   {
-     eo_do(handler, end(&element_data));
-   } else {
-     eo_do(filter, end(&element_data));
-   }
+   eo_do(filter, end(&element_data));
 }
 
 // EFL Functions
@@ -210,6 +142,23 @@ static void
 _set_document_locator(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
    LOG("XML SAX BASE _set_document_locator called");
+   
+   Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
+   
+   void * ctx = va_arg(*list, void*);
+   
+   xmlSAXLocatorPtr loc = va_arg(*list, xmlSAXLocatorPtr);
+
+   Eo *handler = data->handler;
+   
+   if (handler)
+   {
+     eo_do(handler, set_document_locator(ctx, loc));
+   } else if(MY_CLASS != XML_SAX_BASE) {
+     eo_do(obj, set_document_locator(ctx, loc));
+   } else {
+     LOG("No Handler for set_document_locator implemented.");
+  }
 }
 
 static void
@@ -217,6 +166,21 @@ _document_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
 
    LOG("XML SAX BASE doc start called");
+   
+   Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
+   
+   ElementData *element = va_arg(*list, ElementData*);
+   
+   Eo *handler = data->handler;
+   
+   if (handler)
+   {
+     eo_do(handler, document_start(element));
+   } else if (MY_CLASS != XML_SAX_BASE) {
+     eo_do(obj, document_start(element));
+   } else {
+     LOG("NO DOCUMENT START HANDLER IMPLEMENTED");
+  }
 }
 
 static void
@@ -224,33 +188,41 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
    int i;
 
+   Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
+   
    ElementData *element = va_arg(*list, ElementData*);
-
-   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
-
-   LOGF("ELEMENT: %s", element->localname);
-
-   if (element->nb_attributes > 0)
-     {
-	for (i = 0; element->attributes[i]; i++)
-{
-   LOGF("ATTRIBUTE %i %s", i, element->attributes[i]);
-    }
+   
+   Eo *handler = data->handler;
+   
+   if (handler)
+   {
+     eo_do(handler, start(element));
+   } else if(MY_CLASS != XML_SAX_BASE) {
+     eo_do(obj, start(element));
+   } else {
+     LOG("NO START HANDLER IMPLEMENTED");
   }
 }
 
 static void
 _char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
-   void *data = va_arg(*list, void*);
+   void *char_data = va_arg(*list, void*);
    const xmlChar *string = va_arg(*list, const xmlChar*);
    int length = va_arg(*list, int);
-
-   // ref important bytes passed in if they arent whitespace.
-   if (length > 0 && !isspace(*string))
-     {
-	LOGF("char data in tag: %i.%s", length, string);
-    }
+   
+   Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
+   
+   Eo *handler = data->handler;
+   
+   if (handler)
+   {
+     eo_do(handler, char(char_data, string, length));
+   } else if(MY_CLASS != XML_SAX_BASE) {
+     eo_do(obj, char(char_data, string, length));
+   } else {
+     LOG("NO CHAR HANDLER IMPLEMENTED");
+  }
 }
 
 static void
@@ -266,6 +238,47 @@ static void
 _document_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
    LOG("Document end");
+   
+   Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
+   ElementData *element = va_arg(*list, ElementData*);
+   
+   Eo *handler = data->handler;
+   
+   if (handler != NULL)
+   {
+     eo_do(handler, document_end(element));
+   } else if(MY_CLASS != XML_SAX_BASE) {
+     eo_do(obj, document_end(element));
+   } else {
+     LOG("NO DOCUMENT END HANDLER IMPLEMENTED");
+  }
+}
+
+static void
+_set_content_handler(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+{
+   LOG("Set content handler");
+   Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
+   Eo *content_handler = va_arg(*list, Eo*);
+   data->content_handler = content_handler;
+}
+
+static void
+_set_document_handler(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+{
+   LOG("Set document handler");
+   Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
+   Eo *document_handler = va_arg(*list, Eo*);
+   data->document_handler = document_handler;
+}
+
+static void
+_set_handler(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+{
+   LOG("Set handler");
+   Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
+   Eo *handler = va_arg(*list, Eo*);
+   data->handler = handler;
 }
 
 static void
@@ -273,6 +286,9 @@ _handler_constructor(Eo *obj, void *class_data, va_list *list)
 {
    // Get handler from args
    Eo *handler = va_arg(*list, Eo*);
+   
+   // Set parent on handler
+   eo_do(handler, eo_parent_set(obj));
    
    // Assign the current handler.
    Xml_Base_Data  *pd = eo_data_scope_get(obj, XML_SAX_BASE);
@@ -295,6 +311,9 @@ _class_constructor(Eo_Class *klass)
    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_CHAR), _char),
    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_END), _end),
    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_END), _document_end),
+   EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_CONTENT_HANDLER), _set_content_handler),
+   EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_HANDLER), _set_document_handler),
+   EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_SET_HANDLER), _set_handler),
    EO_OP_FUNC_SENTINEL
 };
 
@@ -311,6 +330,9 @@ static const Eo_Op_Description op_desc[] =
    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_CHAR, "Called when char data found between elements"),
    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_END, "Called when end tag is hit during parsing"),
    EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_DOCUMENT_END, "Called when end of document is reached during parsing"),
+   EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_SET_CONTENT_HANDLER, "Used to set a content handler on the current filter"),
+   EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_SET_DOCUMENT_HANDLER, "Used to set a document handler on the current filter"),
+   EO_OP_DESCRIPTION(XML_SAX_BASE_SUB_ID_SET_HANDLER, "Used to set a handler on the current filter"),
    EO_OP_DESCRIPTION_SENTINEL
 };
 
