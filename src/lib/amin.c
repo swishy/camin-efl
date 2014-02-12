@@ -58,6 +58,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
   
   LOG("Kicking parser into action....");
   
+  // TODO Move to struct once declared at completeion of machine_spec.
   int foo;
   
   eo_do(xml_base, parse_string(profile, &foo));
