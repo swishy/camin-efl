@@ -12,6 +12,7 @@
 #include "machine_spec.h"
 #include "document.h"
 #include "amin_machine_dispatcher.h"
+#include "uriparser/Uri.h"
 
 int DEPTH;
 
@@ -32,17 +33,22 @@ _parse(Eo *obj, void *class_data, va_list *list)
   // Document is only thing passed to us so pop if off the list.
   const char *profile = va_arg(*list, const char *);
   
-  // TODO properly check if URI! atm just trys to create URL object.
-  Ecore_Con_Url *ec_url = ecore_con_url_new(profile);
+  // TODO wrap into function.
+  // Check if the profile is a URI
+  UriParserStateA state;
+  UriUriA machine_spec_uri;
+  state.uri = &machine_spec_uri;
+  Eo *machine_spec;
   
-  // TODO implement machine_spec to load config. Need to check if spec is uri also.
-  
-  // Testing new XML_SAX_BASE
-  
-  LOG("Loading XML_SAX_BASE");
-  
-  Eo *machine_spec = eo_add(AMIN_MACHINE_SPEC, NULL);
-  
+  if ( uriParseUriA ( &state, profile ) != URI_SUCCESS )
+    {
+      /* Failure */
+      uriFreeUriMembersA ( &machine_spec_uri );
+      machine_spec = eo_add(AMIN_MACHINE_SPEC, NULL);
+    } else {
+      machine_spec = eo_add(AMIN_MACHINE_SPEC, NULL); // TODO ADD set_uri function to class.
+    }
+   
   Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec));
   
   Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
@@ -54,7 +60,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
   
   int foo;
   
-  eo_do(xinclude_filter, parse_string(profile, &foo));
+  eo_do(xml_base, parse_string(profile, &foo));
   
   /**LOG("Loading AMIN machine spec");
   Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC, NULL, filter_constructor(machine_parser, obj));

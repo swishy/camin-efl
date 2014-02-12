@@ -33,13 +33,7 @@ static void
 _libxml2_document_end(void *user_data)
 {
    Eo *filter = (Eo*)user_data;
-   if(filter)
-   {
-     eo_do(filter, document_end(user_data));
-   } else {
-     LOG("WHO STOLE THA FILTER!!");
-   }
-   
+   eo_do(filter, document_end(user_data));
 }
 
 static void
@@ -91,12 +85,9 @@ _libxml2_end(
 	     const xmlChar* prefix,
 	     const xmlChar* URI)
 {
-   // Here we grab current filter and private data for such, if a handler exists we
-   // use the handler callback if defined.
+   // Here we grab current filter and private data for such
    Eo *filter = (Eo*)ctx;
 
-   // TODO move this to a statement which checks end tag name = filter name
-   //
    ElementData element_data;
    element_data.ctx = ctx;
    element_data.localname = localname;
@@ -157,7 +148,7 @@ _set_document_locator(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
    } else if(MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, set_document_locator(ctx, loc));
    } else {
-     LOG("No Handler for set_document_locator implemented.");
+     LOG("XSB set_document_locator NO FURTHER HANDLERS");
   }
 }
 
@@ -179,7 +170,7 @@ _document_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
    } else if (MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, document_start(element));
    } else {
-     LOG("NO DOCUMENT START HANDLER IMPLEMENTED");
+     LOG("XSB DOCUMENT START NO FURTHER HANDLERS");
   }
 }
 
@@ -200,7 +191,7 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
    } else if(MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, start(element));
    } else {
-     LOG("NO START HANDLER IMPLEMENTED");
+     LOG("XSB START HANDLER NO FURTHER HANDLERS");
   }
 }
 
@@ -221,7 +212,7 @@ _char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
    } else if(MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, char(char_data, string, length));
    } else {
-     LOG("NO CHAR HANDLER IMPLEMENTED");
+     LOG("XSB CHAR HANDLER NO FURTHER HANDLERS");
   }
 }
 
@@ -229,9 +220,23 @@ static void
 _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
 
-   LOG("Element End");
+   LOG("Element end");
+   
+   // TODO move this to a statement which checks end tag name = filter name
+   
+   Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    ElementData *element = va_arg(*list, ElementData*);
-   LOGF("End element name: %s", element->localname);
+   
+   Eo *handler = data->handler;
+   
+   if (handler != NULL)
+   {
+     eo_do(handler, end(element));
+   } else if(MY_CLASS != XML_SAX_BASE) {
+     eo_do(obj, end(element));
+   } else {
+     LOG("XSB END HANDLER NO FURTHER HANDLERS");
+  }
 }
 
 static void
@@ -250,7 +255,7 @@ _document_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
    } else if(MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, document_end(element));
    } else {
-     LOG("NO DOCUMENT END HANDLER IMPLEMENTED");
+     LOG("XSB DOCUMENT END HANDLER NO FURTHER HANDLERS");
   }
 }
 
