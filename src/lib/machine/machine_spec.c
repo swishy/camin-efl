@@ -18,33 +18,27 @@ EAPI Eo_Op AMIN_MACHINE_SPEC_BASE_ID = 0;
 
 typedef struct
 {
-   xmlSAXHandler parser;
-   char input;
-   Eina_List *attrs;
-   Eina_List *filters;
-   char command;
-   char param;
-   char target;
-   char flag;
-   char name;
-   char element;
-   char doctype;
-   char docname;
-   char text;
-   Eo *filter;
+   Eina_Hash *filters;
+   Machine_Spec_Document spec;
 } Private_Data;
 
 #define MY_CLASS AMIN_MACHINE_SPEC
+
+static void
+_filter_entry_free_cb(void *data)
+{
+  free(data);
+}
 
 static Eina_Bool
 _filter_foreach_cb(const Eina_Hash *filter, const void *key,
 void *data, void *fdata)
 {
-const char *name = key;
-Filter_Data *filter_data = data;
-printf("%s\n", name);
-// Return EINA_FALSE to stop this callback from being called
-return EINA_TRUE;
+  const char *name = key;
+  Filter_Data *filter_data = data;
+  printf ( "%s\n", name );
+  // Return EINA_FALSE to stop this callback from being called
+  return EINA_TRUE;
 }
 
 static void 
@@ -56,10 +50,9 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
 
   Private_Data *data = eo_data_ref(obj, MY_CLASS);
   
-  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
+  data->filters = eina_hash_string_superfast_new(_filter_entry_free_cb);
   
-  LOG("MachineSpec start....");
-
+  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
   if ((machine_spec = fopen("/etc/amin/machine_spec.xml", "rb")))
   {
@@ -80,65 +73,62 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
   
   LOG("Kicking parser into action in machine_spec....");
-  
-  // TODO implement out param on xml_sax_base tp receive the result of parsing....
-  Machine_Spec_Document spec;
-  eo_do(machine_spec_document, parse_string(machine_spec_buffer, &spec));
-  LOG("Listing filters in result.....");
-  
-  eina_hash_foreach(spec.filters, _filter_foreach_cb, NULL);
-  
+
+  // Start Machine Spec parsing and assign results to local var.
+  eo_do(machine_spec_document, parse_string(machine_spec_buffer, &data->spec));
 }
 
 static void 
 _start(Eo *obj, void *class_data, va_list *list) {
-  int i;
-  
+
   LOG("AMIN_MACHINE_SPEC _start");
   
-  void *data = va_arg(*list, void*);
-  const char *element = va_arg(*list, const char*);
-  const char **attributes = va_arg(*list, const char**);
+  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
-  size_t module_length = (strlen(element) + strlen(attributes[1]));
+  Private_Data *pd = class_data;
+  ElementData *element = va_arg ( *list, ElementData* );
   
-  char *module = malloc(sizeof(char) * module_length);
+  char *module;
   
-  //eina_str_join(module, module_length, "", element, attributes[1]);
-  
-  
-  
-  LOGF("Element: %s", element);
-  LOGF("Attribute: %s", attributes[1]);
-  
-  LOGF("Module: %s", module);
-  
-  
-  /** PERL FOO 
-    my ($self, $element) = @_;
-	my %attrs = %{$element->{Attributes}};
-    my $module = $element->{Prefix} . "::" . $element->{'LocalName'};
-    if ($attrs{'{}name'}->{'Value'}) {
-        $module .= "::" . $attrs{'{}name'}->{'Value'};
-    }
-    $self->{'filters'}->{$module} = "";
-  
-  eina_str_join_len(prologue, 106, ' ', part1, strlen(part1), part2, strlen(part2));*/
-  
-} 
+  if ( element->nb_attributes > 0 )
+        {
+          int i = 0;
+          int attribute_position = 0;
+          char *parse_value;
 
-static void
-_char(Eo *obj, void *class_data, va_list *list)
-{
-  /**void *data = va_arg(*list, void*);
-  const XML_Char *string = va_arg(*list, const XML_Char*);
-  int length = va_arg(*list, int);
+          // Get values from attributes
+          while ( i < element->nb_attributes )
+            {
+              if ( element->attributes[attribute_position] != NULL )
+                {
+                  if ( strncmp ( element->attributes[attribute_position],"name",sizeof ( element->attributes[attribute_position] ) ) == 0 )
+                    {
+                      int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                      module = strndup ( element->attributes[attribute_position + 3], attribute_length );
+                    }
+                }
+              attribute_position = attribute_position + 5;
+              i++;
+            }
+        }
+        
+        LOGF("Found module: %s", module);
+        
+   eina_hash_add(pd->filters, module, &module);
+  
+}
 
-    // ref important bytes passed in if they arent whitespace.
-    if (length > 0 && !isspace(*string))
-    {
-      LOGF("char data in tag: %.*s", length, string);
-    }    */
+static void 
+_end_document(Eo *obj, void *class_data, va_list *list) {
+  Private_Data *pd = class_data;
+  ElementData *element = va_arg ( *list, ElementData* );
+  
+  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
+  
+  LOGF("Module count: %lu", sizeof(pd->filters));
+  
+  eina_hash_foreach(pd->filters, _filter_foreach_cb, NULL);
+
 }
 
 static void
@@ -147,6 +137,7 @@ _class_constructor(Eo_Class *klass)
   const Eo_Op_Func_Description func_desc[] = {
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_START), _document_start),
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_START), _start),
+    EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_END), _end_document),
     EO_OP_FUNC_SENTINEL
   };
   

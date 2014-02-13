@@ -40,7 +40,7 @@ XInclude_Data;
 #define MY_CLASS AMIN_XINCLUDE
 
 static void
-_start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+_start_document ( Eo *obj, void *class_data, va_list *list )
 {
   //Xml_Base_Data *data = class_data;
   XInclude_Data *pd = class_data;
@@ -54,7 +54,7 @@ _start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 }
 
 static void
-_start ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+_start ( Eo *obj, void *class_data, va_list *list )
 {
   const Eo_Class *current_class = eo_class_get ( obj );
   LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
@@ -137,7 +137,7 @@ _start ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 }
 
 static void
-_set_document_locator ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+_set_document_locator ( Eo *obj, void *class_data, va_list *list )
 {
   Eo *ctx = va_arg ( *list, Eo* );
   xmlSAXLocatorPtr location_pointer = va_arg ( *list, xmlSAXLocatorPtr );
@@ -180,7 +180,7 @@ _set_document_locator ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 }
 
 static void
-_end ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+_end ( Eo *obj, void *class_data, va_list *list )
 {
   XInclude_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
@@ -201,7 +201,7 @@ _end ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 }
 
 static void
-_end_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+_end_document ( Eo *obj, void *class_data, va_list *list )
 {
   XInclude_Data *pd = class_data;
   eina_array_pop ( pd->locators );

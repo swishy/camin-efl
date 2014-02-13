@@ -58,7 +58,7 @@ _filter_entry_free_cb(void *data)
   free(data);
 }
 
-_start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+_start_document ( Eo *obj, void *class_data, va_list *list )
 {
   ElementData *element = va_arg ( *list, ElementData* );
   Private_Data *pd = class_data;
@@ -66,7 +66,7 @@ _start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
 }
 
 static void
-_start ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
+_start ( Eo *obj, void *class_data, va_list *list )
 {
   int i;
 
@@ -245,14 +245,10 @@ _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
     filter.download = pd->download;
     filter.version = pd->version;
     filter.module = pd->module;
-    LOGF("About to add filter to hash %s", filter.module);
     eina_hash_add(pd->filters, filter.module, &filter);
   }
-  /**if ( strncmp ( pd->localname,MACHINE_TAG,sizeof ( MACHINE_TAG ) ) == 0 )
-  {
-    // TODO investigate returned struct.
-    LOG("Dont think we need much more here?");
-  }*/
+  
+  // TODO Decide on machine_name tag?
 }
 
 static void 
@@ -274,8 +270,6 @@ _end_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   } else {
     eo_error_set(obj);
   }
-  
-  LOG("END OF END DOCUMENT");
 }
 
 static void
