@@ -42,6 +42,7 @@ XInclude_Data;
 static void
 _start_document ( Eo *obj, void *class_data, va_list *list )
 {
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
   //Xml_Base_Data *data = class_data;
   XInclude_Data *pd = class_data;
   pd->level = 0;
@@ -57,7 +58,7 @@ static void
 _start ( Eo *obj, void *class_data, va_list *list )
 {
   const Eo_Class *current_class = eo_class_get ( obj );
-  LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
 
   
   XInclude_Data *pd = class_data;
@@ -68,13 +69,17 @@ _start ( Eo *obj, void *class_data, va_list *list )
 
       // Handle XML_BASE stuff?? 
       // TODO investigate what X::S::B is currently doing also.
-
+      
+      LOGF("Bases is currently: %lu", sizeof(pd->bases));
+      //UriUriA parent_base = 
+      
       // Handle xincludes
       LOGF ( "XML URI %s", element->URI );
       LOGF ( "XML localname %s", element->localname );
 
-      if ( element->URI != NULL )
+      if ( element->URI )
         {
+	  LOG ( "Just before strncmp" );
           if ( strncmp ( element->URI,XINCLUDE_NAMESPACE,sizeof ( XINCLUDE_NAMESPACE ) ) == 0 &&  strncmp ( element->localname,XINCLUDE_TAG,sizeof ( XINCLUDE_TAG ) ) == 0 )
             {
               if ( element->nb_attributes > 0 )
@@ -127,18 +132,19 @@ _start ( Eo *obj, void *class_data, va_list *list )
                     pd->level++;
                 }
             }
-          else
-            {
-              // Pass back to XML_SAX_BASE
-              eo_do_super ( obj, MY_CLASS, start ( element ) );
-            }
+          
+        } else {
+          // Pass back to XML_SAX_BASE
+	  eo_do_super ( obj, MY_CLASS, start ( element ) );
         }
     }
+    
 }
 
 static void
 _set_document_locator ( Eo *obj, void *class_data, va_list *list )
 {
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
   Eo *ctx = va_arg ( *list, Eo* );
   xmlSAXLocatorPtr location_pointer = va_arg ( *list, xmlSAXLocatorPtr );
   //Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
@@ -156,7 +162,8 @@ _set_document_locator ( Eo *obj, void *class_data, va_list *list )
     }
 
   const xmlChar *bob = location_pointer->getSystemId(&ctx);
-  LOGF("BOBS VALUE: %s", (const char*)bob);
+  if(bob)
+    LOGF("BOBS VALUE: %s", (char*)bob);
   // Do we have a URI?
   // TODO split this into util.!!
   UriParserStateA state;
@@ -182,6 +189,7 @@ _set_document_locator ( Eo *obj, void *class_data, va_list *list )
 static void
 _end ( Eo *obj, void *class_data, va_list *list )
 {
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
   XInclude_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
 
@@ -203,6 +211,7 @@ _end ( Eo *obj, void *class_data, va_list *list )
 static void
 _end_document ( Eo *obj, void *class_data, va_list *list )
 {
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
   XInclude_Data *pd = class_data;
   eina_array_pop ( pd->locators );
   pd->depth--;

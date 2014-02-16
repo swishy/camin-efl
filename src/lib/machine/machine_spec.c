@@ -75,7 +75,7 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   LOG("Kicking parser into action in machine_spec....");
 
   // Start Machine Spec parsing and assign results to local var.
-  eo_do(machine_spec_document, parse_string(machine_spec_buffer, &data->spec));
+  eo_do(xml_base, parse_string(machine_spec_buffer, &data->spec));
 }
 
 static void 
@@ -88,34 +88,33 @@ _start(Eo *obj, void *class_data, va_list *list) {
   Private_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
   
-  char *module;
+  LOGF("Number of attributes in machine spec start: %i", element->nb_attributes);
   
   if ( element->nb_attributes > 0 )
         {
           int i = 0;
           int attribute_position = 0;
-          char *parse_value;
 
           // Get values from attributes
           while ( i < element->nb_attributes )
             {
               if ( element->attributes[attribute_position] != NULL )
                 {
+		  LOGF("Attribute is %s", element->attributes[attribute_position]);
                   if ( strncmp ( element->attributes[attribute_position],"name",sizeof ( element->attributes[attribute_position] ) ) == 0 )
                     {
                       int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
-                      module = strndup ( element->attributes[attribute_position + 3], attribute_length );
+                      LOGF("Attribute liength: %i", attribute_length);
+		      
+		      char *module_name = strndup ( element->attributes[attribute_position + 3], attribute_length );
+		      LOGF("Module name: %s", module_name);
+		      eina_hash_add(pd->filters, module_name, &module_name);
                     }
                 }
               attribute_position = attribute_position + 5;
               i++;
             }
         }
-        
-        LOGF("Found module: %s", module);
-        
-   eina_hash_add(pd->filters, module, &module);
-  
 }
 
 static void 

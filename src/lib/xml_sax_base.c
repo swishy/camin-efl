@@ -130,7 +130,7 @@ _parse_string(Eo *obj, void *class_data, va_list *list)
 }
 
 static void
-_set_document_locator(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_set_document_locator(Eo *obj, void *class_data, va_list *list)
 {
    LOG("XML SAX BASE _set_document_locator called");
    
@@ -153,7 +153,7 @@ _set_document_locator(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
-_document_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_document_start(Eo *obj, void *class_data, va_list *list)
 {
 
    LOG("XML SAX BASE doc start called");
@@ -175,7 +175,7 @@ _document_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
-_start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_start(Eo *obj, void *class_data, va_list *list)
 {
    int i;
 
@@ -196,7 +196,7 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
-_char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_char(Eo *obj, void *class_data, va_list *list)
 {
    void *char_data = va_arg(*list, void*);
    const xmlChar *string = va_arg(*list, const xmlChar*);
@@ -217,11 +217,8 @@ _char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
-_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_end(Eo *obj, void *class_data, va_list *list)
 {
-
-   LOG("Element end");
-   
    // TODO move this to a statement which checks end tag name = filter name
    
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
@@ -240,7 +237,7 @@ _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
-_document_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_document_end(Eo *obj, void *class_data, va_list *list)
 {
    LOG("Document end");
    
@@ -260,7 +257,7 @@ _document_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
-_set_content_handler(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_set_content_handler(Eo *obj, void *class_data, va_list *list)
 {
    LOG("Set content handler");
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
@@ -269,7 +266,7 @@ _set_content_handler(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
-_set_document_handler(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_set_document_handler(Eo *obj, void *class_data, va_list *list)
 {
    LOG("Set document handler");
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
@@ -278,7 +275,7 @@ _set_document_handler(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void
-_set_handler(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_set_handler(Eo *obj, void *class_data, va_list *list)
 {
    LOG("Set handler");
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);

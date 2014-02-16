@@ -184,7 +184,7 @@ _start ( Eo *obj, void *class_data, va_list *list )
 }
 
 static void
-_char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
+_char(Eo *obj, void *class_data, va_list *list)
 {
    void *data = va_arg ( *list, void*);
    const xmlChar *string = va_arg(*list, const xmlChar*);
@@ -230,7 +230,7 @@ _char(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 }
 
 static void 
-_end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+_end(Eo *obj, void *class_data, va_list *list) {
   
   Private_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
@@ -252,7 +252,7 @@ _end(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
 }
 
 static void 
-_end_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
+_end_document(Eo *obj, void *class_data, va_list *list) {
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
@@ -268,7 +268,8 @@ _end_document(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
     spec_document->filters = pd->filters;
     
   } else {
-    eo_error_set(obj);
+    //eo_error_set(obj);
+    LOG("ERROR ADDING FILTER TO MACHINE SPEC RESULT");
   }
 }
 
