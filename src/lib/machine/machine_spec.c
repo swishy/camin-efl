@@ -54,6 +54,8 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
+  // Get size of machine_spec and read in.
+  // TODO implement error handling
   if ((machine_spec = fopen("/etc/amin/machine_spec.xml", "rb")))
   {
     fseek(machine_spec, 0, SEEK_END);
@@ -66,6 +68,7 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
     fread(machine_spec_buffer, 1, size, machine_spec);
   }
   
+  // Set up filter chain.
   Eo *machine_spec_document = eo_add(AMIN_MACHINE_SPEC_DOCUMENT, NULL);
   
   Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec_document));
