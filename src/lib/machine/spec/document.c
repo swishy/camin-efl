@@ -58,9 +58,10 @@ _filter_entry_free_cb(void *data)
   free(data);
 }
 
+static void
 _start_document ( Eo *obj, void *class_data, va_list *list )
 {
-  ElementData *element = va_arg ( *list, ElementData* );
+  // Setup Eina_Hash to collect filters found during parsing.
   Private_Data *pd = class_data;
   pd->filters = eina_hash_string_superfast_new(_filter_entry_free_cb);
 }
@@ -284,8 +285,7 @@ _class_constructor(Eo_Class *klass)
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_DOCUMENT_END), _end_document),
     EO_OP_FUNC_SENTINEL
   };
-  
-  
+
   eo_class_funcs_set(klass, func_desc);
 }
 

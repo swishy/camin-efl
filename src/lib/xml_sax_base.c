@@ -219,8 +219,6 @@ _char(Eo *obj, void *class_data, va_list *list)
 static void
 _end(Eo *obj, void *class_data, va_list *list)
 {
-   // TODO move this to a statement which checks end tag name = filter name
-   
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    ElementData *element = va_arg(*list, ElementData*);
    

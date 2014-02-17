@@ -62,7 +62,7 @@ _class_constructor(Eo_Class *klass)
 
 static const Eo_Op_Description op_desc[] = {
      EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_AMIN_COMMAND, "Starts processing an Amin command."),
-     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_WHITE_WASH, "Trys to shell out and execute command if no amin module exists to handle it."),
+     EO_OP_DESCRIPTION(AMIN_ELT_SUB_ID_WHITE_WASH, "Trys to sanitise commands..."),
      EO_OP_DESCRIPTION_SENTINEL
 };
 

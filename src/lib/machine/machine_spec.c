@@ -18,7 +18,7 @@ EAPI Eo_Op AMIN_MACHINE_SPEC_BASE_ID = 0;
 
 typedef struct
 {
-   Eina_Hash *filters;
+   Eina_List *filters;
    Machine_Spec_Document spec;
 } Private_Data;
 
@@ -30,17 +30,6 @@ _filter_entry_free_cb(void *data)
   free(data);
 }
 
-static Eina_Bool
-_filter_foreach_cb(const Eina_Hash *filter, const void *key,
-void *data, void *fdata)
-{
-  const char *name = key;
-  Filter_Data *filter_data = data;
-  printf ( "%s\n", name );
-  // Return EINA_FALSE to stop this callback from being called
-  return EINA_TRUE;
-}
-
 static void 
 _document_start(Eo *obj, void *class_data, va_list *list) {
   
@@ -49,8 +38,6 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   char *machine_spec_buffer;
 
   Private_Data *data = eo_data_ref(obj, MY_CLASS);
-  
-  data->filters = eina_hash_string_superfast_new(_filter_entry_free_cb);
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
@@ -111,7 +98,7 @@ _start(Eo *obj, void *class_data, va_list *list) {
 		      
 		      char *module_name = strndup ( element->attributes[attribute_position + 3], attribute_length );
 		      LOGF("Module name: %s", module_name);
-		      eina_hash_add(pd->filters, module_name, &module_name);
+		      eina_list_append(pd->filters, module_name);
                     }
                 }
               attribute_position = attribute_position + 5;
@@ -129,7 +116,11 @@ _end_document(Eo *obj, void *class_data, va_list *list) {
   
   LOGF("Module count: %lu", sizeof(pd->filters));
   
-  eina_hash_foreach(pd->filters, _filter_foreach_cb, NULL);
+  Eina_List *l_itr;
+  char *module;
+  
+  EINA_LIST_FOREACH(pd->filters, l_itr, module)
+    LOGF("Current module is %s", module);
 
 }
 
