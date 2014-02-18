@@ -17,7 +17,7 @@ EAPI Eo_Op XML_SAX_BASE_BASE_ID = 0;
 static void
 _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
 {
-   LOG("_libxml2_set_document_locator");
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Eo *filter = (Eo*)ctx;
    eo_do(filter, set_document_locator(ctx, loc));
 }
@@ -25,6 +25,7 @@ _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
 static void
 _libxml2_document_start(void *user_data)
 {
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Eo *filter = (Eo*)user_data;
    eo_do(filter, document_start(user_data));
 }
@@ -32,6 +33,7 @@ _libxml2_document_start(void *user_data)
 static void
 _libxml2_document_end(void *user_data)
 {
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Eo *filter = (Eo*)user_data;
    eo_do(filter, document_end(user_data));
 }
@@ -48,6 +50,7 @@ _libxml2_start(
 	       int nb_defaulted,
 	       const xmlChar **attributes )
 {
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    // Here we grab current filter 
    Eo *filter = (Eo*)ctx;
 
@@ -73,6 +76,7 @@ _libxml2_char(
 	      const xmlChar *string,
 	      int string_len)
 {
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    // Pass on through to the other side...
    Eo *filter = (Eo*)user_data;
    eo_do(filter, char(user_data, string, string_len));
@@ -85,6 +89,7 @@ _libxml2_end(
 	     const xmlChar* prefix,
 	     const xmlChar* URI)
 {
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    // Here we grab current filter and private data for such
    Eo *filter = (Eo*)ctx;
 
@@ -103,7 +108,7 @@ _libxml2_end(
 static void
 _parse_string(Eo *obj, void *class_data, va_list *list)
 {
-  
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Xml_Base_Data *data = class_data;
    // Create a parser instance for this request.
    // TODO this currently is here as having one setup in the constructor
@@ -124,15 +129,15 @@ _parse_string(Eo *obj, void *class_data, va_list *list)
    parser.setDocumentLocator = _libxml2_set_document_locator;
 
    if (xmlSAXUserParseMemory(&parser, obj, xmlString, strlen(xmlString)) < 0 )
-{
-   LOG("Issue parsing XML document");
-};
+   {
+     LOG("Issue parsing XML document");
+   };
 }
 
 static void
 _set_document_locator(Eo *obj, void *class_data, va_list *list)
 {
-   LOG("XML SAX BASE _set_document_locator called");
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    
@@ -155,8 +160,7 @@ _set_document_locator(Eo *obj, void *class_data, va_list *list)
 static void
 _document_start(Eo *obj, void *class_data, va_list *list)
 {
-
-   LOG("XML SAX BASE doc start called");
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    
@@ -177,6 +181,7 @@ _document_start(Eo *obj, void *class_data, va_list *list)
 static void
 _start(Eo *obj, void *class_data, va_list *list)
 {
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    int i;
 
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
@@ -198,6 +203,7 @@ _start(Eo *obj, void *class_data, va_list *list)
 static void
 _char(Eo *obj, void *class_data, va_list *list)
 {
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    void *char_data = va_arg(*list, void*);
    const xmlChar *string = va_arg(*list, const xmlChar*);
    int length = va_arg(*list, int);
@@ -219,6 +225,7 @@ _char(Eo *obj, void *class_data, va_list *list)
 static void
 _end(Eo *obj, void *class_data, va_list *list)
 {
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    ElementData *element = va_arg(*list, ElementData*);
    
@@ -237,7 +244,7 @@ _end(Eo *obj, void *class_data, va_list *list)
 static void
 _document_end(Eo *obj, void *class_data, va_list *list)
 {
-   LOG("Document end");
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    ElementData *element = va_arg(*list, ElementData*);
@@ -257,7 +264,7 @@ _document_end(Eo *obj, void *class_data, va_list *list)
 static void
 _set_content_handler(Eo *obj, void *class_data, va_list *list)
 {
-   LOG("Set content handler");
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    Eo *content_handler = va_arg(*list, Eo*);
    data->content_handler = content_handler;
@@ -266,7 +273,7 @@ _set_content_handler(Eo *obj, void *class_data, va_list *list)
 static void
 _set_document_handler(Eo *obj, void *class_data, va_list *list)
 {
-   LOG("Set document handler");
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    Eo *document_handler = va_arg(*list, Eo*);
    data->document_handler = document_handler;
@@ -275,7 +282,7 @@ _set_document_handler(Eo *obj, void *class_data, va_list *list)
 static void
 _set_handler(Eo *obj, void *class_data, va_list *list)
 {
-   LOG("Set handler");
+   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    Eo *handler = va_arg(*list, Eo*);
    data->handler = handler;

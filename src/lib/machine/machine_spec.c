@@ -37,7 +37,7 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   long size;
   char *machine_spec_buffer;
 
-  Private_Data *data = eo_data_ref(obj, MY_CLASS);
+  Private_Data *pd = class_data;
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
   
@@ -65,11 +65,12 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   LOG("Kicking parser into action in machine_spec....");
 
   // Start Machine Spec parsing and assign results to local var.
-  eo_do(xml_base, parse_string(machine_spec_buffer, &data->spec));
+  eo_do(xml_base, parse_string(machine_spec_buffer, &pd->spec));
 }
 
 static void 
 _start(Eo *obj, void *class_data, va_list *list) {
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
 
   LOG("AMIN_MACHINE_SPEC _start");
   
@@ -109,6 +110,7 @@ _start(Eo *obj, void *class_data, va_list *list) {
 
 static void 
 _end_document(Eo *obj, void *class_data, va_list *list) {
+  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
   Private_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
   
