@@ -58,6 +58,16 @@ _filter_entry_free_cb(void *data)
   free(data);
 }
 
+static Eina_Bool
+_machine_spec_foreach_cb(const Eina_Hash *modules, const void *key,
+                       void *data, void *fdata)
+{
+   const char *name = key;
+   printf("%s\n", name);
+   // Return EINA_FALSE to stop this callback from being called
+   return EINA_TRUE;
+}
+
 static void
 _start_document ( Eo *obj, void *class_data, va_list *list )
 {
@@ -270,6 +280,8 @@ _end_document(Eo *obj, void *class_data, va_list *list) {
     // TODO Access result stored in XML_SAX_BASE pd and set spec document values on such.
     Machine_Spec_Document *spec_document = (Machine_Spec_Document*)xd->result;
     spec_document->filters = pd->filters;
+    
+    eina_hash_foreach(spec_document->filters, _machine_spec_foreach_cb, NULL);
     
   } else {
     //eo_error_set(obj);

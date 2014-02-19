@@ -30,6 +30,17 @@ _filter_entry_free_cb(void *data)
   free(data);
 }
 
+static Eina_Bool
+_machine_spec_foreach_cb(const Eina_Hash *modules, const void *key,
+                       void *data, void *fdata)
+{
+   const char *name = key;
+   printf("%s\n", name);
+
+   // Return EINA_FALSE to stop this callback from being called
+   return EINA_TRUE;
+}
+
 static void 
 _document_start(Eo *obj, void *class_data, va_list *list) {
   
@@ -66,6 +77,11 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
 
   // Start Machine Spec parsing and assign results to local var.
   eo_do(xml_base, parse_string(machine_spec_buffer, &pd->spec));
+  
+  Machine_Spec_Document *doc = &pd->spec;
+  Eina_Hash *filters = doc->filters;
+  
+   eina_hash_foreach(filters, _machine_spec_foreach_cb, NULL);
 }
 
 static void 
@@ -95,7 +111,7 @@ _start(Eo *obj, void *class_data, va_list *list) {
                   if ( strncmp ( element->attributes[attribute_position],"name",sizeof ( element->attributes[attribute_position] ) ) == 0 )
                     {
                       int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
-                      LOGF("Attribute liength: %i", attribute_length);
+                      LOGF("Attribute length: %i", attribute_length);
 		      
 		      char *module_name = strndup ( element->attributes[attribute_position + 3], attribute_length );
 		      LOGF("Module name: %s", module_name);
