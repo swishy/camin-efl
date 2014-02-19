@@ -301,6 +301,10 @@ _handler_constructor(Eo *obj, void *class_data, va_list *list)
    Xml_Base_Data  *pd = eo_data_scope_get(obj, XML_SAX_BASE);
    pd->handler = handler;
    
+   // Set a reference to result so its accessible up the chain.
+   Xml_Base_Data *handler_base_data = eo_data_scope_get(handler, XML_SAX_BASE);
+   handler_base_data->result = &pd->result;
+   
    // Call base constructor.
    eo_do_super(obj, MY_CLASS, eo_constructor());
 }
