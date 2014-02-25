@@ -269,7 +269,7 @@ static void
 _end_document(Eo *obj, void *class_data, va_list *list) {
   
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
-  
+
   Private_Data *pd = class_data;
   Xml_Base_Data *xd = (Xml_Base_Data*)eo_data_scope_get(obj, XML_SAX_BASE);
   
