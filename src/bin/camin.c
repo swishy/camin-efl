@@ -18,7 +18,7 @@ static const Ecore_Getopt optdesc = {
   "CAmin",
   NULL,
   "0.0",
-  "(C) 2013 ProjectAmin.org",
+  "(C) 2014 ProjectAmin.org",
   "",
   "Amin implementation in C",
   0,
@@ -80,8 +80,6 @@ static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
   printf("obj-type:'%s'\n", eo_class_name_get(klass));
   
   eo_do(amin, parse(buf));
-  
-  eo_shutdown();
   
   // All done jumping out....
   ecore_main_loop_quit();
@@ -154,7 +152,6 @@ int main(int argc, char* argv[])
   
   ecore_main_loop_begin();
   
-  //eo_shutdown();
   ecore_shutdown();
   
   return 0;
