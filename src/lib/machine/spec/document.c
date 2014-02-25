@@ -71,7 +71,8 @@ _machine_spec_foreach_cb(const Eina_Hash *modules, const void *key,
 static void
 _start_document ( Eo *obj, void *class_data, va_list *list )
 {
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
+  const Eo_Class *current_class = eo_class_get ( obj );
+  LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
   // Setup Eina_Hash to collect filters found during parsing.
   Private_Data *pd = class_data;
   pd->filters = eina_hash_string_superfast_new(_filter_entry_free_cb);
@@ -80,7 +81,7 @@ _start_document ( Eo *obj, void *class_data, va_list *list )
 static void
 _start ( Eo *obj, void *class_data, va_list *list )
 {
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
+
   int i;
 
   Private_Data *pd = class_data;
@@ -199,7 +200,7 @@ _start ( Eo *obj, void *class_data, va_list *list )
 static void
 _char(Eo *obj, void *class_data, va_list *list)
 {
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
+
    void *data = va_arg ( *list, void*);
    const xmlChar *string = va_arg(*list, const xmlChar*);
    int length = va_arg(*list, int);
@@ -245,7 +246,7 @@ _char(Eo *obj, void *class_data, va_list *list)
 
 static void 
 _end(Eo *obj, void *class_data, va_list *list) {
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
+
   Private_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
 
@@ -267,8 +268,6 @@ _end(Eo *obj, void *class_data, va_list *list) {
 
 static void 
 _end_document(Eo *obj, void *class_data, va_list *list) {
-  
-  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
 
   Private_Data *pd = class_data;
   Xml_Base_Data *xd = (Xml_Base_Data*)eo_data_scope_get(obj, XML_SAX_BASE);

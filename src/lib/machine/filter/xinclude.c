@@ -42,7 +42,6 @@ XInclude_Data;
 static void
 _start_document ( Eo *obj, void *class_data, va_list *list )
 {
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
   //Xml_Base_Data *data = class_data;
   XInclude_Data *pd = class_data;
   pd->level = 0;
@@ -58,9 +57,7 @@ static void
 _start ( Eo *obj, void *class_data, va_list *list )
 {
   const Eo_Class *current_class = eo_class_get ( obj );
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
 
-  
   XInclude_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
   if ( pd->level == 0 )
@@ -70,12 +67,12 @@ _start ( Eo *obj, void *class_data, va_list *list )
       // Handle XML_BASE stuff?? 
       // TODO investigate what X::S::B is currently doing also.
       
-      LOGF("Bases is currently: %lu", sizeof(pd->bases));
+      //LOGF("Bases is currently: %lu", sizeof(pd->bases));
       //UriUriA parent_base = 
       
       // Handle xincludes
-      LOGF ( "XML URI %s", element->URI );
-      LOGF ( "XML localname %s", element->localname );
+      //LOGF ( "XML URI %s", element->URI );
+      //LOGF ( "XML localname %s", element->localname );
 
       if ( element->URI )
         {
@@ -144,7 +141,6 @@ _start ( Eo *obj, void *class_data, va_list *list )
 static void
 _set_document_locator ( Eo *obj, void *class_data, va_list *list )
 {
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
   Eo *ctx = va_arg ( *list, Eo* );
   xmlSAXLocatorPtr location_pointer = va_arg ( *list, xmlSAXLocatorPtr );
   //Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
@@ -189,7 +185,6 @@ _set_document_locator ( Eo *obj, void *class_data, va_list *list )
 static void
 _end ( Eo *obj, void *class_data, va_list *list )
 {
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
   XInclude_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
 
@@ -211,7 +206,6 @@ _end ( Eo *obj, void *class_data, va_list *list )
 static void
 _end_document ( Eo *obj, void *class_data, va_list *list )
 {
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
   XInclude_Data *pd = class_data;
   eina_array_pop ( pd->locators );
   pd->depth--;
