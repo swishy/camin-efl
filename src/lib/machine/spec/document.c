@@ -10,8 +10,6 @@
 #include "elt.h"
 #include "document.h"
 
-int DEPTH;
-
 EAPI Eo_Op AMIN_MACHINE_SPEC_DOCUMENT_BASE_ID = 0;
 
 static const char FILTER_TAG[] = "filter";
@@ -33,10 +31,10 @@ typedef struct
 {
    const char *localname;
    char *element;
-   Eo *mparent;   
-   char *log;   
-   char *filter_param;   
-   char *download;  
+   Eo *mparent;
+   char *log;
+   char *filter_param;
+   char *download;
    char *module;
    char *version;
    char *generator;
@@ -244,7 +242,7 @@ _char(Eo *obj, void *class_data, va_list *list)
     }
 }
 
-static void 
+static void
 _end(Eo *obj, void *class_data, va_list *list) {
 
   Private_Data *pd = class_data;
@@ -262,16 +260,16 @@ _end(Eo *obj, void *class_data, va_list *list) {
     filter.module = pd->module;
     eina_hash_add(pd->filters, filter.module, &filter);
   }
-  
+
   // TODO Decide on machine_name tag?
 }
 
-static void 
+static void
 _end_document(Eo *obj, void *class_data, va_list *list) {
 
   Private_Data *pd = class_data;
   Xml_Base_Data *xd = (Xml_Base_Data*)eo_data_scope_get(obj, XML_SAX_BASE);
-  
+
   if(!xd) eo_error_set(obj);
   if(xd->result)
   {
@@ -279,9 +277,9 @@ _end_document(Eo *obj, void *class_data, va_list *list) {
     // TODO Access result stored in XML_SAX_BASE pd and set spec document values on such.
     Machine_Spec_Document *spec_document = (Machine_Spec_Document*)xd->result;
     spec_document->filters = pd->filters;
-    
+
     eina_hash_foreach(spec_document->filters, _machine_spec_foreach_cb, NULL);
-    
+
   } else {
     //eo_error_set(obj);
     LOG("ERROR ADDING FILTER TO MACHINE SPEC RESULT");

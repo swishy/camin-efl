@@ -10,8 +10,6 @@
 #include "elt.h"
 #include "amin_machine_filter_dispatcher.h"
 
-int DEPTH;
-
 EAPI Eo_Op AMIN_MACHINE_FILTER_DISPATCHER_BASE_ID = 0;
 
 typedef struct
@@ -34,18 +32,18 @@ typedef struct
 
 #define MY_CLASS AMIN_MACHINE_FILTER_DISPATCHER_CLASS
 
-static void 
+static void
 _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   int i;
-  
+
   void *data = va_arg(*list, void*);
   const char *element = va_arg(*list, const char*);
   const char **attributes = va_arg(*list, const char**);
-  
+
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
-  
+
   LOG("Dispatching stuff....");
-  
+
   // TODO Get ref to current class data to access filter.
   //eo_do(pd->filter, start(data, el, attr));
 
@@ -59,7 +57,7 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   }
 
   DEPTH++;
-} 
+}
 
 static void
 _class_constructor(Eo_Class *klass)
@@ -68,7 +66,7 @@ _class_constructor(Eo_Class *klass)
     EO_OP_FUNC(XML_SAX_BASE_ID(XML_SAX_BASE_SUB_ID_START), _start),
     EO_OP_FUNC_SENTINEL
   };
-  
+
   eo_class_funcs_set(klass, func_desc);
 }
 

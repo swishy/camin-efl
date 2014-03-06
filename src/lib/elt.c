@@ -8,8 +8,6 @@
 #include "xml_sax_base.h"
 #include "elt.h"
 
-int DEPTH;
-
 EAPI Eo_Op AMIN_ELT_BASE_ID = 0;
 
 typedef struct
@@ -28,7 +26,7 @@ _start_document ( Eo *obj EINA_UNUSED, void *class_data, va_list *list )
       eo_do_super ( obj, MY_CLASS, document_start ( va_arg ( *list, Eo* ) ) );
 }
 
-static void 
+static void
 _fix_text(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
   LOG("fix text called");

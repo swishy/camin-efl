@@ -8,8 +8,6 @@
 #include "amin.h"
 #include "amin_machine_dispatcher.h"
 
-int DEPTH;
-
 EAPI Eo_Op AMIN_MACHINE_DISPATCHER_BASE_ID = 0;
 
 typedef struct
@@ -37,11 +35,11 @@ static void
 _dispatcher_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
    // TODO Reorder filter list.
-   
+
    // TODO Set machine name in spec
-    
-   // TODO Update filter list in spec  
-    
+
+   // TODO Update filter list in spec
+
 }
 
 static void
