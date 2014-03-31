@@ -41,24 +41,20 @@ static unsigned char
 _adminlist_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage)
 {
    printf("Adminlist Callback received %s\n", str);
+   
+   ecore_main_loop_quit();
 
-   return 0;
+   return ECORE_CALLBACK_CANCEL;
 }
 
 static unsigned char
 _uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage)
 {
    printf("URI Callback received %s\n", str);
+   
+   ecore_main_loop_quit();
 
-   return 0;
-}
-
-void process_input(char *profile)
-{
-  LOGF("%s", profile);
-  
-  // Send to machine for processing.
-  //parse_content(profile);
+   return ECORE_CALLBACK_CANCEL;
 }
 
 static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
@@ -148,13 +144,14 @@ int main(int argc, char* argv[])
     return -1;
   }
   
+  // Parse commandline arguments.
   if (ecore_getopt_parse(&optdesc, values, argc, argv) < 0)
   {
     LOG("Failed to parse options passed to Amin");
     return 1;
   }
   
-  // We have something passed to us from stdin.
+  // We are exepcting something from stdin so lets read it!
   if (profile)
   {
     read_stdin();
