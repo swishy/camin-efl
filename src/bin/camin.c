@@ -14,6 +14,12 @@ struct context
   Ecore_Fd_Handler *handler;
 };
 
+void read_stdin();
+
+static unsigned char _adminlist_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage);
+
+static unsigned char _uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage);
+
 static const Ecore_Getopt optdesc = {
   "CAmin",
   NULL,
@@ -23,13 +29,29 @@ static const Ecore_Getopt optdesc = {
   "Amin implementation in C",
   0,
   {
-    ECORE_GETOPT_STORE_STR('a', "adminlist", "[-a|-adminlist] uri://"),
-    ECORE_GETOPT_STORE_STR('u', "uri", "[-u|-uri] uri://"),
+    ECORE_GETOPT_CALLBACK_ARGS('a', "adminlist", "[-a|-adminlist] uri://", "STRING", _adminlist_callback, NULL),
+    ECORE_GETOPT_CALLBACK_ARGS('u', "uri", "[-u|-uri] uri://", "STRING", _uri_callback, NULL),
     ECORE_GETOPT_STORE_TRUE('p', "profile", "[-p|-profile] as <STDIN>"),
     ECORE_GETOPT_HELP('h', "help"),
     ECORE_GETOPT_SENTINEL
   }
 };
+
+static unsigned char
+_adminlist_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage)
+{
+   printf("Adminlist Callback received %s\n", str);
+
+   return 0;
+}
+
+static unsigned char
+_uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage)
+{
+   printf("URI Callback received %s\n", str);
+
+   return 0;
+}
 
 void process_input(char *profile)
 {
@@ -136,18 +158,6 @@ int main(int argc, char* argv[])
   if (profile)
   {
     read_stdin();
-  }
-  
-  else if (adminlist)
-  {
-    LOG("Adminlist passed, Not currently implemented.");
-    return 1;
-  }
-  
-  else if (uri)
-  {
-    LOG("Process URI passed, Not currently implemented.");
-    return 1;
   }
   
   ecore_main_loop_begin();
