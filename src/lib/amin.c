@@ -75,56 +75,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
     LOG("Issue parsing XML document");
   };
   */
-  /** BELOW IS EXPAT FOO
-  // Start processing, let machine_spec handle expat foo.
-  if(!ec_url)
-  {
-    // We dont appear to have a uri, process expecting XML in char.
 
-    // Let Expat do its thing, the local event callbacks are assigned to the parser instance
-    // as they are dynamically loaded up the stack. Here we just kick it off.
-    if(XML_Parse(machine_parser, profile, strlen(profile), XML_TRUE) == XML_STATUS_ERROR)
-    {
-	LOGF("Error: %s\n", XML_ErrorString(XML_GetErrorCode(machine_parser)));
-    }
-  }
-  else {
-    // We appear to have a url process as such. Currently not handled.
-
-  }
-
-  // TODO Implement below. probably needs to be generic in ELT base ie get_result() not get_spec...
-
-  // Eo *spec = eo_do(amin_machine_spec, get_spec());
-  Eo *spec = eo_add(AMIN, NULL, NULL);
-
-  XML_ParserFree(machine_parser);
-
-  // TODO make sure the parser is free'd!!
-
-  // Hopefully by now all is loaded and happy spec wise start processing things.
-
-  // Create a parser instance for this request.
-  XML_Parser parser = XML_ParserCreate(NULL);
-  if (! parser) {
-    LOG("Camin could not allocate memory for parser");
-    ecore_shutdown();
-  }
-
-  // Load up initial filter instance to start parsing profile.
-  LOG("Creating Amin Dispatcher Instance");
-  Eo *amin_dispatcher = eo_add_custom(AMIN_MACHINE_DISPATCHER, NULL, dispatcher_constructor(spec));
-  const Eo_Class *klass = eo_class_get(amin_dispatcher);
-  LOGF("obj-type:'%s'\n", eo_class_name_get(klass));
-
-    // Let Expat do its thing, the local event callbacks are assigned to the parser instance
-    // as they are dynamically loaded up the stack. Here we just kick it off.
-    if(XML_Parse(parser, profile, strlen(profile), XML_TRUE) == XML_STATUS_ERROR)
-    {
-	LOGF("Error: %s\n", XML_ErrorString(XML_GetErrorCode(parser)));
-    }
-
-    */
 }
 
 static void

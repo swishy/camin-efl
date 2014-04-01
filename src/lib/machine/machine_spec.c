@@ -168,4 +168,4 @@ static const Eo_Class_Description class_desc = {
      NULL
 };
 
-EO_DEFINE_CLASS(amin_machine_spec_class_get, &class_desc, AMIN_ELT, EO_BASE_CLASS, NULL);
+EO_DEFINE_CLASS(amin_machine_spec_class_get, &class_desc, AMIN_ELT, NULL);
