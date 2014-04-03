@@ -120,6 +120,7 @@ _parse_string(Eo *obj, void *class_data, va_list *list)
    parser.startElementNs = _libxml2_start;
    parser.endElementNs = _libxml2_end;
    parser.characters = _libxml2_char;
+   // TODO fix get location issues in XInclude filter.
    parser.setDocumentLocator = _libxml2_set_document_locator;
 
    if (xmlSAXUserParseMemory(&parser, obj, xmlString, strlen(xmlString)) < 0 )
@@ -162,6 +163,12 @@ _document_start(Eo *obj, void *class_data, va_list *list)
    
    if (handler)
    {
+     // Attempt to make sure base data gets moved up the handler chain so results set at the top level
+     // are available down the stack.
+     // IE everything in the chain is manipulating the same Xml_Base_Data
+     Xml_Base_Data *base_data = eo_data_ref(obj, XML_SAX_BASE);
+     Xml_Base_Data *handler_data = eo_data_ref(handler, XML_SAX_BASE);
+     handler_data = base_data;
      eo_do(handler, document_start(user_data));
    } else if (MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, document_start(user_data));

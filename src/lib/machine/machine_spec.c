@@ -47,6 +47,7 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   char *machine_spec_buffer;
 
   Private_Data *pd = class_data;
+  pd->filters = eina_hash_string_superfast_new(_filter_entry_free_cb);
 
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
 
@@ -79,7 +80,7 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   Machine_Spec_Document *doc = &pd->spec;
   Eina_Hash *filters = doc->filters;
 
-   eina_hash_foreach(filters, _machine_spec_foreach_cb, NULL);
+   // eina_hash_foreach(filters, _machine_spec_foreach_cb, NULL);
 }
 
 static void
@@ -113,7 +114,7 @@ _start(Eo *obj, void *class_data, va_list *list) {
 
 		      char *module_name = strndup ( element->attributes[attribute_position + 3], attribute_length );
 		      LOGF("Module name: %s", module_name);
-		      eina_list_append(pd->filters, module_name);
+		      pd->filters = eina_list_append(pd->filters, module_name);
                     }
                 }
               attribute_position = attribute_position + 5;
@@ -130,13 +131,13 @@ _end_document(Eo *obj, void *class_data, va_list *list) {
 
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
 
-  LOGF("Module count: %lu", sizeof(pd->filters));
+  LOGF("Module count: %u", eina_list_count(pd->filters));
 
   Eina_List *l_itr;
   char *module;
 
-  EINA_LIST_FOREACH(pd->filters, l_itr, module)
-    LOGF("Current module is %s", module);
+  // EINA_LIST_FOREACH(pd->filters, l_itr, module)
+    // LOGF("Current module is %s", module);
 
 }
 

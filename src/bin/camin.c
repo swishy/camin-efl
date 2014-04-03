@@ -57,7 +57,7 @@ _uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const c
    return ECORE_CALLBACK_CANCEL;
 }
 
-static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
+static Eina_Bool _stdin_handler_cb(void *data, Ecore_Fd_Handler *handler)
 {
   
   // Setup local vars.
@@ -114,7 +114,7 @@ void read_stdin()
   // Setup handler and callback.
   ctxt.handler = ecore_main_fd_handler_add(STDIN_FILENO,
 					   ECORE_FD_READ | ECORE_FD_ERROR,
-					   _fd_handler_cb,
+					   _stdin_handler_cb,
 					   &ctxt, NULL, NULL);
 }
 
