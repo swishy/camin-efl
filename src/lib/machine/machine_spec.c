@@ -47,7 +47,7 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   char *machine_spec_buffer;
 
   Private_Data *pd = class_data;
-  pd->filters = eina_hash_string_superfast_new(_filter_entry_free_cb);
+  pd->filters = NULL;
 
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
 
@@ -85,9 +85,6 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
 
 static void
 _start(Eo *obj, void *class_data, va_list *list) {
-  LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
-
-  LOG("AMIN_MACHINE_SPEC _start");
 
   LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
 
@@ -136,9 +133,16 @@ _end_document(Eo *obj, void *class_data, va_list *list) {
   Eina_List *l_itr;
   char *module;
 
-  // EINA_LIST_FOREACH(pd->filters, l_itr, module)
-    // LOGF("Current module is %s", module);
+  EINA_LIST_FOREACH(pd->filters, l_itr, module)
+    LOGF("Current module is %s", module);
+    
+  Xml_Base_Data *xd = (Xml_Base_Data*)eo_data_scope_get(obj, XML_SAX_BASE);
 
+  if(!xd) eo_error_set(obj);
+  if(xd->result)
+  {
+    xd->result = &pd->spec;
+  }
 }
 
 static void
