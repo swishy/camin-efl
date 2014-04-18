@@ -258,7 +258,10 @@ _end(Eo *obj, void *class_data, va_list *list) {
     filter.download = pd->download;
     filter.version = pd->version;
     filter.module = pd->module;
-    eina_hash_add(pd->filters, filter.module, &filter);
+    if(!eina_hash_add(pd->filters, filter.module, &filter))
+    {
+      LOG("Failed to add filter to filters hash!");
+    }  
   }
 
   // TODO Decide on machine_name tag?
@@ -278,6 +281,7 @@ _end_document(Eo *obj, void *class_data, va_list *list) {
     Machine_Spec_Document *spec_document = (Machine_Spec_Document*)xd->result;
     spec_document->filters = pd->filters;
 
+    LOG("Calling foreach in document.c.");
     eina_hash_foreach(spec_document->filters, _machine_spec_foreach_cb, NULL);
 
   } else {

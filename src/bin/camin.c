@@ -14,6 +14,12 @@ struct context
   Ecore_Fd_Handler *handler;
 };
 
+void read_stdin();
+
+static unsigned char _adminlist_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage);
+
+static unsigned char _uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage);
+
 static const Ecore_Getopt optdesc = {
   "CAmin",
   NULL,
@@ -23,23 +29,35 @@ static const Ecore_Getopt optdesc = {
   "Amin implementation in C",
   0,
   {
-    ECORE_GETOPT_STORE_STR('a', "adminlist", "[-a|-adminlist] uri://"),
-    ECORE_GETOPT_STORE_STR('u', "uri", "[-u|-uri] uri://"),
+    ECORE_GETOPT_CALLBACK_ARGS('a', "adminlist", "[-a|-adminlist] uri://", "STRING", _adminlist_callback, NULL),
+    ECORE_GETOPT_CALLBACK_ARGS('u', "uri", "[-u|-uri] uri://", "STRING", _uri_callback, NULL),
     ECORE_GETOPT_STORE_TRUE('p', "profile", "[-p|-profile] as <STDIN>"),
     ECORE_GETOPT_HELP('h', "help"),
     ECORE_GETOPT_SENTINEL
   }
 };
 
-void process_input(char *profile)
+static unsigned char
+_adminlist_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage)
 {
-  LOGF("%s", profile);
-  
-  // Send to machine for processing.
-  //parse_content(profile);
+   printf("Adminlist Callback received %s\n", str);
+   
+   ecore_main_loop_quit();
+
+   return ECORE_CALLBACK_CANCEL;
 }
 
-static Eina_Bool _fd_handler_cb(void *data, Ecore_Fd_Handler *handler)
+static unsigned char
+_uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage)
+{
+   printf("URI Callback received %s\n", str);
+   
+   ecore_main_loop_quit();
+
+   return ECORE_CALLBACK_CANCEL;
+}
+
+static Eina_Bool _stdin_handler_cb(void *data, Ecore_Fd_Handler *handler)
 {
   
   // Setup local vars.
@@ -96,7 +114,7 @@ void read_stdin()
   // Setup handler and callback.
   ctxt.handler = ecore_main_fd_handler_add(STDIN_FILENO,
 					   ECORE_FD_READ | ECORE_FD_ERROR,
-					   _fd_handler_cb,
+					   _stdin_handler_cb,
 					   &ctxt, NULL, NULL);
 }
 
@@ -126,28 +144,17 @@ int main(int argc, char* argv[])
     return -1;
   }
   
+  // Parse commandline arguments.
   if (ecore_getopt_parse(&optdesc, values, argc, argv) < 0)
   {
     LOG("Failed to parse options passed to Amin");
     return 1;
   }
   
-  // We have something passed to us from stdin.
+  // We are exepcting something from stdin so lets read it!
   if (profile)
   {
     read_stdin();
-  }
-  
-  else if (adminlist)
-  {
-    LOG("Adminlist passed, Not currently implemented.");
-    return 1;
-  }
-  
-  else if (uri)
-  {
-    LOG("Process URI passed, Not currently implemented.");
-    return 1;
   }
   
   ecore_main_loop_begin();

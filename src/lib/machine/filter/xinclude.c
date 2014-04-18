@@ -157,7 +157,7 @@ _set_document_locator ( Eo *obj, void *class_data, va_list *list )
       pd->bases = eina_array_new ( 1 );
     }
 
-  const xmlChar *bob = location_pointer->getSystemId(&ctx);
+  const xmlChar *bob; // = location_pointer->getSystemId(&ctx);
   if(bob)
     LOGF("BOBS VALUE: %s", (char*)bob);
   // Do we have a URI?
