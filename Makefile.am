@@ -21,7 +21,7 @@ libamin_la_LDFLAGS = -version-info @version_info@
 bin_PROGRAMS = camin cainit
 
 cainit_SOURCES = src/bin/cainit.c
-cainit_LDADD = /usr/local/lib/libuv.a	@EINA_LIBS@ @ECORE_LIBS@ @EO_LIBS@ @LIBXML2_LIBS@
+cainit_LDADD = @EINA_LIBS@ @ECORE_LIBS@ @EO_LIBS@ @LIBXML2_LIBS@
 cainit_CFLAGS = -luv -lpthread @EINA_CFLAGS@ @ECORE_CFLAGS@ @EO_CFLAGS@ @LIBXML2_CFLAGS@
 
 camin_SOURCES = src/bin/camin.c

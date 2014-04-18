@@ -69,7 +69,7 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
 
   Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec_document));
 
-  Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
+  Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(machine_spec_document));
 
   LOG("Kicking parser into action in machine_spec....");
 
@@ -113,7 +113,7 @@ _start(Eo *obj, void *class_data, va_list *list) {
 
 		      char *module_name = strndup ( element->attributes[attribute_position + 3], attribute_length );
 		      LOGF("Module name: %s", module_name);
-		      eina_list_append(pd->filters, module_name);
+		      pd->filters = eina_list_append(pd->filters, module_name);
                     }
                 }
               attribute_position = attribute_position + 5;
@@ -168,4 +168,4 @@ static const Eo_Class_Description class_desc = {
      NULL
 };
 
-EO_DEFINE_CLASS(amin_machine_spec_class_get, &class_desc, AMIN_ELT, EO_BASE_CLASS, NULL);
+EO_DEFINE_CLASS(amin_machine_spec_class_get, &class_desc, AMIN_ELT, NULL);

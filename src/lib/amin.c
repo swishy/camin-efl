@@ -49,7 +49,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
 
   Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec));
 
-  Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
+  Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(machine_spec));
 
   const Eo_Class *xml_base_class = eo_class_get(xml_base);
   LOGF("obj-type:'%s'\n", eo_class_name_get(xml_base_class));
