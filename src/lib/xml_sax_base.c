@@ -148,7 +148,7 @@ _set_document_locator(Eo *obj, void *class_data, va_list *list)
    } else if(MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, set_document_locator(ctx, loc));
    } else {
-     LOG("XSB set_document_locator NO FURTHER HANDLERS");
+     // Do nothing for the moment
   }
 }
 
@@ -173,7 +173,7 @@ _document_start(Eo *obj, void *class_data, va_list *list)
    } else if (MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, document_start(user_data));
    } else {
-     LOG("XSB DOCUMENT START NO FURTHER HANDLERS");
+     // Do nothing for the moment
   }
 }
 
@@ -192,7 +192,7 @@ _start(Eo *obj, void *class_data, va_list *list)
    } else if(MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, start(element));
    } else {
-     LOG("XSB START HANDLER NO FURTHER HANDLERS");
+     // Do nothing for the moment
   }
 }
 
@@ -213,7 +213,7 @@ _char(Eo *obj, void *class_data, va_list *list)
    } else if(MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, char(char_data, string, length));
    } else {
-     LOG("XSB CHAR HANDLER NO FURTHER HANDLERS");
+     // Do nothing for the moment
   }
 }
 
@@ -231,7 +231,7 @@ _end(Eo *obj, void *class_data, va_list *list)
    } else if(MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, end(element));
    } else {
-     LOG("XSB END HANDLER NO FURTHER HANDLERS");
+     // Do nothing for the moment
   }
 }
 
@@ -249,7 +249,7 @@ _document_end(Eo *obj, void *class_data, va_list *list)
    } else if(MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, document_end(user_data));
    } else {
-     LOG("XSB DOCUMENT END HANDLER NO FURTHER HANDLERS");
+     // Do nothing for the moment
   }
 }
 

@@ -24,6 +24,16 @@ typedef struct
 
 #define MY_CLASS AMIN
 
+static Eina_Bool
+_machine_spec_foreach_cb(const Eina_Hash *modules, const void *key,
+                       void *data, void *fdata)
+{
+   const char *name = key;
+   printf("%s\n", name);
+   // Return EINA_FALSE to stop this callback from being called
+   return EINA_TRUE;
+}
+
 static void
 _parse(Eo *obj, void *class_data, va_list *list)
 {
@@ -49,7 +59,7 @@ _parse(Eo *obj, void *class_data, va_list *list)
 
   Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec));
 
-  Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(xinclude_filter));
+  Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(machine_spec));
 
   const Eo_Class *xml_base_class = eo_class_get(xml_base);
   LOGF("obj-type:'%s'\n", eo_class_name_get(xml_base_class));
@@ -57,9 +67,11 @@ _parse(Eo *obj, void *class_data, va_list *list)
   LOG("Kicking parser into action....");
 
   // TODO Move to struct once declared at completeion of machine_spec.
-  int foo;
+  Machine_Spec_Document *foo = NULL;
 
   eo_do(xml_base, parse_string(profile, &foo));
+  
+  eina_hash_foreach(foo->filters, _machine_spec_foreach_cb, NULL);
 
   /**LOG("Loading AMIN machine spec");
   Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC, NULL, filter_constructor(machine_parser, obj));
