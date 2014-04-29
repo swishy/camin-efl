@@ -47,16 +47,12 @@ _start(Eo *obj EINA_UNUSED, void *class_data, va_list *list) {
   // TODO Get ref to current class data to access filter.
   //eo_do(pd->filter, start(data, el, attr));
 
-  for (i = 0; i < DEPTH; i++)
-    LOG("  ");
 
   LOGF("%s", element);
 
   for (i = 0; attributes[i]; i += 2) {
     LOGF(" %s='%s'", attributes[i], attributes[i + 1]);
   }
-
-  DEPTH++;
 }
 
 static void
