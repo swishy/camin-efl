@@ -30,6 +30,8 @@ _machine_spec_foreach_cb(const Eina_Hash *modules, const void *key,
 {
    const char *name = key;
    printf("%s\n", name);
+   Filter_Data *filter = (Filter_Data*)data;
+   LOGF("Lets see if theres a position... %s", filter->position)
    // Return EINA_FALSE to stop this callback from being called
    return EINA_TRUE;
 }
@@ -67,11 +69,13 @@ _parse(Eo *obj, void *class_data, va_list *list)
   LOG("Kicking parser into action....");
 
   // TODO Move to struct once declared at completeion of machine_spec.
-  Machine_Spec_Document *foo = NULL;
+  Machine_Spec_Document *spec;
 
-  eo_do(xml_base, parse_string(profile, &foo));
+  eo_do(xml_base, parse_string(profile, &spec));
   
-  eina_hash_foreach(foo->filters, _machine_spec_foreach_cb, NULL);
+  eina_hash_foreach(spec->filters, _machine_spec_foreach_cb, NULL);
+  
+  
 
   /**LOG("Loading AMIN machine spec");
   Eo *amin_machine_spec = eo_add_custom(AMIN_MACHINE_SPEC, NULL, filter_constructor(machine_parser, obj));

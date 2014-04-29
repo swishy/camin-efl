@@ -16,4 +16,12 @@
 		<download>http://projectamin.org/filters/amin/command/mkdir.xml</download>
 		<version>1.0</version>
 	</filter>
+	<filter name="Amin::Command::Cat">
+		<element>command</element>
+		<namespace>amin</namespace>
+		<name>cat</name>
+		<position>middle</position>
+		<download>http://projectamin.org/filters/command/cat.xml</download>
+		<version>1.0</version>
+	</filter>
 </machine>

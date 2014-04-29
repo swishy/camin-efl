@@ -68,19 +68,18 @@ _document_start(Eo *obj, void *class_data, va_list *list) {
   // Set up filter chain.
   Eo *machine_spec_document = eo_add(AMIN_MACHINE_SPEC_DOCUMENT, NULL);
 
-  Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec_document));
+  // TODO fix xinclude
+  // Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec_document));
 
   Eo *xml_base = eo_add_custom(XML_SAX_BASE, NULL, set_handler_constructor(machine_spec_document));
 
   LOG("Kicking parser into action in machine_spec....");
-
+  
   // Start Machine Spec parsing and assign results to local var.
   eo_do(xml_base, parse_string(machine_spec_buffer, &pd->spec));
 
-  Machine_Spec_Document *doc = &pd->spec;
-  Eina_Hash *filters = doc->filters;
-
-   // eina_hash_foreach(filters, _machine_spec_foreach_cb, NULL);
+  LOG("Calling foreach in machine_spec document_start");
+  eina_hash_foreach(pd->spec.filters, _machine_spec_foreach_cb, NULL);
 }
 
 static void
@@ -90,8 +89,6 @@ _start(Eo *obj, void *class_data, va_list *list) {
 
   Private_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
-
-  LOGF("Number of attributes in machine spec start: %i", element->nb_attributes);
 
   if ( element->nb_attributes > 0 )
         {
@@ -126,10 +123,6 @@ _end_document(Eo *obj, void *class_data, va_list *list) {
   Private_Data *pd = class_data;
   ElementData *element = va_arg ( *list, ElementData* );
 
-  LOGF("%s %s\n", eo_class_name_get(MY_CLASS), __func__);
-
-  LOGF("Module count: %u", eina_list_count(pd->filters));
-
   Eina_List *l_itr;
   char *module;
 
@@ -141,7 +134,8 @@ _end_document(Eo *obj, void *class_data, va_list *list) {
   if(!xd) eo_error_set(obj);
   if(xd->result)
   {
-    xd->result = &pd->spec;
+    Machine_Spec_Document spec = pd->spec;
+    xd->result = &spec;
   }
 }
 

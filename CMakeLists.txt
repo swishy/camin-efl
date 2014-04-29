@@ -12,13 +12,16 @@ pkg_check_modules(LIBXML2 libxml-2.0)
 pkg_check_modules(ECORE ecore-con ecore)
 pkg_check_modules(EO eo)
 pkg_check_modules(LIBURIPARSER liburiparser)
-configure_file( ${CMAKE_SOURCE_DIR}/include/config.h.in ${CMAKE_SOURCE_DIR}/include/config.h )
+configure_file( ${CMAKE_SOURCE_DIR}/libamin/include/config.h.in ${CMAKE_SOURCE_DIR}/libamin/include/config.h )
 link_directories(
      ${LIBXML2_LIBRARY_DIRS} ${ECORE_LIBRARY_DIRS} ${EO_LIBRARY_DIRS} ${LIBURIPARSER_LIBRARY_DIRS}
 )
 include_directories(
-     include/ ${LIBXML2_INCLUDE_DIRS} ${ECORE_INCLUDE_DIRS} ${EO_INCLUDE_DIRS} ${LIBURIPARSER_INCLUDE_DIRS}
+     libamin/include/ ${LIBXML2_INCLUDE_DIRS} ${ECORE_INCLUDE_DIRS} ${EO_INCLUDE_DIRS} ${LIBURIPARSER_INCLUDE_DIRS}
 )
-add_subdirectory(src)
+add_subdirectory(libamin)
 
+add_executable(camin camin/camin.c)
+target_link_libraries(camin amin)
 
+install(TARGETS camin DESTINATION bin)

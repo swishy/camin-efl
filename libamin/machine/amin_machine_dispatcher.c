@@ -7,6 +7,7 @@
 #include "common.h"
 #include "amin.h"
 #include "amin_machine_dispatcher.h"
+#include "document.h"
 
 EAPI Eo_Op AMIN_MACHINE_DISPATCHER_BASE_ID = 0;
 
@@ -30,11 +31,26 @@ typedef struct
 
 #define MY_CLASS AMIN_MACHINE_DISPATCHER
 
+static Eina_Bool
+_filter_sort_foreach_cb(const Eina_Hash *modules, const void *key,
+                       void *data, void *fdata)
+{
+   const char *name = key;
+   Filter_Data *filter_data = (Filter_Data*)data;
+   LOGF("Filter Name: %s", filter_data->name);
+   // Return EINA_FALSE to stop this callback from being called
+   return EINA_TRUE;
+}
+
 
 static void
 _dispatcher_constructor(Eo *obj EINA_UNUSED, void *class_data, va_list *list)
 {
    // TODO Reorder filter list.
+  
+    Machine_Spec_Document *machine_spec = va_arg(*list, Machine_Spec_Document *);
+    
+    eina_hash_foreach(machine_spec->filters, _filter_sort_foreach_cb, NULL);
 
    // TODO Set machine name in spec
 

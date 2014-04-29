@@ -17,7 +17,6 @@ EAPI Eo_Op XML_SAX_BASE_BASE_ID = 0;
 static void
 _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
 {
-   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Eo *filter = (Eo*)ctx;
    eo_do(filter, set_document_locator(ctx, loc));
 }
@@ -132,8 +131,6 @@ _parse_string(Eo *obj, void *class_data, va_list *list)
 static void
 _set_document_locator(Eo *obj, void *class_data, va_list *list)
 {
-   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
-   
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    
    void * ctx = va_arg(*list, void*);
@@ -163,12 +160,6 @@ _document_start(Eo *obj, void *class_data, va_list *list)
    
    if (handler)
    {
-     // Attempt to make sure base data gets moved up the handler chain so results set at the top level
-     // are available down the stack.
-     // IE everything in the chain is manipulating the same Xml_Base_Data
-     Xml_Base_Data *base_data = eo_data_ref(obj, XML_SAX_BASE);
-     Xml_Base_Data *handler_data = eo_data_ref(handler, XML_SAX_BASE);
-     handler_data = base_data;
      eo_do(handler, document_start(user_data));
    } else if (MY_CLASS != XML_SAX_BASE) {
      eo_do(obj, document_start(user_data));
@@ -250,13 +241,12 @@ _document_end(Eo *obj, void *class_data, va_list *list)
      eo_do(obj, document_end(user_data));
    } else {
      // Do nothing for the moment
-  }
+    }
 }
 
 static void
 _set_content_handler(Eo *obj, void *class_data, va_list *list)
 {
-   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    Eo *content_handler = va_arg(*list, Eo*);
    data->content_handler = content_handler;
@@ -265,7 +255,6 @@ _set_content_handler(Eo *obj, void *class_data, va_list *list)
 static void
 _set_document_handler(Eo *obj, void *class_data, va_list *list)
 {
-   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    Eo *document_handler = va_arg(*list, Eo*);
    data->document_handler = document_handler;
@@ -274,7 +263,6 @@ _set_document_handler(Eo *obj, void *class_data, va_list *list)
 static void
 _set_handler(Eo *obj, void *class_data, va_list *list)
 {
-   LOGF ( "Class is : %s %s", eo_class_name_get ( MY_CLASS ), __func__ );
    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE);
    Eo *handler = va_arg(*list, Eo*);
    data->handler = handler;
