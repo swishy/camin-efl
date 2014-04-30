@@ -1,3 +1,6 @@
 language: c
 
-script: cmake && make
+script: cmake . && make
+
+install:
+ - sudo apt-get install  e17-dev libuv-dev liburiparser-dev
