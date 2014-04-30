@@ -4,5 +4,5 @@ script: cmake . && make
 
 install:
  - git clone https://github.com/joyent/libuv.git
- - cd libuv && sh autogen.sh && ./configure --prefix=/usr && make && make install
+ - cd libuv && sh autogen.sh && ./configure --prefix=/usr && make && sudo make install
  - sudo apt-get install  e17-dev liburiparser-dev
