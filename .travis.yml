@@ -5,7 +5,7 @@ script: cmake ../ && make
 install:
  - git clone https://github.com/joyent/libuv.git
  - cd libuv && sh autogen.sh && ./configure --prefix=/usr && make && sudo make install && cd ..
- - sudo apt-get install autoconf-archive libtool libpam0g-dev libjpeg-dev libungif4-dev librsvg2-dev libdbus-1-dev liblua5.1-0-dev libasound2-dev libudev-dev libxcb-shape0-dev liburiparser-dev 
+ - sudo apt-get install autopoint libfribidi-dev autoconf-archive libtool libpam0g-dev libjpeg-dev libungif4-dev librsvg2-dev libdbus-1-dev liblua5.1-0-dev libasound2-dev libudev-dev libxcb-shape0-dev liburiparser-dev 
  - wget http://download.enlightenment.org/rel/libs/efl/efl-1.9.3.tar.gz && tar -xvzf efl-1.9.3.tar.gz
  - cd efl-1.9.3 && ./autogen.sh --prefix=/usr && make && make install && cd ..
  - mkdir build && cd build
