@@ -28,3 +28,4 @@ target_link_libraries(camin amin)
 target_link_libraries(cainit amin ${LIBUV_LIBRARIES})
 
 install(TARGETS camin DESTINATION bin)
+
