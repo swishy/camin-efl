@@ -26,4 +26,7 @@ git clone http://git.enlightenment.org/core/efl.git/
 
 Build camin 
 
-./autoconf --prefix=/usr && make && make install 
+mkdir build
+cd build
+cmake ..
+make && make install 
