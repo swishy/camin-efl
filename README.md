@@ -27,6 +27,9 @@ git clone http://git.enlightenment.org/core/efl.git/
 Build camin 
 
 mkdir build
+
 cd build
+
 cmake ..
+
 make && make install 
