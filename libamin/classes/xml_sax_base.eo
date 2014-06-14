@@ -1,4 +1,4 @@
-class XML::SAX::BASE (Eo_Base)
+class Xml_Sax_Base (Eo_Base)
 {
    eo_prefix: xml_sax_base;
    data: Xml_Base_Data;
@@ -64,7 +64,7 @@ class XML::SAX::BASE (Eo_Base)
       char { /*@ Called when XML characters are found within an element */
         params {
             @in void *data;
-            @in const XML_Char *string;
+            @in const xmlChar *string;
             @in int string_len;
         }
       }
