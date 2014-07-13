@@ -1,4 +1,4 @@
-class Xml_Sax_Base (Eo_Base)
+class Xml.Sax.Base (Eo.Base)
 {
    eo_prefix: xml_sax_base;
    data: Xml_Base_Data;
@@ -41,7 +41,7 @@ class Xml_Sax_Base (Eo_Base)
    methods {
       parse_string { /*@ This method starts the parsing process of the XML document passed in */
          params {
-            @in const char *document; /*@ The XML Document to parse */
+            @in const(char) *document; /*@ The XML Document to parse */
          }
          return Eo*; /* Can return any Eo object */
       }
@@ -64,7 +64,7 @@ class Xml_Sax_Base (Eo_Base)
       char { /*@ Called when XML characters are found within an element */
         params {
             @in void *data;
-            @in const xmlChar *string;
+            @in const(xmlChar) *string;
             @in int string_len;
         }
       }
@@ -80,8 +80,8 @@ class Xml_Sax_Base (Eo_Base)
       }
    }
    implements {
-      class::constructor;
-      Eo_Base::constructor;
-      Eo_Base::destructor;
+      class.constructor;
+      Eo.Base.constructor;
+      Eo.Base.destructor;
    }
 }

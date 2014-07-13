@@ -1,0 +1,19 @@
+class Amin (Eo.Base)
+{
+   eo_prefix: amin;
+   data: Amin_Data;
+   properties {
+   }
+   methods {
+      parse { /*@ Starts the amin machine processing the current XML document */
+        params {
+            @in char *document;
+        }
+	return Eo*;
+      }
+   }
+   implements {
+      Eo.Base.constructor;
+      Eo.Base.destructor;
+   }
+}

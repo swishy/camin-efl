@@ -1,4 +1,4 @@
-class Amin_Elt (Xml_Sax_Base)
+class Amin_Elt (Xml.Sax.Base)
 {
    eo_prefix: amin_elt;
    data: Amin_Elt_Data;
@@ -26,6 +26,6 @@ class Amin_Elt (Xml_Sax_Base)
       }
    }
    implements {
-      Xml_Sax_Base::document_start;
+      Xml.Sax.Base.document_start;
    }
 }
