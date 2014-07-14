@@ -8,5 +8,5 @@ install:
  - git clone https://github.com/joyent/libuv.git
  - cd libuv && sh autogen.sh && ./configure --prefix=/usr && make && sudo make install && cd ..
  - git clone http://git.enlightenment.org/core/efl.git
- - cd efl && ./autogen.sh --prefix=/usr --enable-i-really-know-what-i-am-doing-and-that-this-will-probably-break-things-and-i-will-fix-them-myself-and-send-patches-aaa --disable-physics --with-x11=none --disable-gstreamer1 --disable-audio && make && sudo make install && cd ..
+ - cd efl && ./autogen.sh --prefix=/usr --enable-i-really-know-what-i-am-doing-and-that-this-will-probably-break-things-and-i-will-fix-them-myself-and-send-patches-aba --disable-physics --with-x11=none --disable-gstreamer1 --disable-audio && make && sudo make install && cd ..
  - mkdir build && cd build
