@@ -164,38 +164,53 @@ _xml_sax_base_parse_string(Eo *obj, Xml_Base_Data *pd, char *document)
 EOLIAN static void
 _xml_sax_base_set_document_locator(Eo *obj, Xml_Base_Data *pd, void *ctx, xmlSAXLocatorPtr loc)
 {
+    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE_CLASS);
 
+    Eo *handler = data->handler;
+
+    if (handler)
+    {
+        eo_do(handler, xml_sax_base_set_document_locator(ctx, loc));
+    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
+        eo_do(obj, xml_sax_base_set_document_locator(ctx, loc));
+    } else {
+        // Do nothing for the moment
+    }
 }
 
 EOLIAN static void
 _xml_sax_base_document_start(Eo *obj, Xml_Base_Data *pd, void *user_data)
 {
-    LOG("Document start called!");
+    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE_CLASS);
 
-}
+    Eo *handler = data->handler;
 
-EOLIAN static void
-_xml_sax_base_start(Eo *obj, Xml_Base_Data *pd, ElementData *elementData)
-{
-
-}
-
-EOLIAN static void
-_xml_sax_base_char(Eo *obj, Xml_Base_Data *pd, void *data, const xmlChar *string, int string_len)
-{
-
-}
-
-EOLIAN static void
-_xml_sax_base_end(Eo *obj, Xml_Base_Data *pd, ElementData *data)
-{
+    if (handler)
+    {
+        eo_do(handler, xml_sax_base_document_start(user_data));
+    } else if (EO_CLASS != XML_SAX_BASE_CLASS) {
+        eo_do(obj, xml_sax_base_document_start(user_data));
+    } else {
+        // Do nothing for the moment
+    }
 
 }
 
 EOLIAN static void
 _xml_sax_base_document_end(Eo *obj, Xml_Base_Data *pd, void *data)
 {
+    Xml_Base_Data *base_data = eo_data_ref(obj, XML_SAX_BASE_CLASS);
 
+    Eo *handler = base_data->handler;
+
+    if (handler != NULL)
+    {
+        eo_do(handler, xml_sax_base_document_end(data));
+    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
+        eo_do(obj, xml_sax_base_document_end(data));
+    } else {
+        // Do nothing for the moment
+    }
 }
 
 EOLIAN static void
@@ -213,18 +228,53 @@ _xml_sax_base_class_constructor(Eo_Class *klass)
 EOLIAN static void
 _xml_sax_base_element_start(Eo *obj, Xml_Base_Data *pd, ElementData *elementData)
 {
+    Xml_Base_Data *data = eo_data_ref(obj, XML_SAX_BASE_CLASS);
 
+    Eo *handler = data->handler;
+
+    if (handler)
+    {
+        eo_do(handler, xml_sax_base_element_start(elementData));
+    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
+        eo_do(obj, xml_sax_base_element_start(elementData));
+    } else {
+        // Do nothing for the moment
+    }
 }
 
 EOLIAN static void
 _xml_sax_base_element_char(Eo *obj, Xml_Base_Data *pd, void *data, const xmlChar *string, int string_len)
 {
+    Xml_Base_Data *base_data = eo_data_ref(obj, XML_SAX_BASE_CLASS);
+
+    Eo *handler = base_data->handler;
+
+    if (handler)
+    {
+        eo_do(handler, xml_sax_base_element_char(data, string, string_len));
+    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
+        eo_do(obj, xml_sax_base_element_char(data, string, string_len));
+    } else {
+        // Do nothing for the moment
+    }
 
 }
 
 EOLIAN static void
 _xml_sax_base_element_end(Eo *obj, Xml_Base_Data *pd, ElementData *data)
 {
+    Xml_Base_Data *base_data = eo_data_ref(obj, XML_SAX_BASE_CLASS);
+
+    Eo *handler = base_data->handler;
+
+    if (handler != NULL)
+    {
+        eo_do(handler, xml_sax_base_element_end(data));
+    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
+        eo_do(obj, xml_sax_base_element_end(data));
+    } else {
+        // Do nothing for the moment
+    }
 
 }
 
