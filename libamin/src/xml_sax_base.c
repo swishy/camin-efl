@@ -1,15 +1,10 @@
 #define EFL_BETA_API_SUPPORT
 #include <Eo.h>
-#include <libxml/SAX2.h>
-#include "xml_sax_base_types.h"
 #include "xml_sax_base.eo.h"
 
 typedef struct
 {
-    Eo *content_handler;
-    Eo *document_handler;
-    Eo *handler;
-    void *result;
+
 } Xml_Base_Data;
 
 EOLIAN static void
@@ -99,13 +94,7 @@ _xml_sax_base_constructor(Eo *obj, Xml_Base_Data *pd, Eo *handler)
 EOLIAN static void
 _xml_sax_base_eo_base_constructor(Eo *obj, Xml_Base_Data *pd)
 {
-   eo_do_super(obj, XML_SAX_BASE_CLASS, eo_base_constructor());
-
-}
-
-EOLIAN static void
-_xml_sax_base_eo_base_destructor(Eo *obj, Xml_Base_Data *pd)
-{
+   eo_do_super(obj, XML_SAX_BASE_CLASS, eo_base_constructor();
 
 }
 

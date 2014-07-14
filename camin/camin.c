@@ -5,9 +5,9 @@
 #include <unistd.h>
 #include <Ecore.h>
 #include <Ecore_Getopt.h>
-#include "amin.h"
 #include "common.h"
-#include "elt.h"
+#include "amin.eo.h"
+#include "amin_elt.eo.h"
 
 struct context
 {
@@ -92,12 +92,12 @@ static Eina_Bool _stdin_handler_cb(void *data, Ecore_Fd_Handler *handler)
   ctxt->handler = NULL;
   
   LOG("Creating Amin Instance");
-  Eo *amin = eo_add(AMIN, NULL);
+  Eo *amin = eo_add(AMIN_CLASS, NULL);
   
   const Eo_Class *klass = eo_class_get(amin);
   printf("obj-type:'%s'\n", eo_class_name_get(klass));
   
-  eo_do(amin, parse(buf));
+  eo_do(amin, amin_parse(buf));
   
   // All done jumping out....
   ecore_main_loop_quit();
@@ -129,13 +129,15 @@ int main(int argc, char* argv[])
   char *uri;
   Eina_Bool profile = EINA_FALSE;
   Eina_Bool quit = EINA_FALSE;
-  
+
+  eo_init();
+
   Ecore_Getopt_Value values[] = {
 	ECORE_GETOPT_VALUE_STR(adminlist),
 	ECORE_GETOPT_VALUE_STR(uri),
 	ECORE_GETOPT_VALUE_BOOL(profile),
 	ECORE_GETOPT_VALUE_BOOL(quit),
-	ECORE_GETOPT_VALUE_NONE
+    ECORE_GETOPT_VALUE_NONE
   };
 
   if (!ecore_init())
