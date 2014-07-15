@@ -20,4 +20,12 @@ eolian_gen -I $INC_EO -I stage/ --gc --eo -o stage/amin_elt.eo.c stage/amin_elt.
 eolian_gen -I $INC_EO -I stage/ --gh --eo -o stage/amin_elt.eo.h stage/amin_elt.eo
 eolian_gen -I $INC_EO -I stage/ --gi --eo -o stage/amin_elt.c stage/amin_elt.eo
 
+eolian_gen -I $INC_EO -I stage/ --gc --eo -o stage/amin_machine_spec.eo.c stage/amin_machine_spec.eo
+eolian_gen -I $INC_EO -I stage/ --gh --eo -o stage/amin_machine_spec.eo.h stage/amin_machine_spec.eo
+eolian_gen -I $INC_EO -I stage/ --gi --eo -o stage/amin_machine_spec.c stage/amin_machine_spec.eo
+
+eolian_gen -I $INC_EO -I stage/ --gc --eo -o stage/amin_machine_spec_document.eo.c stage/amin_machine_spec_document.eo
+eolian_gen -I $INC_EO -I stage/ --gh --eo -o stage/amin_machine_spec_document.eo.h stage/amin_machine_spec_document.eo
+eolian_gen -I $INC_EO -I stage/ --gi --eo -o stage/amin_machine_spec_document.c stage/amin_machine_spec_document.eo
+
 exit 0

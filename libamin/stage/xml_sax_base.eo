@@ -1,13 +1,6 @@
 class Xml.Sax.Base (Eo.Base)
 {
    data: Xml_Base_Data;
-   constructors {
-      constructor { /*@ Custom constructor to allow setting of a handler at creation */
-        params {
-            @in Eo *handler; /*@ The custom handler for the current XSB instance */
-        }
-      }
-   }
    properties {
       handler {
          set { /*@ This sets the handler of the current XSB object */
@@ -79,6 +72,5 @@ class Xml.Sax.Base (Eo.Base)
       }
    }
    implements {
-      class.constructor;
    }
 }

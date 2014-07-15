@@ -7,15 +7,6 @@ const Eo_Class *xml_sax_base_class_get(void) EINA_CONST;
 
 /**
  *
- * No description supplied.
- *
- * @param[in] handler The custom handler for the current XSB instance
- *
- */
-EOAPI void  xml_sax_base_constructor(Eo *handler);
-
-/**
- *
  * This sets the handler of the current XSB object
  *
  * @param[in] handler The handler for the current XSB instance

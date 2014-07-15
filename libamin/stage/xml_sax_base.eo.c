@@ -51,12 +51,7 @@ void _xml_sax_base_document_end(Eo *obj, Xml_Base_Data *pd, void *data);
 
 EOAPI EO_VOID_FUNC_BODYV(xml_sax_base_document_end, EO_FUNC_CALL(data), void *data);
 
-void _xml_sax_base_constructor(Eo *obj, Xml_Base_Data *pd, Eo *handler);
-
-EOAPI EO_VOID_FUNC_BODYV(xml_sax_base_constructor, EO_FUNC_CALL(handler), Eo *handler);
-
 static Eo_Op_Description _xml_sax_base_op_desc[] = {
-     EO_OP_FUNC(xml_sax_base_constructor, _xml_sax_base_constructor, ""),
      EO_OP_FUNC(xml_sax_base_handler_set, _xml_sax_base_handler_set, "This sets the handler of the current XSB object"),
      EO_OP_FUNC(xml_sax_base_handler_get, _xml_sax_base_handler_get, "This gets the handler of the XSB object if set"),
      EO_OP_FUNC(xml_sax_base_content_handler_set, _xml_sax_base_content_handler_set, "This sets a custom content handler"),
@@ -80,7 +75,7 @@ static const Eo_Class_Description _xml_sax_base_class_desc = {
      EO_CLASS_DESCRIPTION_OPS(_xml_sax_base_op_desc),
      NULL,
      sizeof(Xml_Base_Data),
-     _xml_sax_base_class_constructor,
+     NULL,
      NULL
 };
 

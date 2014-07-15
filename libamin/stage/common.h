@@ -16,3 +16,40 @@ typedef struct Spec
 {
    /* etc. */
 } Spec ;
+
+// TODO Not happy about this....
+typedef struct
+{
+    Eo *content_handler;
+    Eo *document_handler;
+    Eo *handler;
+    Eo *result;
+}
+Xml_Base_Data;
+
+typedef struct
+{
+    const char *element;
+    const char *name_space;
+    const char *name;
+    const char *position;
+    const char *download;
+    const char *version;
+    const char *module;
+} Filter_Data;
+
+
+typedef struct
+{
+    const char *name;
+    Filter_Data *data;
+} Filter;
+
+typedef struct
+{
+    const char *machine_name;
+    char *generator;
+    char *log;
+    char **filter_params;
+    Eina_Hash *filters;
+} Machine_Spec_Document;

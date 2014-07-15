@@ -1,3 +1,4 @@
+#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include "common.h"
 #include <libxml/SAX.h>
@@ -5,6 +6,7 @@
 #include "xml_sax_base_types.h"
 #include <xml_sax_base.eo.h>
 #include "amin.eo.h"
+#include "amin_machine_spec.eo.h"
 
 typedef struct
 {
@@ -37,15 +39,16 @@ _amin_parse(Eo *obj, Amin_Data *pd, char *profile)
     {
         /* Failure */
         uriFreeUriMembersA ( &machine_spec_uri );
-        //machine_spec = eo_add(AMIN_MACHINE_SPEC, NULL);
+        machine_spec = eo_add(AMIN_MACHINE_SPEC_CLASS, NULL);
     } else {
-       // machine_spec = eo_add(AMIN_MACHINE_SPEC, NULL); // TODO ADD set_uri function to class.
+        machine_spec = eo_add(AMIN_MACHINE_SPEC_CLASS, NULL); // TODO ADD set_uri function to class.
     }
 
     // Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec));
 
     // Eo *xml_base = eo_add_custom(XML_SAX_BASE_CLASS, NULL, set_handler_constructor(machine_spec));
     Eo *xml_base = eo_add(XML_SAX_BASE_CLASS, NULL);
+    eo_do(xml_base, xml_sax_base_handler_set(machine_spec));
 
     const Eo_Class *xml_base_class = eo_class_get(xml_base);
     LOGF("obj-type:'%s'\n", eo_class_name_get(xml_base_class));

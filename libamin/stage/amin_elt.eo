@@ -1,4 +1,4 @@
-class Amin_Elt (Xml.Sax.Base)
+class Amin.Elt (Xml.Sax.Base)
 {
    data: Amin_Elt_Data;
    constructors {

@@ -51,10 +51,46 @@ static unsigned char
 _uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage)
 {
    printf("URI Callback received %s\n", str);
-   
-   ecore_main_loop_quit();
 
-   return ECORE_CALLBACK_CANCEL;
+    FILE *file;
+    long size;
+    char *file_buffer;
+
+    // Get size of machine_spec and read in.
+    // TODO implement error handling
+    if ((file = fopen(str, "rb")))
+    {
+        fseek(file, 0, SEEK_END);
+        size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+    } else {
+        perror("Error");
+
+        // All done jumping out....
+        ecore_main_loop_quit();
+
+        // Signal no further events to this callback.
+        return ECORE_CALLBACK_CANCEL;
+    }
+
+    if ((file_buffer = malloc(size)))
+    {
+        fread(file_buffer, 1, size, file);
+    }
+
+    LOG("Creating Amin Instance");
+    Eo *amin = eo_add(AMIN_CLASS, NULL);
+
+    const Eo_Class *klass = eo_class_get(amin);
+    printf("obj-type:'%s'\n", eo_class_name_get(klass));
+
+    eo_do(amin, amin_parse(file_buffer));
+
+    // All done jumping out....
+    ecore_main_loop_quit();
+
+    // Signal no further events to this callback.
+    return ECORE_CALLBACK_CANCEL;
 }
 
 static Eina_Bool _stdin_handler_cb(void *data, Ecore_Fd_Handler *handler)
