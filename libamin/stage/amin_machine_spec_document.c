@@ -1,4 +1,3 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include <Eina.h>
 #include <libxml/SAX2.h>
@@ -38,7 +37,7 @@ typedef struct
     char *handler_name;
     char *handler_out;
     const char *element_name;
-    const char *name;
+    char *name;
     const char *machine_name;
     const char *position;
     const char *name_space;
@@ -65,9 +64,6 @@ _machine_spec_foreach_cb(const Eina_Hash *modules, const void *key,
 EOLIAN static void
 _amin_machine_spec_document_xml_sax_base_document_start(Eo *obj, Document_Data *pd, void *user_data)
 {
-    const Eo_Class *current_class = eo_class_get ( obj );
-    LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
-
     // Setup Eina_Hash to collect filters found during parsing.
     pd->filters = eina_hash_pointer_new(_filter_entry_free_cb);
 }
@@ -75,9 +71,6 @@ _amin_machine_spec_document_xml_sax_base_document_start(Eo *obj, Document_Data *
 EOLIAN static void
 _amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Document_Data *pd, ElementData *elementData)
 {
-    const Eo_Class *current_class = eo_class_get ( obj );
-    LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
-
     int i;
 
     pd->localname = elementData->localname;
@@ -194,10 +187,6 @@ _amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Document_Data *p
 EOLIAN static void
 _amin_machine_spec_document_xml_sax_base_element_char(Eo *obj, Document_Data *pd, void *data, const xmlChar *string, int string_len)
 {
-
-    const Eo_Class *current_class = eo_class_get ( obj );
-    LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
-
     // ref important bytes passed in if they arent whitespace.
     if (string_len > 0 && !isspace(*string))
     {
@@ -242,19 +231,18 @@ _amin_machine_spec_document_xml_sax_base_element_end(Eo *obj, Document_Data *pd,
     const Eo_Class *current_class = eo_class_get ( obj );
     LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
 
-    LOGF("element_end: %s",data->localname);
-
     if ( strncmp ( data->localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 )
     {
-        Filter_Data filter;
-        filter.element = pd->element_name;
-        filter.name_space = pd->name_space;
-        filter.name = pd->name;
-        filter.position = pd->position;
-        filter.download = pd->download;
-        filter.version = pd->version;
-        filter.module = pd->module;
-        if(!eina_hash_add(pd->filters, filter.module, &filter))
+        Filter_Data *filter = malloc( sizeof(Filter_Data) );
+
+        filter->element = pd->element_name;
+        filter->name_space = pd->name_space;
+        filter->name = pd->name;
+        filter->position = pd->position;
+        filter->download = pd->download;
+        filter->version = pd->version;
+        filter->module = pd->module;
+        if(!eina_hash_add(pd->filters, filter->name, filter))
         {
             LOG("Failed to add filter to filters hash!");
         }

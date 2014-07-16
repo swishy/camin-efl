@@ -1,4 +1,3 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include <libxml/SAX.h>
 #include "common.h"

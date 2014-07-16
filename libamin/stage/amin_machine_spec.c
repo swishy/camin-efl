@@ -1,4 +1,3 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include <libxml/SAX.h>
 #include "xml_sax_base_types.h"
@@ -7,10 +6,11 @@
 #include "amin_elt.eo.h"
 #include "amin_machine_spec.eo.h"
 #include "amin_machine_spec_document.eo.h"
+#include "amin_machine_spec_data.eo.h"
 
 typedef struct
 {
-    Eina_List *filters;
+    Eina_Hash *filters;
     Eo *spec;
 } Spec_Data;
 
@@ -21,6 +21,10 @@ _machine_spec_foreach_cb(const Eina_Hash *modules, const void *key,
     const char *name = key;
     printf("%s\n", name);
 
+    Filter_Data *filter = (Filter_Data*)data;
+    printf("%s\n", filter->module);
+
+
     // Return EINA_FALSE to stop this callback from being called
     return EINA_TRUE;
 }
@@ -28,9 +32,6 @@ _machine_spec_foreach_cb(const Eina_Hash *modules, const void *key,
 EOLIAN static void
 _amin_machine_spec_xml_sax_base_document_start(Eo *obj, Spec_Data *pd, void *user_data)
 {
-    const Eo_Class *current_class = eo_class_get ( obj );
-    LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
-
     FILE *machine_spec;
     long size;
     char *machine_spec_buffer;
@@ -86,6 +87,19 @@ _amin_machine_spec_xml_sax_base_document_end(Eo *obj, Spec_Data *pd, void *data)
 {
     const Eo_Class *current_class = eo_class_get ( obj );
     LOGF ( "Class is : %s %s", eo_class_name_get ( current_class ), __func__ );
+
+    // TODO need to implement pattern to tidy this crud up.
+
+    Eo *parent = eo_do(obj, eo_parent_get());
+
+    Xml_Base_Data *xd = eo_data_scope_get(parent, XML_SAX_BASE_CLASS);
+
+    Eo *spec = eo_add(AMIN_MACHINE_SPEC_DATA_CLASS, NULL);
+    eo_do(spec, amin_machine_spec_data_filters_set(pd->filters));
+
+    if(!xd) eo_error_set(obj);
+
+    xd->result = spec;
 
 }
 

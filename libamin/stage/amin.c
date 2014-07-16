@@ -1,4 +1,3 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include "common.h"
 #include <libxml/SAX.h>
@@ -7,6 +6,7 @@
 #include <xml_sax_base.eo.h>
 #include "amin.eo.h"
 #include "amin_machine_spec.eo.h"
+#include "amin_machine_spec_data.eo.h"
 
 typedef struct
 {
@@ -19,8 +19,8 @@ _machine_spec_foreach_cb(const Eina_Hash *modules, const void *key,
 {
     const char *name = key;
     printf("%s\n", name);
-    //Filter_Data *filter = (Filter_Data*)data;
-    //LOGF("Lets see if theres a position... %s", filter->position);
+    Filter_Data *filter = (Filter_Data*)data;
+    LOGF("Lets see if theres a module... %s", filter->module);
     // Return EINA_FALSE to stop this callback from being called
     return EINA_TRUE;
 }
@@ -46,20 +46,21 @@ _amin_parse(Eo *obj, Amin_Data *pd, char *profile)
 
     // Eo *xinclude_filter = eo_add_custom(AMIN_XINCLUDE, NULL, set_handler_constructor(machine_spec));
 
-    // Eo *xml_base = eo_add_custom(XML_SAX_BASE_CLASS, NULL, set_handler_constructor(machine_spec));
-    Eo *xml_base = eo_add(XML_SAX_BASE_CLASS, NULL);
-    eo_do(xml_base, xml_sax_base_handler_set(machine_spec));
+    // Handler loading is inverted to the Perl implementation atm as EFL are likely removing constructors.
 
-    const Eo_Class *xml_base_class = eo_class_get(xml_base);
+    // Load up XML_SAX_BASE_CLASS and add machine spec handler to it.
+    Eo *xml_sax_base = eo_add(XML_SAX_BASE_CLASS, NULL);
+    eo_do(xml_sax_base, xml_sax_base_handler_set(machine_spec));
+
+    const Eo_Class *xml_base_class = eo_class_get(xml_sax_base);
     LOGF("obj-type:'%s'\n", eo_class_name_get(xml_base_class));
 
-    LOG("Kicking parser into action....");
+    LOG("Kicking parser into action....hold on to your hats!");
 
-    // TODO Move to struct once declared at completeion of machine_spec.
-    // Machine_Spec_Document *spec;
-    Eo *result = eo_do(xml_base, xml_sax_base_parse_string(profile));
+    Eo *amin_spec = eo_do(xml_sax_base, xml_sax_base_parse_string(profile));
 
-    //eina_hash_foreach(spec->filters, _machine_spec_foreach_cb, NULL);
+    LOG("Do we have a spec??");
+    eina_hash_foreach(eo_do(amin_spec, amin_machine_spec_data_filters_get()), _machine_spec_foreach_cb, NULL);
 
 
 

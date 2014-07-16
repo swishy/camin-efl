@@ -1,4 +1,3 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include <libxml/SAX2.h>
 #include "xml_sax_base_types.h"
