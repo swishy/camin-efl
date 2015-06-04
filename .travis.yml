@@ -9,5 +9,5 @@ install:
  - cd libuv && sh autogen.sh && ./configure --prefix=/usr && make && sudo make install && cd ..
  - wget http://download.enlightenment.org/rel/libs/efl/efl-1.14.1.tar.gz
  - tar -xvzf efl-1.14.1.tar.gz
- - cd efl-1.14.1 && ./autogen.sh --prefix=/usr --enable-i-really-know-what-i-am-doing-and-that-this-will-probably-break-things-and-i-will-fix-them-myself-and-send-patches-aba --disable-physics --with-x11=none --disable-gstreamer1 --disable-audio && make && sudo make install && cd ..
+ - cd efl-1.14.1 && ./configure --prefix=/usr --enable-i-really-know-what-i-am-doing-and-that-this-will-probably-break-things-and-i-will-fix-them-myself-and-send-patches-aba --disable-physics --with-x11=none --disable-gstreamer1 --disable-audio && make && sudo make install && cd ..
  - mkdir build && cd build
