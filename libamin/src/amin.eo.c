@@ -3,9 +3,8 @@ Eo * _amin_parse(Eo *obj, Amin_Data *pd, char *profile);
 
 EOAPI EO_FUNC_BODYV(amin_parse, Eo *, 0, EO_FUNC_CALL(profile), char *profile);
 
-static Eo_Op_Description _amin_op_desc[] = {
-     EO_OP_FUNC(amin_parse, _amin_parse, "Starts the amin machine processing the current XML profile"),
-     EO_OP_SENTINEL
+static const Eo_Op_Description _amin_op_desc[] = {
+     EO_OP_FUNC(amin_parse, _amin_parse),
 };
 
 static const Eo_Class_Description _amin_class_desc = {

@@ -1,4 +1,8 @@
 
+void _amin_elt_constructor(Eo *obj, Amin_Elt_Data *pd, Eo *handler);
+
+EOAPI EO_VOID_FUNC_BODYV(amin_elt_constructor, EO_FUNC_CALL(handler), Eo *handler);
+
 Eo * _amin_elt_amin_command(Eo *obj, Amin_Elt_Data *pd, Eo *filter);
 
 EOAPI EO_FUNC_BODYV(amin_elt_amin_command, Eo *, 0, EO_FUNC_CALL(filter), Eo *filter);
@@ -10,16 +14,11 @@ EOAPI EO_FUNC_BODYV(amin_elt_white_wash, Eo *, 0, EO_FUNC_CALL(filter), Eo *filt
 void _amin_elt_xml_sax_base_document_start(Eo *obj, Amin_Elt_Data *pd, void *user_data);
 
 
-void _amin_elt_constructor(Eo *obj, Amin_Elt_Data *pd, Eo *handler);
-
-EOAPI EO_VOID_FUNC_BODYV(amin_elt_constructor, EO_FUNC_CALL(handler), Eo *handler);
-
-static Eo_Op_Description _amin_elt_op_desc[] = {
+static const Eo_Op_Description _amin_elt_op_desc[] = {
      EO_OP_FUNC_OVERRIDE(xml_sax_base_document_start, _amin_elt_xml_sax_base_document_start),
-     EO_OP_FUNC(amin_elt_constructor, _amin_elt_constructor, ""),
-     EO_OP_FUNC(amin_elt_amin_command, _amin_elt_amin_command, "Returns a configured amin instance to process appropriate document type"),
-     EO_OP_FUNC(amin_elt_white_wash, _amin_elt_white_wash, "Reimplements Perl regexp magic to ... um ask Bryan..."),
-     EO_OP_SENTINEL
+     EO_OP_FUNC(amin_elt_constructor, _amin_elt_constructor),
+     EO_OP_FUNC(amin_elt_amin_command, _amin_elt_amin_command),
+     EO_OP_FUNC(amin_elt_white_wash, _amin_elt_white_wash),
 };
 
 static const Eo_Class_Description _amin_elt_class_desc = {
