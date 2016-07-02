@@ -20,9 +20,9 @@ eolian_gen -I $INC_EO -I src/ --gc --eo -o src/amin_elt.eo.c src/amin_elt.eo
 eolian_gen -I $INC_EO -I src/ --gh --eo -o src/amin_elt.eo.h src/amin_elt.eo
 eolian_gen -I $INC_EO -I src/ --gi --eo -o src/amin_elt.c src/amin_elt.eo
 
-#eolian_gen -I $INC_EO -I src/ --gc --eo -o src/amin_machine_spec.eo.c src/amin_machine_spec.eo
-#eolian_gen -I $INC_EO -I src/ --gh --eo -o src/amin_machine_spec.eo.h src/amin_machine_spec.eo
-#eolian_gen -I $INC_EO -I src/ --gi --eo -o src/amin_machine_spec.c src/amin_machine_spec.eo
+eolian_gen -I $INC_EO -I src/ --gc --eo -o src/amin_machine_spec.eo.c src/amin_machine_spec.eo
+eolian_gen -I $INC_EO -I src/ --gh --eo -o src/amin_machine_spec.eo.h src/amin_machine_spec.eo
+eolian_gen -I $INC_EO -I src/ --gi --eo -o src/amin_machine_spec.c src/amin_machine_spec.eo
 
 #eolian_gen -I $INC_EO -I src/ --gc --eo -o src/amin_machine_spec_document.eo.c src/amin_machine_spec_document.eo
 #eolian_gen -I $INC_EO -I src/ --gh --eo -o src/amin_machine_spec_document.eo.h src/amin_machine_spec_document.eo
