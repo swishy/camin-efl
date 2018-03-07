@@ -1,0 +1,18 @@
+import efl_types;
+import eina_types;
+
+class Amin.Machine.Spec.Data (Efl.Object)
+{
+   data: Spec_Data;
+   methods {
+       @property filters {
+          set { [[This sets the filters for the current spec ]]
+          }
+          get { [[This gets the filters for the current machine document if set ]]
+          }
+          values {
+             filters: hash<string, Efl.Object>; [[ The filters for the current machine document ]]
+          }
+       }
+   }
+}

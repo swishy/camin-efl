@@ -1,0 +1,74 @@
+class Xml.Sax.Base (Eo.Base)
+{
+   data: Xml_Base_Data;
+   methods {
+      @property handler {
+         set { [[ This sets the handler of the current XSB object ]]
+         }
+         get { [[ This gets the handler of the XSB object if set ]]
+         }
+         values {
+            handler: Eo*; [[ The handler for the current XSB instance ]]
+         }
+      }
+      @property content_handler {
+        set { [[ This sets a custom content handler ]]
+        }
+        get { [[ This gets the current content handler if set ]]
+        }
+        values {
+            handler: Eo*; [[ The content handler for the current XSB instance ]]
+        }
+      }
+      @property document_handler {
+        set { [[ This sets a custom document handler ]]
+        }
+        get { [[This gets the current document handler ]]
+        }
+        values {
+            handler: Eo*; [[ The document handler for the current XSB instance ]]
+        }
+      }
+      parse_string { [[ This method starts the parsing process of the XML document passed in ]]
+         params {
+            @in document: char*; [[ The XML Document to parse ]]
+         }
+         return: Eo*; [[ Can return any Eo object ]]
+      }
+      set_document_locator { [[ Receives the document locator on start of parsing ]]
+        params {
+            @in ctx: void*; [[ The Libxml2 parser context ]]
+            @in loc: xmlSAXLocatorPtr; [[ The LibXML2 locator pointer ]]
+        }
+      }
+      document_start { [[ Called when the XML Namespace element is hit ]]
+        params {
+            @in user_data: void*; [[ Function is passed the user_data set ]]
+        }
+      }
+      element_start { [[ Called when XML node element start is hit ]]
+        params {
+            @in elementData: ElementData*; [[ Data associated with the element ]]
+        }
+      }
+      element_char { [[ Called when XML characters are found within an element ]]
+        params {
+            @in data: void*;
+            @in string: const(xmlChar)*;
+            @in string_len: int;
+        }
+      }
+      element_end { [[ Called when the end of an XML element is hit ]]
+        params {
+            @in data: ElementData*;
+        }
+      }
+      document_end { [[ Called when XML end document is hit ]]
+        params {
+            @in data: void*;
+        }
+      }
+   }
+   implements {
+   }
+}

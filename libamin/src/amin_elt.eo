@@ -1,29 +1,30 @@
 class Amin.Elt (Xml.Sax.Base)
 {
    data: Amin_Elt_Data;
-   constructors {
-      .constructor;
-   }
    methods {
-      constructor { [[ Custom constructor to allow setting of a handler at creation ]]
-        params {
-            @in handler: Eo*; [[ The custom handler for the current XSB instance ]]
-        }
-      }
-      amin_command { [[ Returns a configured amin instance to process appropriate document type ]]
+     amin_elt_constructor { [[Custom constructor to allow setting of a handler at creation]]
+       params {
+           @in handler: Efl.Object; [[The custom handler for the current XSB instance]]
+       }
+     }
+      amin_command { [[Returns a configured amin instance to process appropriate document type]]
          params {
-            @in filter: Eo*;
+            @in filter: Efl.Object;
          }
-         return: Eo*; [[ Can return any Eo object ]]
+         return: Efl.Object; [[Can return any Eo object]]
       }
-      white_wash { [[ Reimplements Perl regexp magic to ... um ask Bryan... ]]
+      white_wash { [[Reimplements Perl regexp magic to ... um ask Bryan... ]]
         params {
-            @in filter: Eo*;
+            @in filter: Efl.Object;
         }
-        return: Eo*;
+        return: Efl.Object;
       }
    }
    implements {
+      class.constructor;
       Xml.Sax.Base.document_start;
+   }
+   constructors {
+      .amin_elt_constructor;
    }
 }

@@ -1,17 +1,13 @@
-import amin_machine_spec;
-
-class Amin (Eo.Base)
+class Amin (Efl.Object)
 {
    data: Amin_Data;
    methods {
-      /* @Starts the amin machine processing the current XML profile */
-      parse { 
+     parse @const {
+        [[Docs - Starts the amin machine processing the current XML profile.]]
         params {
-            @in profile: char*;
+            @in profile: string @nullable;
         }
-	return: own(Eo*);
+        return: Efl.Object @warn_unused;
       }
-   }
-   implements {
    }
 }
