@@ -3,11 +3,14 @@
 #endif
 
 #include <unistd.h>
-#include <Ecore.h>
+#include <Eina.h>
+#include <Eo.h>
+#include <Efl_Core.h>
 #include <Ecore_Getopt.h>
+#include <Ecore.h>
 #include "common.h"
 #include "amin.eo.h"
-#include "amin_elt.eo.h"
+// #include "amin_elt.eo.h"
 
 struct context
 {
@@ -79,12 +82,11 @@ _uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const c
     }
 
     LOG("Creating Amin Instance");
-    Eo *amin = eo_add(AMIN_CLASS, NULL);
+    Eo *amin = efl_add(AMIN_CLASS, NULL);
+    amin_parse(amin, file_buffer);
 
-    const Eo_Class *klass = eo_class_get(amin);
-    printf("obj-type:'%s'\n", eo_class_name_get(klass));
-
-    eo_do(amin, amin_parse(file_buffer));
+    const Efl_Class *klass = efl_class_get(amin);
+    printf("obj-type:'%s'\n", efl_class_name_get(klass));
 
     // All done jumping out....
     ecore_main_loop_quit();
@@ -113,7 +115,7 @@ static Eina_Bool _stdin_handler_cb(void *data, Ecore_Fd_Handler *handler)
   
   // Read till no futher data.
   fd = ecore_main_fd_handler_fd_get(handler);
-  nbytes = read(fd, buf, sizeof(buf));
+  nbytes = (size_t) read(fd, buf, sizeof(buf));
   if (nbytes == 0)
   {
     LOG("STDIN contained no data exiting Amin.");
@@ -128,12 +130,12 @@ static Eina_Bool _stdin_handler_cb(void *data, Ecore_Fd_Handler *handler)
   ctxt->handler = NULL;
   
   LOG("Creating Amin Instance");
-  Eo *amin = eo_add(AMIN_CLASS, NULL);
+  Eo *amin = efl_add(AMIN_CLASS, NULL);
   
-  const Eo_Class *klass = eo_class_get(amin);
-  printf("obj-type:'%s'\n", eo_class_name_get(klass));
-  
-  eo_do(amin, amin_parse(buf));
+  const Efl_Class *klass = efl_class_get(amin);
+  printf("obj-type:'%s'\n", efl_class_name_get(klass));
+
+  amin_parse(amin, buf);
   
   // All done jumping out....
   ecore_main_loop_quit();
@@ -144,6 +146,7 @@ static Eina_Bool _stdin_handler_cb(void *data, Ecore_Fd_Handler *handler)
 
 void read_stdin()
 {
+    LOG("Reading from STDIN");
   // Create struct to maintain pointer to handler.
   struct context ctxt = {0};
   
@@ -154,50 +157,49 @@ void read_stdin()
 					   &ctxt, NULL, NULL);
 }
 
-
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
+
   LOG("Welcome to Amin version 1.0");
   LOG("Today brought to you by caffiene and MoonAlice(tm)...");
-  
+
+  // eina_log_level_set(EINA_LOG_LEVEL_INFO);
   // Define vars to contain commandline options.
   char *adminlist;
   char *uri;
   Eina_Bool profile = EINA_FALSE;
   Eina_Bool quit = EINA_FALSE;
 
-  eo_init();
-
   Ecore_Getopt_Value values[] = {
-	ECORE_GETOPT_VALUE_STR(adminlist),
-	ECORE_GETOPT_VALUE_STR(uri),
-	ECORE_GETOPT_VALUE_BOOL(profile),
-	ECORE_GETOPT_VALUE_BOOL(quit),
-    ECORE_GETOPT_VALUE_NONE
-  };
+  	ECORE_GETOPT_VALUE_STR(adminlist),
+   	ECORE_GETOPT_VALUE_STR(uri),
+  	ECORE_GETOPT_VALUE_BOOL(profile),
+  	ECORE_GETOPT_VALUE_BOOL(quit),
+      ECORE_GETOPT_VALUE_NONE
+    };
 
-  if (!ecore_init())
-  {
-    printf("ERROR: Cannot init Eo / Ecore!\n");
-    return -1;
-  }
-  
-  // Parse commandline arguments.
-  if (ecore_getopt_parse(&optdesc, values, argc, argv) < 0)
-  {
-    LOG("Failed to parse options passed to Amin");
-    return 1;
-  }
-  
-  // We are exepcting something from stdin so lets read it!
-  if (profile)
-  {
-    read_stdin();
-  }
-  
-  ecore_main_loop_begin();
-  
-  ecore_shutdown();
-  
-  return 0;
+
+
+    if (!ecore_init())
+    {
+        printf("ERROR: Cannot init Eo / Ecore!\n");
+        efl_exit(-1);
+    }
+
+    // Parse commandline arguments.
+    if (ecore_getopt_parse(&optdesc, values, argc, argv) < 0)
+    {
+        LOG("Failed to parse options passed to Amin");
+        efl_exit(-1);
+    }
+
+    // We are expecting something from stdin so lets read it!
+    if (profile)
+    {
+        read_stdin();
+    }
+
+    ecore_shutdown();
+
+    return 0;
 }

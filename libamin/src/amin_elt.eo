@@ -1,6 +1,5 @@
 class Amin.Elt (Xml.Sax.Base)
 {
-   data: Amin_Elt_Data;
    methods {
      amin_elt_constructor { [[Custom constructor to allow setting of a handler at creation]]
        params {

@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <uv.h>
-#include "common.h"
+#include <common.h>
 
 #define PORT 420
 

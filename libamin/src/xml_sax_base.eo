@@ -38,7 +38,7 @@ class Xml.Sax.Base (Efl.Object)
       set_document_locator { [[Receives the document locator on start of parsing]]
         params {
             @in ctx: void_ptr; [[The Libxml2 parser context]]
-            @in loc: xmlSAXLocatorPtr; [[The LibXML2 locator pointer]]
+            @in loc: void_ptr; [[The LibXML2 locator pointer]]
         }
       }
       document_start { [[Called when the XML Namespace element is hit]]
