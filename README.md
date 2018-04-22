@@ -8,21 +8,26 @@ Installation
 
 Installation 
 
-Requires libuv, libxml2, ecore and eo libraries.
+Requires libuv, libxml2, efl libraries.
 
 Libxml2 install via distro etc.
 
-Grab Libuv 
-
-https://github.com/joyent/libuv
-
-./autoconf && ./configure --prefix=/usr && make && make install
+Libuv install via distro ( libuv1-dev on debian / ubuntu )
 
 Grab EFL 
 
-git clone http://git.enlightenment.org/core/efl.git/
+`git clone http://git.enlightenment.org/core/efl.git/`
 
-./autoconf --prefix=/usr && make && make install 
+`mkdir build`
+
+`cd build`
+
+`meson ../`
+
+`ninja`
+
+`sudo ninja install`
+
 
 Build camin 
 
@@ -32,4 +37,4 @@ cd build
 
 cmake ..
 
-make && make install 
+make && sudo make install
