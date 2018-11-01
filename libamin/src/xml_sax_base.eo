@@ -47,21 +47,15 @@ class Xml.Sax.Base (Efl.Object)
         }
       }
       element_start { [[Called when XML node element start is hit]]
-        params {
-            @in elementData: ElementData; [[Data associated with the element]]
-        }
       }
       element_char { [[Called when XML characters are found within an element]]
         params {
             @in data: void_ptr;
-            @in string: const(xmlChar);
+            @in string: string;
             @in string_len: int;
         }
       }
       element_end { [[Called when the end of an XML element is hit]]
-        params {
-            @in data: ElementData;
-        }
       }
       document_end { [[Called when XML end document is hit]]
         params {
