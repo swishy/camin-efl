@@ -1,3 +1,4 @@
+#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include "xml_sax_base.eo.h"
 #include "amin_elt.eo.h"

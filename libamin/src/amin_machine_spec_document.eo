@@ -1,0 +1,11 @@
+class Amin.Machine.Spec.Document (Amin.Elt)
+{
+   data: Spec_Data;
+   implements {
+	Xml.Sax.Base.document_start;
+	Xml.Sax.Base.element_start;
+	Xml.Sax.Base.element_char;
+	Xml.Sax.Base.element_end;
+	Xml.Sax.Base.document_end;
+   }
+}
