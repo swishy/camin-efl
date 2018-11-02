@@ -47,6 +47,9 @@ class Xml.Sax.Base (Efl.Object)
         }
       }
       element_start { [[Called when XML node element start is hit]]
+        params {
+          @in data: void_ptr;
+        }
       }
       element_char { [[Called when XML characters are found within an element]]
         params {

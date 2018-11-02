@@ -16,7 +16,7 @@ _amin_machine_spec_xml_sax_base_document_start(Eo *obj, Spec_Data *pd, void *use
 }
 
 EOLIAN static void
-_amin_machine_spec_xml_sax_base_element_start(Eo *obj, Spec_Data *pd)
+_amin_machine_spec_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, void *data)
 {
 
 }

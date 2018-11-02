@@ -62,7 +62,7 @@ _xml_sax_base_document_start(Eo *obj, Xml_Base_Data *pd, void *user_data)
 }
 
 EOLIAN static void
-_xml_sax_base_element_start(Eo *obj, Xml_Base_Data *pd)
+_xml_sax_base_element_start(Eo *obj, Xml_Base_Data *pd, void *data)
 {
 
 }
