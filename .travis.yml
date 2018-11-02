@@ -5,7 +5,7 @@ script: cmake ../ && make
 install:
  - sudo apt-get update
  - sudo apt-get install check libluajit-5.1-dev libblkid-dev mount libmount-dev autopoint libfribidi-dev autoconf-archive libtool libpam0g-dev libjpeg-dev librsvg2-dev libdbus-1-dev liblua5.1-0-dev libasound2-dev libudev-dev liburiparser-dev libuv-dev
- - wget http://download.enlightenment.org/rel/libs/efl/efl-1.21.0.tar.gz
- - tar -xvzf efl-1.21.0.tar.gz
+ - wget https://download.enlightenment.org/rel/libs/efl/efl-1.21.0.tar.xz
+ - tar -xvf efl-1.21.0.tar.xz
  - cd efl-1.21.0 && ./configure --prefix=/usr --enable-i-really-know-what-i-am-doing-and-that-this-will-probably-break-things-and-i-will-fix-them-myself-and-send-patches-aba --disable-physics --with-x11=none --disable-gstreamer1 --disable-audio && make && sudo make install && cd ..
  - mkdir build && cd build
