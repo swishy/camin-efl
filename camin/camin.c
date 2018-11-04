@@ -30,7 +30,7 @@ static const Ecore_Getopt optdesc = {
   "(C) 2014 ProjectAmin.org",
   "",
   "Amin implementation in C",
-  0,
+  EINA_TRUE,
   {
     ECORE_GETOPT_CALLBACK_ARGS('a', "adminlist", "[-a|-adminlist] uri://", "STRING", _adminlist_callback, NULL),
     ECORE_GETOPT_CALLBACK_ARGS('u', "uri", "[-u|-uri] uri://", "STRING", _uri_callback, NULL),

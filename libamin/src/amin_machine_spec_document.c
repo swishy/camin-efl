@@ -1,6 +1,6 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include <common.h>
+#include "element.eo.h"
 #include "xml_sax_base.eo.h"
 #include "amin_elt.eo.h"
 #include "amin_machine_spec_document.eo.h"
@@ -57,9 +57,125 @@ _amin_machine_spec_document_xml_sax_base_document_start(Eo *obj, Spec_Data *pd, 
 }
 
 EOLIAN static void
-_amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, void *data)
+_amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element *data)
 {
+    int i;
 
+    Element *element = data;
+
+    const char *localname = element_localname_get(element);
+    LOGF ( "Localname is : %s %s", localname, __func__ );
+
+    pd->localname = localname;
+
+    // Get Module Name
+    /**if ( strncmp ( localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 || strncmp ( localname,BUNDLE_TAG,sizeof ( BUNDLE_TAG ) ) == 0 )
+    {
+        int nb_attributes = element_nb_attributes_get(element);
+        const char *attributes = element_attributes_get(element);
+        if ( nb_attributes > 0 )
+        {
+            int i = 0;
+            int attribute_position = 0;
+            char *parse_value;
+
+            // Get values from attributes
+            while ( i < nb_attributes )
+            {
+                if ( attributes[attribute_position] != NULL )
+                {
+                    if ( strncmp ( &attributes[attribute_position],"name",sizeof ( attributes[attribute_position] ) ) == 0 )
+                    {
+                        int attribute_length = ( strlen ( &attributes[attribute_position + 3] ) - strlen ( attributes[attribute_position + 4] ) );
+                        pd->module = strndup ( &attributes[attribute_position + 3], attribute_length );
+                    }
+                }
+                attribute_position = attribute_position + 5;
+                i++;
+            }
+        }
+    }
+
+    if ( strncmp ( localname,GENERATOR_TAG,sizeof ( GENERATOR_TAG ) ) == 0 )
+    {
+        if ( element->nb_attributes > 0 )
+        {
+            int i = 0;
+            int attribute_position = 0;
+            char *parse_value;
+
+            // Get values from attributes
+            while ( i < element->nb_attributes )
+            {
+                if ( element->attributes[attribute_position] != NULL )
+                {
+                    if ( strncmp ( element->attributes[attribute_position],"generator",sizeof ( element->attributes[attribute_position] ) ) == 0 )
+                    {
+                        int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                        pd->generator = strndup ( element->attributes[attribute_position + 3], attribute_length );
+                    }
+                }
+                attribute_position = attribute_position + 5;
+                i++;
+            }
+        }
+    }
+
+    if ( strncmp ( localname,HANDLER_TAG,sizeof ( HANDLER_TAG ) ) == 0 )
+    {
+        if ( element->nb_attributes > 0 )
+        {
+            int i = 0;
+            int attribute_position = 0;
+            char *parse_value;
+
+            // Get values from attributes
+            while ( i < element->nb_attributes )
+            {
+                if ( element->attributes[attribute_position] != NULL )
+                {
+                    if ( strncmp ( element->attributes[attribute_position],"handler",sizeof ( element->attributes[attribute_position] ) ) == 0 )
+                    {
+                        int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                        pd->handler_name = strndup ( element->attributes[attribute_position + 3], attribute_length );
+                    }
+
+                    if ( strncmp ( element->attributes[attribute_position],"output",sizeof ( element->attributes[attribute_position] ) ) == 0 )
+                    {
+                        int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                        pd->handler_out = strndup ( element->attributes[attribute_position + 3], attribute_length );
+                    }
+                }
+                attribute_position = attribute_position + 5;
+                i++;
+            }
+        }
+    }
+
+    if ( strncmp ( localname,LOG_TAG,sizeof ( LOG_TAG ) ) == 0 )
+    {
+        if ( element->nb_attributes > 0 )
+        {
+            int i = 0;
+            int attribute_position = 0;
+            char *parse_value;
+
+            // Get values from attributes
+            while ( i < element->nb_attributes )
+            {
+                if ( element->attributes[attribute_position] != NULL )
+                {
+                    if ( strncmp ( element->attributes[attribute_position],"log",sizeof ( element->attributes[attribute_position] ) ) == 0 )
+                    {
+                        int attribute_length = ( strlen ( element->attributes[attribute_position + 3] ) - strlen ( element->attributes[attribute_position + 4] ) );
+                        pd->generator = strndup ( element->attributes[attribute_position + 3], attribute_length );
+                    }
+                }
+                attribute_position = attribute_position + 5;
+                i++;
+            }
+        }
+    }*/
 }
 
 EOLIAN static void
@@ -69,7 +185,7 @@ _amin_machine_spec_document_xml_sax_base_element_char(Eo *obj, Spec_Data *pd, vo
 }
 
 EOLIAN static void
-_amin_machine_spec_document_xml_sax_base_element_end(Eo *obj, Spec_Data *pd)
+_amin_machine_spec_document_xml_sax_base_element_end(Eo *obj, Spec_Data *pd, Element *data)
 {
 
 }
