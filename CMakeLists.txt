@@ -11,15 +11,16 @@ find_package(PkgConfig)
 pkg_check_modules(LIBXML2 libxml-2.0)
 pkg_check_modules(ECORE ecore-con ecore)
 pkg_check_modules(EO eo)
+pkg_check_modules(EINA eina)
 pkg_check_modules(LIBURIPARSER liburiparser)
 pkg_check_modules(LIBUV libuv)
 configure_file( ${CMAKE_SOURCE_DIR}/libamin/include/config.h.in ${CMAKE_SOURCE_DIR}/libamin/include/config.h )
 link_directories(
-     ${LIBXML2_LIBRARY_DIRS} ${ECORE_LIBRARY_DIRS} ${EO_LIBRARY_DIRS} ${LIBURIPARSER_LIBRARY_DIRS}
+     ${LIBXML2_LIBRARY_DIRS} ${EINA_LIBRARY_DIRS} ${ECORE_LIBRARY_DIRS} ${EO_LIBRARY_DIRS} ${LIBURIPARSER_LIBRARY_DIRS}
 )
 # Including libamin/src as it allows for Eo headers to be found
 include_directories(
-     libamin/src libamin/include/ ${LIBXML2_INCLUDE_DIRS} ${ECORE_INCLUDE_DIRS} ${EO_INCLUDE_DIRS} ${LIBURIPARSER_INCLUDE_DIRS}
+     libamin/src libamin/include/ ${LIBXML2_INCLUDE_DIRS} ${EINA_INCLUDE_DIRS} ${ECORE_INCLUDE_DIRS} ${EO_INCLUDE_DIRS} ${LIBURIPARSER_INCLUDE_DIRS}
 )
 add_subdirectory(libamin)
 
