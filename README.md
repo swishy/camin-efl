@@ -11,12 +11,14 @@ Requires EFL 1.20+ , libuv, libxml2, uriparser.
 Build
 ==
 
-* clone git repository
+* `git clone https://github/com/swishy/camin.git`
 
-* mkdir build
+* `cd camin`
 
-* cd build
+* `mkdir build`
 
-* cmake ..
+* `cd build`
 
-* make && sudo make install
+* `cmake ..`
+
+* `make && sudo make install`
