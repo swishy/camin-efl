@@ -1,6 +1,7 @@
+#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include <common.h>
-#include "element.eo.h"
+#include "element_data.eot.h"
 #include "xml_sax_base.eo.h"
 #include "amin_elt.eo.h"
 #include "amin_machine_spec_document.eo.h"
@@ -52,18 +53,17 @@ _amin_machine_spec_document_xml_sax_base_document_start(Eo *obj, Spec_Data *pd, 
 {
     const Efl_Class *current_class = efl_class_get ( obj );
     LOGF ( "Class is : %s %s", efl_class_name_get ( current_class ), __func__ );
+
     // Setup Eina_Hash to collect filters found during parsing.
-    pd->filters = eina_hash_string_superfast_new(_filter_entry_free_cb);
+    pd->filters = eina_hash_pointer_new(_filter_entry_free_cb);
 }
 
 EOLIAN static void
-_amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element *data)
+_amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element_Data *data)
 {
     int i;
 
-    Element *element = data;
-
-    const char *localname = element_localname_get(element);
+    const char *localname = data->localname;
     LOGF ( "Localname is : %s %s", localname, __func__ );
 
     pd->localname = localname;
@@ -185,7 +185,7 @@ _amin_machine_spec_document_xml_sax_base_element_char(Eo *obj, Spec_Data *pd, vo
 }
 
 EOLIAN static void
-_amin_machine_spec_document_xml_sax_base_element_end(Eo *obj, Spec_Data *pd, Element *data)
+_amin_machine_spec_document_xml_sax_base_element_end(Eo *obj, Spec_Data *pd, Element_Data *data)
 {
 
 }

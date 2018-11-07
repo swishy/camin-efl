@@ -70,17 +70,16 @@ _libxml2_start(
 
     LOG("libxml2 start el callback");
 
-    // Populate object to pass around
-    Element *element_data = efl_add(ELEMENT_CLASS, NULL);
-    element_attributes_set(element_data, (const char *) attributes);
-    element_ctx_set(element_data, ctx);
-    element_localname_set(element_data, (const char *) localname);
-    element_prefix_set(element_data, (const char *) prefix);
-    element_URI_set(element_data, (const char *) URI);
-    element_nb_namespaces_set(element_data, nb_namespaces);
-    element_namespaces_set(element_data, (const char *) namespaces);
-    element_nb_attributes_set(element_data, nb_attributes);
-    element_nb_defaulted_set(element_data, nb_defaulted);
+    // Populate struct to pass around
+    Element_Data *element_data;
+    element_data->localname = (const char*)localname;
+    element_data->ctx = ctx;
+    element_data->prefix = (const char*)prefix;
+    element_data->URI = (const char*)URI;
+    element_data->attributes = (const char *) attributes;
+    element_data->nb_namespaces = nb_namespaces;
+    element_data->nb_attributes = nb_attributes;
+    element_data->nb_defaulted = nb_defaulted;
 
     // Fire in the hole!
     xml_sax_base_element_start(filter, element_data);
@@ -107,11 +106,11 @@ _libxml2_end(
     // Here we grab current filter and private data for such
     Eo *filter = (Eo*)ctx;
 
-    Element *element_data = efl_add(ELEMENT_CLASS, NULL);
-    element_ctx_set(element_data, ctx);
-    element_localname_set(element_data, (const char*) localname);
-    element_prefix_set(element_data, (const char*) prefix);
-    element_URI_set(element_data, (const char*) URI);
+    Element_Data *element_data;
+    element_data->localname = (const char*)localname;
+    element_data->ctx = ctx;
+    element_data->prefix = (const char*)prefix;
+    element_data->URI = (const char*)URI;
 
     // Fire in the hole!
     xml_sax_base_element_end(filter, element_data);
@@ -233,7 +232,7 @@ _xml_sax_base_document_start(Eo *obj, Xml_Base_Data *pd, void *user_data)
 }
 
 EOLIAN static void
-_xml_sax_base_element_start(Eo *obj, Xml_Base_Data *pd, Element *data)
+_xml_sax_base_element_start(Eo *obj, Xml_Base_Data *pd, Element_Data *data)
 {
     const Efl_Class *current_class = efl_class_get(obj);
     LOGF("Element Start called in:'%s'\n", efl_class_name_get(current_class));
@@ -269,7 +268,7 @@ _xml_sax_base_element_char(Eo *obj, Xml_Base_Data *pd, void *data, const char *s
 }
 
 EOLIAN static void
-_xml_sax_base_element_end(Eo *obj, Xml_Base_Data *pd, Element *data)
+_xml_sax_base_element_end(Eo *obj, Xml_Base_Data *pd, Element_Data *data)
 {
     const Efl_Class *current_class = efl_class_get(obj);
     LOGF("Element End called in:'%s'\n", efl_class_name_get(current_class));

@@ -17,6 +17,8 @@ struct context
   Ecore_Fd_Handler *handler;
 };
 
+Amin *_amin;
+
 void read_stdin();
 
 static unsigned char _adminlist_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage);
@@ -55,13 +57,19 @@ _uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const c
 {
    printf("URI Callback received %s\n", str);
 
+   // TODO this needs to deal with file:// http:// etc
+    Eina_Strbuf *buf = eina_strbuf_new();
+    eina_strbuf_append(buf, str);
+    eina_strbuf_remove(buf, 0, 6);
+    const char *path = eina_strbuf_string_get(buf);
+
     FILE *file;
     long size;
     char *file_buffer;
 
     // Get size of machine_spec and read in.
     // TODO implement error handling
-    if ((file = fopen(str, "rb")))
+    if ((file = fopen(path, "rb")))
     {
         fseek(file, 0, SEEK_END);
         size = ftell(file);
@@ -81,11 +89,9 @@ _uri_callback(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const c
         fread(file_buffer, 1, size, file);
     }
 
-    LOG("Creating Amin Instance");
-    Eo *amin = efl_add(AMIN_CLASS, NULL);
-    amin_parse(amin, file_buffer);
+    amin_parse(_amin, file_buffer);
 
-    const Efl_Class *klass = efl_class_get(amin);
+    const Efl_Class *klass = efl_class_get(_amin);
     printf("obj-type:'%s'\n", efl_class_name_get(klass));
 
     // All done jumping out....
@@ -129,13 +135,10 @@ static Eina_Bool _stdin_handler_cb(void *data, Ecore_Fd_Handler *handler)
   // We want to remove the handler as we have process data relevant.
   ctxt->handler = NULL;
   
-  LOG("Creating Amin Instance");
-  Eo *amin = efl_add(AMIN_CLASS, NULL);
-  
-  const Efl_Class *klass = efl_class_get(amin);
+  const Efl_Class *klass = efl_class_get(_amin);
   printf("obj-type:'%s'\n", efl_class_name_get(klass));
 
-  amin_parse(amin, buf);
+  amin_parse(_amin, buf);
   
   // All done jumping out....
   ecore_main_loop_quit();
@@ -185,6 +188,11 @@ int main(int argc, char *argv[])
         printf("ERROR: Cannot init Eo / Ecore!\n");
         efl_exit(-1);
     }
+
+    LOG("Creating Amin Instance");
+    // TODO Placeholder to track objects till I conceive a nice way to deal with handler graph.
+    _amin = efl_new(AMIN_CLASS,
+                    efl_name_set(efl_added, "Amin"));
 
     // Parse commandline arguments.
     if (ecore_getopt_parse(&optdesc, values, argc, argv) < 0)

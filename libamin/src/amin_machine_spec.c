@@ -1,4 +1,6 @@
+#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
+#include "common.h"
 #include "xml_sax_base.eo.h"
 #include "amin_elt.eo.h"
 #include "amin_machine_spec.eo.h"
@@ -10,14 +12,35 @@ typedef struct
     Eina_Hash *filters;
 } Spec_Data;
 
-EOLIAN static void
-_amin_machine_spec_xml_sax_base_document_start(Eo *obj, Spec_Data *pd, void *user_data)
+static void
+_filter_entry_free_cb(void *data)
 {
-    pd->machine_spec = efl_add(AMIN_MACHINE_SPEC_DOCUMENT_CLASS, NULL);
+    free(data);
 }
 
 EOLIAN static void
-_amin_machine_spec_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element *data)
+_amin_machine_spec_xml_sax_base_document_start(Eo *obj, Spec_Data *pd, void *user_data)
+{
+    LOG("Initialising Amin Machine specification");
+
+    // Reset the filters.
+    pd->filters = eina_hash_pointer_new(_filter_entry_free_cb);
+
+    // Reference machine spec xml
+    // TODO Deal with URL etc.
+
+
+
+    // Setup the parser.
+    Amin_Machine_Spec_Document *handler = efl_add_ref(AMIN_MACHINE_SPEC_DOCUMENT_CLASS, NULL);
+    Xml_Sax_Base *parser = efl_add_ref(XML_SAX_BASE_CLASS, NULL);
+    xml_sax_base_handler_set(parser, handler);
+
+
+}
+
+EOLIAN static void
+_amin_machine_spec_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element_Data *data)
 {
 
 }
