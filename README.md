@@ -6,35 +6,19 @@ C implementation of amin www.projectamin.org , intending to follow current Perl 
 Installation 
 =====
 
-Installation 
+Requires EFL 1.20+ , libuv, libxml2, uriparser.
 
-Requires libuv, libxml2, efl libraries.
+Build
+==
 
-Libxml2 install via distro etc.
+* `git clone https://github/com/swishy/camin.git`
 
-Libuv install via distro ( libuv1-dev on debian / ubuntu )
+* `cd camin`
 
-Grab EFL 
+* `mkdir build`
 
-`git clone http://git.enlightenment.org/core/efl.git/`
+* `cd build`
 
-`mkdir build`
+* `cmake ..`
 
-`cd build`
-
-`meson ../`
-
-`ninja`
-
-`sudo ninja install`
-
-
-Build camin 
-
-mkdir build
-
-cd build
-
-cmake ..
-
-make && sudo make install
+* `make && sudo make install`
