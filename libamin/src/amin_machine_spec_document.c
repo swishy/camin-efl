@@ -1,5 +1,6 @@
 #include <Eo.h>
 #include <common.h>
+#include "filter_data.eot.h"
 #include "xml_sax_base.eo.h"
 #include "amin_elt.eo.h"
 #include "amin_machine_spec_document.eo.h"
@@ -50,16 +51,19 @@ EOLIAN static void
 _amin_machine_spec_document_xml_sax_base_document_start(Eo *obj, Spec_Data *pd, void *user_data)
 {
     const Efl_Class *current_class = efl_class_get ( obj );
-    LOGF ( "Class is : %s %s", efl_class_name_get ( current_class ), __func__ );
+    EINA_LOG_DBG ( "Class is : %s %s", efl_class_name_get ( current_class ), __func__ );
 
     // Setup Eina_Hash to collect filters found during parsing.
     pd->filters = eina_hash_pointer_new(_filter_entry_free_cb);
+
 }
 
 EOLIAN static void
 _amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element *data)
 {
     int i;
+
+    EINA_LOG_DBG("Amin Machine Spec Document Element Start");
 
     //const char *localname = data->localname;
     //LOGF ( "Localname is : %s %s", localname, __func__ );
@@ -179,19 +183,20 @@ _amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, E
 EOLIAN static void
 _amin_machine_spec_document_xml_sax_base_element_char(Eo *obj, Spec_Data *pd, void *data, const char *string, int string_len)
 {
-
+    EINA_LOG_DBG("Amin Machine Spec Document char");
+    EINA_LOG_DBG("Char: %s", string);
 }
 
 EOLIAN static void
 _amin_machine_spec_document_xml_sax_base_element_end(Eo *obj, Spec_Data *pd, Element *data)
 {
-
+    EINA_LOG_DBG("Amin Machine Spec Document element end");
 }
 
 EOLIAN static void
 _amin_machine_spec_document_xml_sax_base_document_end(Eo *obj, Spec_Data *pd, void *data)
 {
-
+    EINA_LOG_DBG("Amin Machine Spec Document document end");
 }
 
 #include "amin_machine_spec_document.eo.c"

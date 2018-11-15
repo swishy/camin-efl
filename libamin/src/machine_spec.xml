@@ -1,0 +1,19 @@
+<machine xmlns:amin="http://projectamin.org/ns/">
+    <!--    LICENSE:
+     Please see the LICENSE file included with this distribution
+        or see the following website http://projectamin.org.
+    -->
+
+
+    <!--what type of machine is this? -->
+    <name>Amin::Machine::Dispatcher</name>
+
+    <filter name="Amin::Command::Mkdir">
+        <namespace>amin</namespace>
+        <element>command</element>
+        <name>mkdir</name>
+        <position>middle</position>
+        <download>http://projectamin.org/filters/amin/command/mkdir.xml</download>
+        <version>1.0</version>
+    </filter>
+</machine>
