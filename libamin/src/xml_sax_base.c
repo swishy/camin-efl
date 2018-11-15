@@ -1,7 +1,7 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include <libxml/SAX.h>
 #include "common.h"
+#include "element.eo.h"
 #include "xml_sax_base.eo.h"
 
 typedef struct
@@ -16,17 +16,17 @@ typedef struct
 
 static void
 _warning(void *user_data, const char *msg, ...) {
-    LOGF("%s", msg);
+    EINA_LOG_WARN("%s", msg);
 }
 
 static void
 _error(void *user_data, const char *msg, ...) {
-    LOGF("%s", msg);
+    EINA_LOG_ERR("%s", msg);
 }
 
 static void
 _fatalError(void *user_data, const char *msg, ...) {
-    LOGF("%s", msg);
+    EINA_LOG_CRIT("%s", msg);
 }
 
 
@@ -41,7 +41,7 @@ _libxml2_set_document_locator(void * ctx, xmlSAXLocatorPtr loc)
 static void
 _libxml2_document_start(void *user_data)
 {
-    LOG("libxml2 doc start callback hit");
+    EINA_LOG_DBG("libxml2 doc start callback hit");
     Eo *filter = (Eo*)user_data;
     xml_sax_base_document_start(filter, user_data);
 }
@@ -49,6 +49,7 @@ _libxml2_document_start(void *user_data)
 static void
 _libxml2_document_end(void *user_data)
 {
+    EINA_LOG_DBG("libxml2 doc end callback hit");
     Eo *filter = (Eo*)user_data;
     xml_sax_base_document_end(filter, user_data);
 }
@@ -71,7 +72,7 @@ _libxml2_start(
     LOG("libxml2 start el callback");
 
     // Populate struct to pass around
-    Element_Data *element_data;
+    /**Element_Data *element_data;
     element_data->localname = (const char*)localname;
     element_data->ctx = ctx;
     element_data->prefix = (const char*)prefix;
@@ -82,7 +83,7 @@ _libxml2_start(
     element_data->nb_defaulted = nb_defaulted;
 
     // Fire in the hole!
-    xml_sax_base_element_start(filter, element_data);
+    xml_sax_base_element_start(filter, element_data);*/
 }
 
 static void
@@ -106,14 +107,14 @@ _libxml2_end(
     // Here we grab current filter and private data for such
     Eo *filter = (Eo*)ctx;
 
-    Element_Data *element_data;
-    element_data->localname = (const char*)localname;
-    element_data->ctx = ctx;
-    element_data->prefix = (const char*)prefix;
-    element_data->URI = (const char*)URI;
+    //Element_Data *element_data;
+    //element_data->localname = (const char*)localname;
+    //element_data->ctx = ctx;
+    //element_data->prefix = (const char*)prefix;
+    //element_data->URI = (const char*)URI;
 
     // Fire in the hole!
-    xml_sax_base_element_end(filter, element_data);
+    //xml_sax_base_element_end(filter, element_data);
 }
 
 EOLIAN static void
@@ -156,11 +157,11 @@ _xml_sax_base_document_handler_get(const Eo *obj, Xml_Base_Data *pd)
 }
 
 EOLIAN static Efl_Object *
-_xml_sax_base_parse_string(Eo *obj, Xml_Base_Data *pd, char document)
+_xml_sax_base_parse_string(Eo *obj, Xml_Base_Data *pd, const char* document)
 {
-    LOG("xsb parse string");
+    EINA_LOG_DBG("Parsing document: %s", document);
     const Efl_Class *current_class = efl_class_get(obj);
-    LOGF("obj-type referenced:'%s'\n", efl_class_name_get(current_class));
+    EINA_LOG_DBG("obj-type referenced:'%s'\n", efl_class_name_get(current_class));
     // Create a parser instance for this request.
     // TODO this currently is here as having one setup in the constructor
     // results in function references being lost in transit...
@@ -184,9 +185,9 @@ _xml_sax_base_parse_string(Eo *obj, Xml_Base_Data *pd, char document)
     parser.warning = _warning;
     parser.fatalError = _fatalError;
 
-    if (xmlSAXUserParseMemory(&parser, obj, &document, (int) strlen(&document)) < 0 )
+    if (xmlSAXUserParseMemory(&parser, obj, document, (int) strlen(document)) < 0 )
     {
-        LOG("Issue parsing XML document");
+        EINA_LOG_ERR("Issue parsing XML document");
     };
 
     // Make sure we cleanup the current parser.
@@ -205,10 +206,6 @@ _xml_sax_base_set_document_locator(Eo *obj, Xml_Base_Data *pd, void *ctx, void *
     if (handler)
     {
         xml_sax_base_set_document_locator(handler, ctx, loc);
-    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
-        xml_sax_base_set_document_locator(handler, ctx, loc);
-    } else {
-        // Do nothing for the moment
     }
 
 }
@@ -224,15 +221,11 @@ _xml_sax_base_document_start(Eo *obj, Xml_Base_Data *pd, void *user_data)
     if (handler)
     {
         xml_sax_base_document_start(handler, user_data);
-    } else if (EO_CLASS != XML_SAX_BASE_CLASS) {
-        xml_sax_base_document_start(obj, user_data);
-    } else {
-        // Do nothing for the moment
     }
 }
 
 EOLIAN static void
-_xml_sax_base_element_start(Eo *obj, Xml_Base_Data *pd, Element_Data *data)
+_xml_sax_base_element_start(Eo *obj, Xml_Base_Data *pd, Element *data)
 {
     const Efl_Class *current_class = efl_class_get(obj);
     LOGF("Element Start called in:'%s'\n", efl_class_name_get(current_class));
@@ -242,10 +235,6 @@ _xml_sax_base_element_start(Eo *obj, Xml_Base_Data *pd, Element_Data *data)
     if (handler)
     {
         xml_sax_base_element_start(handler, data);
-    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
-        xml_sax_base_element_start(obj, data);
-    } else {
-        // Do nothing for the moment
     }
 }
 
@@ -260,15 +249,11 @@ _xml_sax_base_element_char(Eo *obj, Xml_Base_Data *pd, void *data, const char *s
     if (handler)
     {
         xml_sax_base_element_char(handler, data, string, string_len);
-    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
-        xml_sax_base_element_char(obj, data, string, string_len);
-    } else {
-        // Do nothing for the moment
     }
 }
 
 EOLIAN static void
-_xml_sax_base_element_end(Eo *obj, Xml_Base_Data *pd, Element_Data *data)
+_xml_sax_base_element_end(Eo *obj, Xml_Base_Data *pd, Element *data)
 {
     const Efl_Class *current_class = efl_class_get(obj);
     LOGF("Element End called in:'%s'\n", efl_class_name_get(current_class));
@@ -278,10 +263,6 @@ _xml_sax_base_element_end(Eo *obj, Xml_Base_Data *pd, Element_Data *data)
     if (handler)
     {
         xml_sax_base_element_end(handler, data);
-    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
-        xml_sax_base_element_end(obj, data);
-    } else {
-        // Do nothing for the moment
     }
 }
 
@@ -296,10 +277,6 @@ _xml_sax_base_document_end(Eo *obj, Xml_Base_Data *pd, void *data)
     if (handler)
     {
         xml_sax_base_document_end(handler, data);
-    } else if(EO_CLASS != XML_SAX_BASE_CLASS) {
-        xml_sax_base_document_end(obj, data);
-    } else {
-        // Do nothing for the moment
     }
 }
 

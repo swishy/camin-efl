@@ -1,5 +1,5 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
+#include <Eina.h>
 #include <common.h>
 #include "xml_sax_base.eo.h"
 #include "amin.eo.h"
@@ -40,8 +40,7 @@ _amin_parse(const Eo *obj, Amin_Data *pd, const char *profile)
     xml_sax_base_handler_set(xml_base, machine_spec);
 
 
-    LOG("Kicking parser into action....");
-
+    EINA_LOG_DBG("Kicking parser into action");
     // TODO Move to struct once declared at completeion of machine_spec.
     Amin_Machine_Spec_Document *spec;
 

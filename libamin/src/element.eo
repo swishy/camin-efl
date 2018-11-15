@@ -1,0 +1,87 @@
+class Element (Efl.Object)
+{
+   data: Element_Data;
+      methods {
+        @property context {
+           set { [[This sets the current context]]
+           }
+           get { [[This gets the current context]]
+           }
+           values {
+              context: void_ptr; [[The context pointer]]
+           }
+        }
+        @property localname {
+           set {
+           }
+           get {
+           }
+           values {
+              localname: string;
+           }
+        }
+        @property prefix {
+           set {
+           }
+           get {
+           }
+           values {
+              prefix: string;
+           }
+        }
+        @property uri {
+           set {
+           }
+           get {
+           }
+           values {
+              uri: string;
+           }
+        }
+        @property namespaces {
+           set {
+           }
+           get {
+           }
+           values {
+              namespaces: string;
+           }
+        }
+        @property attributes {
+           set {
+           }
+           get {
+           }
+           values {
+              attributes: string;
+           }
+        }
+        @property nb_namespaces {
+           set {
+           }
+           get {
+           }
+           values {
+              nb_namespaces: int;
+           }
+        }
+        @property nb_attributes {
+           set {
+           }
+           get {
+           }
+           values {
+              nb_attributes: int;
+           }
+        }
+        @property nb_defaulted {
+           set {
+           }
+           get {
+           }
+           values {
+              nb_defaulted: int;
+           }
+        }
+      }
+}

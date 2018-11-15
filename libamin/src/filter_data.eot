@@ -1,0 +1,10 @@
+struct Filter.Data
+{
+    [[This contains the parsed definition of an Amin machine filter.]]
+    name: string; [[The command or action the filter will perform]]
+    namespace: string;[[The namespace the filter resides / acts within ie amin, axa, acid, <your kewl app namespace> etc]]
+    element: string;[[The XML element the filter handles]]
+    position: string;[[The point in the chain the filter is designed to execute within, begin / middle / end]]
+    download: string;[[URL to a prebuilt filter ...]]
+    version: string;[[The version of the filter.]]
+}

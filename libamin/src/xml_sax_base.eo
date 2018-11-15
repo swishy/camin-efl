@@ -1,3 +1,4 @@
+import element;
 class Xml.Sax.Base (Efl.Object)
 {
    data: Xml_Base_Data;
@@ -8,7 +9,7 @@ class Xml.Sax.Base (Efl.Object)
         get { [[This gets the handler of the XSB object if set]]
         }
         values {
-           handler: Efl.Object; [[The handler for the current XSB instance]]
+           handler: Xml.Sax.Base; [[The handler for the current XSB instance]]
         }
      }
      @property content_handler {
@@ -17,7 +18,7 @@ class Xml.Sax.Base (Efl.Object)
        get { [[This gets the current content handler if set]]
        }
        values {
-           handler: Efl.Object; [[The content handler for the current XSB instance]]
+           handler: Xml.Sax.Base; [[The content handler for the current XSB instance]]
        }
      }
      @property document_handler {
@@ -26,12 +27,12 @@ class Xml.Sax.Base (Efl.Object)
        get { [[This gets the current document handler]]
        }
        values {
-           handler: Efl.Object; [[The document handler for the current XSB instance]]
+           handler: Xml.Sax.Base; [[The document handler for the current XSB instance]]
        }
      }
       parse_string { [[This method starts the parsing process of the XML document passed in]]
          params {
-            @in document: char; [[The XML Document to parse]]
+            @in document: string; [[The XML Document to parse]]
          }
          return: Efl.Object; [[Can return any Eo object]]
       }
@@ -48,7 +49,7 @@ class Xml.Sax.Base (Efl.Object)
       }
       element_start { [[Called when XML node element start is hit]]
         params {
-          @in data: Element.Data;
+          data: Element;
         }
       }
       element_char { [[Called when XML characters are found within an element]]
@@ -60,7 +61,7 @@ class Xml.Sax.Base (Efl.Object)
       }
       element_end { [[Called when the end of an XML element is hit]]
         params {
-            @in data: Element.Data;
+            @in data: Element;
         }
       }
       document_end { [[Called when XML end document is hit]]

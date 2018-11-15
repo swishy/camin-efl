@@ -1,7 +1,5 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include <common.h>
-#include "element_data.eot.h"
 #include "xml_sax_base.eo.h"
 #include "amin_elt.eo.h"
 #include "amin_machine_spec_document.eo.h"
@@ -59,14 +57,14 @@ _amin_machine_spec_document_xml_sax_base_document_start(Eo *obj, Spec_Data *pd, 
 }
 
 EOLIAN static void
-_amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element_Data *data)
+_amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element *data)
 {
     int i;
 
-    const char *localname = data->localname;
-    LOGF ( "Localname is : %s %s", localname, __func__ );
+    //const char *localname = data->localname;
+    //LOGF ( "Localname is : %s %s", localname, __func__ );
 
-    pd->localname = localname;
+   // pd->localname = localname;
 
     // Get Module Name
     /**if ( strncmp ( localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 || strncmp ( localname,BUNDLE_TAG,sizeof ( BUNDLE_TAG ) ) == 0 )
@@ -185,7 +183,7 @@ _amin_machine_spec_document_xml_sax_base_element_char(Eo *obj, Spec_Data *pd, vo
 }
 
 EOLIAN static void
-_amin_machine_spec_document_xml_sax_base_element_end(Eo *obj, Spec_Data *pd, Element_Data *data)
+_amin_machine_spec_document_xml_sax_base_element_end(Eo *obj, Spec_Data *pd, Element *data)
 {
 
 }

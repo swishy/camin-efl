@@ -1,4 +1,3 @@
-#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include "common.h"
 #include "xml_sax_base.eo.h"
@@ -40,7 +39,7 @@ _amin_machine_spec_xml_sax_base_document_start(Eo *obj, Spec_Data *pd, void *use
 }
 
 EOLIAN static void
-_amin_machine_spec_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element_Data *data)
+_amin_machine_spec_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, Element *data)
 {
 
 }
