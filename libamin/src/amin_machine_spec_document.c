@@ -64,17 +64,15 @@ _amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, E
     int i;
 
     EINA_LOG_DBG("Amin Machine Spec Document Element Start");
-
-    //const char *localname = data->localname;
-    //LOGF ( "Localname is : %s %s", localname, __func__ );
-
-   // pd->localname = localname;
+    const char *localname = element_localname_get(data);
+    pd->localname = localname;
+    EINA_LOG_DBG("Localname: %s", pd->localname);
 
     // Get Module Name
-    /**if ( strncmp ( localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 || strncmp ( localname,BUNDLE_TAG,sizeof ( BUNDLE_TAG ) ) == 0 )
+    if ( strncmp ( localname,FILTER_TAG,sizeof ( FILTER_TAG ) ) == 0 || strncmp ( localname,BUNDLE_TAG,sizeof ( BUNDLE_TAG ) ) == 0 )
     {
-        int nb_attributes = element_nb_attributes_get(element);
-        const char *attributes = element_attributes_get(element);
+        int nb_attributes = element_nb_attributes_get(data);
+        const char *attributes = element_attributes_get(data);
         if ( nb_attributes > 0 )
         {
             int i = 0;
@@ -98,16 +96,17 @@ _amin_machine_spec_document_xml_sax_base_element_start(Eo *obj, Spec_Data *pd, E
         }
     }
 
-    if ( strncmp ( localname,GENERATOR_TAG,sizeof ( GENERATOR_TAG ) ) == 0 )
+    /**if ( strncmp ( localname,GENERATOR_TAG,sizeof ( GENERATOR_TAG ) ) == 0 )
     {
-        if ( element->nb_attributes > 0 )
+        if ( data->nb_attributes > 0 )
         {
             int i = 0;
             int attribute_position = 0;
+
             char *parse_value;
 
             // Get values from attributes
-            while ( i < element->nb_attributes )
+            while ( i < nb_attributes )
             {
                 if ( element->attributes[attribute_position] != NULL )
                 {
@@ -184,7 +183,10 @@ EOLIAN static void
 _amin_machine_spec_document_xml_sax_base_element_char(Eo *obj, Spec_Data *pd, void *data, const char *string, int string_len)
 {
     EINA_LOG_DBG("Amin Machine Spec Document char");
-    EINA_LOG_DBG("Char: %s", string);
+    // EINA_LOG_DBG("Char: %s %d", string, string_len);
+    char *contents = malloc(string_len + 1);
+    eina_strlcpy(contents, string, string_len + 1);
+    EINA_LOG_DBG("Char: %s\n Length: %d", contents, string_len);
 }
 
 EOLIAN static void

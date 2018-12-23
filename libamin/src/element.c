@@ -1,3 +1,4 @@
+#define EFL_BETA_API_SUPPORT
 #include <Eo.h>
 #include "element.eo.h"
 
@@ -7,8 +8,8 @@ typedef struct
     const char *localname;
     const char *prefix;
     const char *uri;
-    const char *namespaces;
-    const char *attributes;
+    const char **namespaces;
+    const char **attributes;
     int nb_namespaces;
     int nb_attributes;
     int nb_defaulted;

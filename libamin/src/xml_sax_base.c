@@ -67,23 +67,23 @@ _libxml2_start(
         const xmlChar **attributes )
 {
     // Here we grab current filter
-    Eo *filter = (Eo*)ctx;
+    Xml_Sax_Base *filter = (Xml_Sax_Base*)ctx;
 
     LOG("libxml2 start el callback");
 
     // Populate struct to pass around
-    /**Element_Data *element_data;
-    element_data->localname = (const char*)localname;
-    element_data->ctx = ctx;
-    element_data->prefix = (const char*)prefix;
-    element_data->URI = (const char*)URI;
-    element_data->attributes = (const char *) attributes;
-    element_data->nb_namespaces = nb_namespaces;
-    element_data->nb_attributes = nb_attributes;
-    element_data->nb_defaulted = nb_defaulted;
+    Element *data = efl_new(ELEMENT_CLASS);
+    element_localname_set(data, (const char *) localname);
+    element_context_set(data, ctx);
+    element_prefix_set(data, (const char *) prefix);
+    element_uri_set(data, (const char *) URI);
+    element_attributes_set(data, (const char *) attributes);
+    element_nb_defaulted_set(data, nb_defaulted);
+    element_nb_attributes_set(data, nb_attributes);
+    element_nb_namespaces_set(data, nb_namespaces);
 
     // Fire in the hole!
-    xml_sax_base_element_start(filter, element_data);*/
+    xml_sax_base_element_start(filter, data);
 }
 
 static void
@@ -105,16 +105,18 @@ _libxml2_end(
         const xmlChar* URI)
 {
     // Here we grab current filter and private data for such
-    Eo *filter = (Eo*)ctx;
+    // Populate struct to pass around
 
-    //Element_Data *element_data;
-    //element_data->localname = (const char*)localname;
-    //element_data->ctx = ctx;
-    //element_data->prefix = (const char*)prefix;
-    //element_data->URI = (const char*)URI;
+    Xml_Sax_Base *filter = (Xml_Sax_Base*)ctx;
+
+    Element *data = efl_new(ELEMENT_CLASS);
+    element_localname_set(data, (const char *) localname);
+    element_context_set(data, ctx);
+    element_prefix_set(data, (const char *) prefix);
+    element_uri_set(data, (const char *) URI);
 
     // Fire in the hole!
-    //xml_sax_base_element_end(filter, element_data);
+    xml_sax_base_element_end(filter, data);
 }
 
 EOLIAN static void
